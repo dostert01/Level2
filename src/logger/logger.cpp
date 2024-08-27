@@ -67,5 +67,10 @@ void Logger::addLoggingDestination(std::unique_ptr<LoggingDestination> destinati
   loggingDestinations.push_back(std::move(destination));
 }
 
+void Logger::setLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
+  removeAllDestinations();
+  addLoggingDestination(std::move(destination));
+}
+
 
 }  // namespace second_take
