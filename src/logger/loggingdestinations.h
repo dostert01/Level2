@@ -2,6 +2,7 @@
 #define LOGGING_DESTINATIONS_H
 
 #include <string>
+#include <memory>
 
 #include "loglevels.h"
 
@@ -26,6 +27,12 @@ class LoggingDestinationStdOut : public LoggingDestination {
 
  private:
   LogLevelStringMapper loglevelMapper;
+};
+
+class LoggingDestinationFactory {
+ public:
+  LoggingDestinationFactory() = default;
+  std::unique_ptr<LoggingDestination> createDestinationStdOut();
 };
 
 }  // namespace second_take

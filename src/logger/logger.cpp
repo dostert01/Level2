@@ -7,9 +7,8 @@ namespace second_take {
 
 Logger::Logger() {
   timeProvider = std::make_unique<DefaultTimeProvider>();
-  std::unique_ptr<LoggingDestination> destination(
-      new LoggingDestinationStdOut());
-  loggingDestinations.push_back(std::move(destination));
+  LoggingDestinationFactory destinationFactory = LoggingDestinationFactory();
+  addLoggingDestination(destinationFactory.createDestinationStdOut());
 }
 
 Logger::~Logger() {}
@@ -55,5 +54,18 @@ void Logger::doLogging(const LogLevel &logLevel, const std::string &message) {
     currentLoggingDestination->doLogging(logLevel, message, timestamp);
   }
 }
+
+void Logger::removeAllDestinations() {
+  loggingDestinations.clear();
+}
+
+std::size_t Logger::getCountOfLoggingDestinations() {
+  return loggingDestinations.size();
+}
+
+void Logger::addLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
+  loggingDestinations.push_back(std::move(destination));
+}
+
 
 }  // namespace second_take

@@ -1,8 +1,14 @@
-#include "loggingdestinations.h"
-
 #include <iostream>
 
+#include "loggingdestinations.h"
+
 namespace second_take {
+
+std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestinationStdOut() {
+    std::unique_ptr<LoggingDestination> destination(
+      new LoggingDestinationStdOut());
+    return destination;
+}
 
 LoggingDestination::~LoggingDestination() {}
 

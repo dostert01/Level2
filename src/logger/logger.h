@@ -25,6 +25,9 @@ class DLL_PUBLIC Logger {
   void warn(const std::string &message);
   void error(const std::string &message);
   void fatal(const std::string &message);
+  void removeAllDestinations();
+  std::size_t getCountOfLoggingDestinations();
+  void addLoggingDestination(std::unique_ptr<LoggingDestination> destination);
 
  private:
   Logger();

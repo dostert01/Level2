@@ -1,5 +1,9 @@
 # Tests hinzufügen
-add_executable(test_secondTake test_secondTake.cpp test_logger.cpp test_timeproviders.cpp)
+add_executable(test_secondTake
+    test_secondTake.cpp
+    test_logger.cpp
+    test_timeproviders.cpp
+    test_loggingdestinations.cpp)
 
 # Include the necessary directories
 target_include_directories(test_secondTake PRIVATE
