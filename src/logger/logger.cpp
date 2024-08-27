@@ -6,6 +6,7 @@
 namespace second_take {
 
 Logger::Logger() {
+  logLevelStringMapper = LogLevelStringMapper();
   setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
   timeProvider = std::make_unique<DefaultTimeProvider>();
   LoggingDestinationFactory destinationFactory = LoggingDestinationFactory();
@@ -49,7 +50,21 @@ void Logger::fatal(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_FATAL, message);
 }
 
+void Logger::checkLogLevelInEnvironment() {
+  const char* maxLogLevelFromEnv = getenv(MAX_LOG_LEVEL_ENV_VAR_NAME);
+  if(maxLogLevelFromEnv != NULL) {
+    std::optional<LogLevel> level = logLevelStringMapper.string2LogLevel(maxLogLevelFromEnv);
+    if(level.has_value()){
+      maxLogLevel = level.value();
+    } else {
+      std::cerr << "Warning: Unknown log level string found in environment: " <<
+        MAX_LOG_LEVEL_ENV_VAR_NAME << " = " << maxLogLevelFromEnv << std::endl;
+    }
+  }
+}
+
 bool Logger::logThisLevel(const LogLevel &logLevel) {
+  checkLogLevelInEnvironment();
   return (logLevel <= maxLogLevel);
 }
 

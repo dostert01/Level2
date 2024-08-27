@@ -36,9 +36,11 @@ class DLL_PUBLIC Logger {
   std::unique_ptr<TimeProvider> timeProvider;
   std::vector<std::unique_ptr<LoggingDestination>> loggingDestinations;
   LogLevel maxLogLevel;
+  LogLevelStringMapper logLevelStringMapper;
 
   void doLogging(const LogLevel &logLevel, const std::string &message);
   bool logThisLevel(const LogLevel &logLevel);
+  void checkLogLevelInEnvironment();
 };
 
 }  // namespace second_take

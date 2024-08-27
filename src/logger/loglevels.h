@@ -15,6 +15,8 @@ namespace second_take {
 #define LOG_PREFIX_FATAL "FATAL"
 #define LOG_PREFIX_NO_LOGGING "NO_LOGGING"
 
+#define MAX_LOG_LEVEL_ENV_VAR_NAME "SECOND_TAKE_MAX_LOG_LEVEL"
+
 enum class LogLevel {
   LOG_LEVEL_TRACE = 6,
   LOG_LEVEL_DEBUG = 5,
