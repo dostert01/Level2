@@ -3,6 +3,7 @@
 #include <regex>
 #include <fstream>
 #include <filesystem>
+#include <vector>
 #include "logger.h"
 
 TEST(LoggingDestinations, DefaultIsStdOut) {
@@ -70,4 +71,46 @@ TEST(LoggingDestinations, CanLogToAFile) {
     if(!std::filesystem::remove(fileName)) {
         std::cerr << "Waring: failed to remove test log file at: " << fileName << std::endl;
     }
+}
+
+void readSyslog(std::vector<std::string>& syslogBuffered) {
+    std::ifstream syslogFile("/var/log/syslog");
+    if(!syslogFile.is_open()){
+        syslogFile.open("/var/log/messages");
+    }
+    if(syslogFile.is_open()){
+        std::string currentLine;
+        while(std::getline(syslogFile, currentLine)){
+            if(!currentLine.empty()){
+                syslogBuffered.push_back(currentLine);
+            }
+        }
+        syslogFile.close();
+    }
+}
+
+bool stringPresentInSyslog(const std::string logString) {
+    std::vector<std::string> syslog;
+    readSyslog(syslog);
+    std::regex regex(logString);
+    bool found = false;
+    for(std::string currentLine : syslog){
+        found = std::regex_search(currentLine, regex);
+        if(found) {
+            std::cout << "line found in syslog: " << currentLine << std::endl;
+            break;
+        }
+    }
+    return found;
+}
+
+TEST(LoggingDestinations, CanLogToSyslog) {
+    std::string fileName = "./testFile.log";
+    second_take::Logger& logger = second_take::Logger::getInstance();
+    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    logger.setLoggingDestination(factory.createDestinationSyslog("testapp"));
+    second_take::DefaultTimeProvider timeProvider;
+    std::string logString = "Hello Log at " + timeProvider.getTimeStampOfNow();
+    logger.error(logString);
+    EXPECT_TRUE(stringPresentInSyslog(logString));
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <syslog.h>
 
 #include "loggingdestinations.h"
 
@@ -31,6 +32,33 @@ void LoggingDestinationStdErr::doLogging(const LogLevel &logLevel,
 }
 
 //-------------------------------------------------------------------
+LoggingDestinationSyslog::LoggingDestinationSyslog(const std::string applicationName) {
+    syslogIdent = applicationName;
+    openlog(syslogIdent.c_str(), LOG_PID | LOG_CONS, LOG_USER);
+}
+
+LoggingDestinationSyslog::~LoggingDestinationSyslog() {
+    closelog();
+}
+
+void LoggingDestinationSyslog::doLogging(const LogLevel &logLevel,
+                                         const std::string &message,
+                                         const std::string &timestamp) {
+    if(logLevel == LogLevel::LOG_LEVEL_DEBUG)
+        syslog(LOG_DEBUG, "%s", message.c_str());
+    else if(logLevel == LogLevel::LOG_LEVEL_ERROR)
+        syslog(LOG_ERR, "%s", message.c_str());
+    else if(logLevel == LogLevel::LOG_LEVEL_FATAL)
+        syslog(LOG_CRIT, "%s", message.c_str());
+    else if(logLevel == LogLevel::LOG_LEVEL_INFO)
+        syslog(LOG_INFO, "%s", message.c_str());
+    else if(logLevel == LogLevel::LOG_LEVEL_TRACE)
+        syslog(LOG_DEBUG, "%s", message.c_str());
+    else if(logLevel == LogLevel::LOG_LEVEL_WARN)
+        syslog(LOG_WARNING, "%s", message.c_str());
+}
+
+//-------------------------------------------------------------------
 LoggingDestinationFile::LoggingDestinationFile(const std::string fileName){
     logFileName = fileName;
 }
@@ -55,6 +83,12 @@ std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestination
 std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestinationStdErr() {
     std::unique_ptr<LoggingDestination> destination(
       new LoggingDestinationStdErr());
+    return destination;
+}
+
+std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestinationSyslog(const std::string applicationName) {
+    std::unique_ptr<LoggingDestination> destination(
+      new LoggingDestinationSyslog(applicationName));
     return destination;
 }
 

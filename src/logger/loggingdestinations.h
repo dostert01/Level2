@@ -35,6 +35,17 @@ class LoggingDestinationStdOut : public LoggingDestination {
 };
 
 //-------------------------------------------------------------------
+class LoggingDestinationSyslog : public LoggingDestination {
+ public:
+    LoggingDestinationSyslog(const std::string applicationName);
+    ~LoggingDestinationSyslog();
+    void doLogging(const LogLevel& logLevel, const std::string& message,
+                 const std::string& timestamp) override;
+  private:
+    std::string syslogIdent;
+};
+
+//-------------------------------------------------------------------
 class LoggingDestinationStdErr : public LoggingDestinationStdOut {
  public:
   void doLogging(const LogLevel& logLevel, const std::string& message,
@@ -58,6 +69,7 @@ class LoggingDestinationFactory {
   std::unique_ptr<LoggingDestination> createDestinationStdOut();
   std::unique_ptr<LoggingDestination> createDestinationStdErr();
   std::unique_ptr<LoggingDestination> createDestinationFile(const std::string fileName);
+  std::unique_ptr<LoggingDestination> createDestinationSyslog(const std::string applicationName);
 };
 
 }  // namespace second_take
