@@ -6,6 +6,7 @@
 namespace second_take {
 
 Logger::Logger() {
+  setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
   timeProvider = std::make_unique<DefaultTimeProvider>();
   LoggingDestinationFactory destinationFactory = LoggingDestinationFactory();
   addLoggingDestination(destinationFactory.createDestinationStdOut());
@@ -48,10 +49,16 @@ void Logger::fatal(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_FATAL, message);
 }
 
+bool Logger::logThisLevel(const LogLevel &logLevel) {
+  return (logLevel <= maxLogLevel);
+}
+
 void Logger::doLogging(const LogLevel &logLevel, const std::string &message) {
-  std::string timestamp = timeProvider->getTimeStampOfNow();
-  for (const auto &currentLoggingDestination : loggingDestinations) {
-    currentLoggingDestination->doLogging(logLevel, message, timestamp);
+  if(logThisLevel(logLevel)){
+    std::string timestamp = timeProvider->getTimeStampOfNow();
+    for (const auto &currentLoggingDestination : loggingDestinations) {
+      currentLoggingDestination->doLogging(logLevel, message, timestamp);
+    }
   }
 }
 
@@ -72,5 +79,8 @@ void Logger::setLoggingDestination(std::unique_ptr<LoggingDestination> destinati
   addLoggingDestination(std::move(destination));
 }
 
+void Logger::setMaxLogLevel(LogLevel logLevel) {
+  maxLogLevel = logLevel;
+}
 
 }  // namespace second_take

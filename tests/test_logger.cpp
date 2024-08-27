@@ -74,3 +74,36 @@ TEST(Logger, CanLogFatalToStdout) {
     std::regex regex("^\\[FATAL\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
     EXPECT_TRUE(std::regex_search(output, regex));
 }
+
+TEST(Logger, DoesNotLogInfoIfMaxLogLevelIsWarn) {
+    second_take::Logger& logger = second_take::Logger::getInstance();
+    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    testing::internal::CaptureStdout();
+    logger.info("Hello Log");
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("^\\[INFO\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_FALSE(std::regex_search(output, regex));
+}
+
+TEST(Logger, LogsWarnIfMaxLogLevelIsWarn) {
+    second_take::Logger& logger = second_take::Logger::getInstance();
+    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    testing::internal::CaptureStdout();
+    logger.warn("Hello Log");
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("^\\[WARN\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_TRUE(std::regex_search(output, regex));
+}
+
+TEST(Logger, LogsErrorIfMaxLogLevelIsWarn) {
+    second_take::Logger& logger = second_take::Logger::getInstance();
+    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    testing::internal::CaptureStdout();
+    logger.error("Hello Log");
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_TRUE(std::regex_search(output, regex));
+}

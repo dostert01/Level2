@@ -16,13 +16,13 @@ namespace second_take {
 #define LOG_PREFIX_NO_LOGGING "NO_LOGGING"
 
 enum class LogLevel {
-  LOG_LEVEL_TRACE = 0,
-  LOG_LEVEL_DEBUG = 1,
-  LOG_LEVEL_INFO = 2,
+  LOG_LEVEL_TRACE = 6,
+  LOG_LEVEL_DEBUG = 5,
+  LOG_LEVEL_INFO = 4,
   LOG_LEVEL_WARN = 3,
-  LOG_LEVEL_ERROR = 4,
-  LOG_LEVEL_FATAL = 5,
-  LOG_LEVEL_NO_LOGGING = 6
+  LOG_LEVEL_ERROR = 2,
+  LOG_LEVEL_FATAL = 1,
+  LOG_LEVEL_NO_LOGGING = 0
 };
 
 class LogLevelStringMapper {

@@ -29,13 +29,16 @@ class DLL_PUBLIC Logger {
   std::size_t getCountOfLoggingDestinations();
   void addLoggingDestination(std::unique_ptr<LoggingDestination> destination);
   void setLoggingDestination(std::unique_ptr<LoggingDestination> destination);
+  void setMaxLogLevel(LogLevel logLevel);
 
  private:
   Logger();
   std::unique_ptr<TimeProvider> timeProvider;
   std::vector<std::unique_ptr<LoggingDestination>> loggingDestinations;
+  LogLevel maxLogLevel;
 
   void doLogging(const LogLevel &logLevel, const std::string &message);
+  bool logThisLevel(const LogLevel &logLevel);
 };
 
 }  // namespace second_take
