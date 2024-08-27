@@ -69,6 +69,7 @@ bool Logger::logThisLevel(const LogLevel &logLevel) {
 }
 
 void Logger::doLogging(const LogLevel &logLevel, const std::string &message) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   if(logThisLevel(logLevel)){
     std::string timestamp = timeProvider->getTimeStampOfNow();
     for (const auto &currentLoggingDestination : loggingDestinations) {
@@ -78,14 +79,17 @@ void Logger::doLogging(const LogLevel &logLevel, const std::string &message) {
 }
 
 void Logger::removeAllDestinations() {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   loggingDestinations.clear();
 }
 
 std::size_t Logger::getCountOfLoggingDestinations() {
+  std::shared_lock<std::shared_mutex> lock(mutex);
   return loggingDestinations.size();
 }
 
 void Logger::addLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   loggingDestinations.push_back(std::move(destination));
 }
 
@@ -95,6 +99,7 @@ void Logger::setLoggingDestination(std::unique_ptr<LoggingDestination> destinati
 }
 
 void Logger::setMaxLogLevel(LogLevel logLevel) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   maxLogLevel = logLevel;
 }
 

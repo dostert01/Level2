@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <shared_mutex>
 
 #include "loggingdestinations.h"
 #include "loglevels.h"
@@ -37,6 +38,7 @@ class DLL_PUBLIC Logger {
   std::vector<std::unique_ptr<LoggingDestination>> loggingDestinations;
   LogLevel maxLogLevel;
   LogLevelStringMapper logLevelStringMapper;
+  std::shared_mutex mutex;
 
   void doLogging(const LogLevel &logLevel, const std::string &message);
   bool logThisLevel(const LogLevel &logLevel);
