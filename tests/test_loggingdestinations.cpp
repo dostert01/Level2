@@ -4,7 +4,11 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include <unistd.h>
+
 #include "logger.h"
+
+#define ONE_SECOND 1000000
 
 TEST(LoggingDestinations, DefaultIsStdOut) {
     second_take::Logger& logger = second_take::Logger::getInstance();
@@ -91,6 +95,7 @@ void readSyslog(std::vector<std::string>& syslogBuffered) {
 
 bool stringPresentInSyslog(const std::string logString) {
     std::vector<std::string> syslog;
+    usleep(ONE_SECOND);
     readSyslog(syslog);
     std::regex regex(logString);
     bool found = false;
