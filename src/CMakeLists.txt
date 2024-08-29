@@ -18,6 +18,7 @@ add_executable(secondTake main.cpp)
 # Include the necessary directories
 target_include_directories(secondTake PRIVATE
     ${CMAKE_SOURCE_DIR}/src/logger
+    ${CMAKE_SOURCE_DIR}/src/pipeline
 )
 
 target_link_libraries(secondTake PRIVATE sndtakelogger)

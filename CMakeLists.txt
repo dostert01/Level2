@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Google Test hinzufügen
 add_subdirectory(src)
 add_subdirectory(src/logger)
+add_subdirectory(src/pipeline)
 add_subdirectory(googletest)
 
 # Tests hinzufügen

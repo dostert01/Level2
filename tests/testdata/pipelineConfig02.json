@@ -1,0 +1,11 @@
+{
+    "name" : "incomplete testPipeline",
+    "pipelineSteps" : [
+        {
+            "stepName":"testStep01"
+        },
+        {
+            "libraryName":"sayHelloWorld"
+        }
+    ]
+}

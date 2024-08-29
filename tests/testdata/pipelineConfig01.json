@@ -1,0 +1,13 @@
+{
+    "name" : "my first testPipeline",
+    "pipelineSteps" : [
+        {
+            "stepName":"testStep01",
+            "libraryName":"sayHelloWorld"
+        },
+        {
+            "stepName":"testStep02",
+            "libraryName":"sayHelloWorld"
+        }
+    ]
+}
