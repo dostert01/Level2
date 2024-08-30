@@ -36,8 +36,9 @@ TEST(PipeLine, ReturnsEmptyIfLoadingFails) {
     EXPECT_FALSE(pipeline1.has_value());
 }
 
-TEST(PipeLine, RejectsLoadingIncompleteDefinitions) {
+
+TEST(PipeLine, PipelineHasName) {
     configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_02);
-    EXPECT_FALSE(pipeline1.has_value());
+    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    EXPECT_TRUE(pipeline1.value()->getPipelineName() == "my first testPipeline");
 }

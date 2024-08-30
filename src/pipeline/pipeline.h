@@ -36,9 +36,13 @@ class Pipeline {
         static std::unique_ptr<Pipeline> getInstance();
         static std::optional<std::unique_ptr<Pipeline>> getInstance(const std::string configFilePath);
         uint getCountOfPipelineSteps();
+        void setPipelineName(const std::string& pipelineName);
+        std::string getPipelineName();
     private:
+        std::string pipelineName;
         std::vector<std::unique_ptr<PipelineStep>> pipelineSteps;
         void loadPipelineConfig(const std::string& configFilePath);
+        void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);
 };
 

@@ -8,6 +8,7 @@
 namespace second_take {
 
 #define UNDEFINED_JSON_DATA "undefined"
+#define JSON_PROPERTY_PIPELINE_NAME "pipelineName"
 #define JSON_PROPERTY_PIPELINE_STEPS "pipelineSteps"
 #define JSON_PROPERTY_STEP_NAME "stepName"
 #define JSON_PROPERTY_LIBRARY_NAME "libraryName"
@@ -22,7 +23,6 @@ std::optional<std::unique_ptr<Pipeline>> Pipeline::getInstance(const std::string
     try {
         instance.get()->loadPipelineConfig(configFilePath);
     } catch (const std::exception& e) {
-        //std::cout << "Failed loading pipeline configuration from " << configFilePath << " : " << e.what() << std::endl;
         second_take::Logger::getInstance().error("Failed loading pipeline configuration from " + configFilePath + " : " + e.what());
         return std::nullopt;
     }
@@ -33,13 +33,31 @@ uint Pipeline::getCountOfPipelineSteps() {
     return pipelineSteps.size();
 }
 
+std::string Pipeline::getPipelineName() {
+    return pipelineName;
+}
+
+void Pipeline::setPipelineName(const std::string& pipelineName) {
+    this->pipelineName = pipelineName;
+}
+
 void Pipeline::loadPipelineConfig(const std::string& configFilePath) {
     try {
         std::ifstream jsonFile(configFilePath);
         json jsonData = json::parse(jsonFile);
+        jsonFile.close();
+        loadPipelineMetaData(jsonData);
         loadPipelineSteps(jsonData);
     } catch (const std::exception& e) {
         throw;
+    }
+}
+
+void Pipeline::loadPipelineMetaData(const json& jsonData) {
+    if(jsonData.contains(JSON_PROPERTY_PIPELINE_NAME)) {
+        setPipelineName(jsonData.value(JSON_PROPERTY_PIPELINE_NAME, UNDEFINED_JSON_DATA));
+    } else {
+        throw PipelineException("Failed to load pipeline metadata. pipelineName not set");
     }
 }
 

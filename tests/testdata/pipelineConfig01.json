@@ -1,5 +1,5 @@
 {
-    "name" : "my first testPipeline",
+    "pipelineName" : "my first testPipeline",
     "pipelineSteps" : [
         {
             "stepName":"testStep01",
