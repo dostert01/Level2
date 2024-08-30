@@ -11,8 +11,9 @@ add_executable(test_secondTake
 
 # Include the necessary directories
 target_include_directories(test_secondTake PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/logger
-    ${CMAKE_SOURCE_DIR}/src/pipeline
+    ${CMAKE_SOURCE_DIR}/framework/src/logger
+    ${CMAKE_SOURCE_DIR}/framework/src/pipeline
+    ${CMAKE_SOURCE_DIR}/_deps/json-src/single_include/
 )
 
 # GTest und GTest Main hinzufügen
