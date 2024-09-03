@@ -6,6 +6,8 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
+#include "pipelineapi.h"
+
 using json = nlohmann::json;
 
 namespace second_take {
@@ -19,15 +21,28 @@ class PipelineException : public std::exception {
         std::string message;
 }; 
 
+using LibInitFunction = int (*)(LibInitData* initData);
+using LibProcessFunction = int (*)(LibProcessingData* initData);
+using LibFinishFunction = int (*)();
+
 class PipelineStep {
     public:
         PipelineStep() = default;
         void setStepName(const std::string stepName);
+        std::string getStepName();
         void setLibraryName(const std::string libraryName);
         bool isInitComplete();
+        LibInitFunction getInitFunction() const;
+        LibProcessFunction getProcessFunction() const;
+        LibFinishFunction getFinishFunction() const;
+        void loadLib();
     private:
         std::string stepName;
         std::string libraryName;
+        void *hLib;
+        LibInitFunction libInit;
+        LibProcessFunction libProcess;
+        LibFinishFunction libFinish;
 };
 
 class Pipeline {
@@ -36,6 +51,7 @@ class Pipeline {
         static std::unique_ptr<Pipeline> getInstance();
         static std::optional<std::unique_ptr<Pipeline>> getInstance(const std::string configFilePath);
         uint getCountOfPipelineSteps();
+        std::optional<PipelineStep*> getStepByName(const std::string& stepName);
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
     private:

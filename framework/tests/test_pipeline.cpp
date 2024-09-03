@@ -42,3 +42,16 @@ TEST(PipeLine, PipelineHasName) {
     std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.value()->getPipelineName() == "my first testPipeline");
 }
+
+TEST(PipeLine, CanLoadTheHelloWordLib) {
+    configureLogger();
+    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<PipelineStep*> pipelineStep = pipeline1.value()->getStepByName("test Step 02");
+    EXPECT_TRUE(pipelineStep.has_value());
+    if(pipelineStep.has_value()) {
+        PipelineStep* currentStep = pipelineStep.value();
+        EXPECT_TRUE(currentStep->getInitFunction() != NULL);
+        EXPECT_TRUE(currentStep->getProcessFunction() != NULL);
+        EXPECT_TRUE(currentStep->getFinishFunction() != NULL);
+    }
+}

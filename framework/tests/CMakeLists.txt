@@ -20,7 +20,8 @@ target_include_directories(test_secondTake PRIVATE
 target_link_libraries(test_secondTake 
     gtest
     gtest_main
-    sndtakelogger)
+    sndtakelogger
+    dl)
 
 # Tests registrieren
 add_test(NAME test_secondTake COMMAND test_secondTake)

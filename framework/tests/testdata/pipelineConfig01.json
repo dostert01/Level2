@@ -2,12 +2,12 @@
     "pipelineName" : "my first testPipeline",
     "pipelineSteps" : [
         {
-            "stepName":"testStep01",
-            "libraryName":"sayHelloWorld"
+            "stepName":"test Step 01",
+            "libraryName":"helloWorld"
         },
         {
-            "stepName":"testStep02",
-            "libraryName":"sayHelloWorld"
+            "stepName":"test Step 02",
+            "libraryName":"helloWorld"
         }
     ]
 }

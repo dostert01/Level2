@@ -10,11 +10,10 @@
 #include "loggingdestinations.h"
 #include "loglevels.h"
 #include "timeproviders.h"
-#include "visibility.h"
 
 namespace second_take {
 
-class DLL_PUBLIC Logger {
+class Logger {
  public:
   virtual ~Logger();
   static Logger &getInstance();
