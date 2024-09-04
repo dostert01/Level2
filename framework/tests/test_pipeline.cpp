@@ -2,6 +2,8 @@
 #include <memory>
 #include <unistd.h>
 #include <iostream>
+#include <regex>
+#include <fstream>
 #include "pipeline.h"
 #include "../logger/logger.h"
 
@@ -10,6 +12,7 @@ using namespace second_take;
 #define TEST_DATA_DIR "testdata"
 #define PIPELINE_CONFIG_TEST_FILE_01 TEST_DATA_DIR "/pipelineConfig01.json"
 #define PIPELINE_CONFIG_TEST_FILE_02 TEST_DATA_DIR "/pipelineConfig02.json"
+#define PIPELINE_CONFIG_TEST_FILE_03 TEST_DATA_DIR "/pipelineConfig03.json"
 
 void configureLogger() {
     Logger& logger = second_take::Logger::getInstance();
@@ -54,4 +57,23 @@ TEST(PipeLine, CanLoadTheHelloWordLib) {
         EXPECT_TRUE(currentStep->getProcessFunction() != NULL);
         EXPECT_TRUE(currentStep->getFinishFunction() != NULL);
     }
+}
+
+TEST(Pipeline, CanExecuteThePipeline) {
+    configureLogger();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    testing::internal::CaptureStdout();
+    pipeline.value()->execute();
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("Hello World");
+    EXPECT_TRUE(std::regex_search(output, regex));
+}
+
+TEST(Pipeline, CanUseArgumentsFromJson) {
+    configureLogger();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+    pipeline.value()->execute();
+    std::ifstream file01("./argumentsProcessor_output01.txt");
+    EXPECT_TRUE(file01.is_open());
 }

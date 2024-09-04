@@ -1,10 +1,10 @@
-#include "pipeline.h"
 #include <memory>
 #include <iostream>
 #include <fstream>
 #include <dlfcn.h>
 
 #include "../logger/logger.h"
+#include "pipeline.h"
 
 namespace second_take {
 
@@ -13,6 +13,7 @@ namespace second_take {
 #define JSON_PROPERTY_PIPELINE_STEPS "pipelineSteps"
 #define JSON_PROPERTY_STEP_NAME "stepName"
 #define JSON_PROPERTY_LIBRARY_NAME "libraryName"
+#define JSON_PROPERTY_NAMED_ARGUMENTS "namedArguments"
 
 std::unique_ptr<Pipeline> Pipeline::getInstance() {
     std::unique_ptr<Pipeline> instance = std::make_unique<Pipeline>();
@@ -32,6 +33,12 @@ std::optional<std::unique_ptr<Pipeline>> Pipeline::getInstance(const std::string
 
 uint Pipeline::getCountOfPipelineSteps() {
     return pipelineSteps.size();
+}
+
+void Pipeline::execute() {
+    for(const auto& currentStep : pipelineSteps) {
+        currentStep.get()->getProcessFunction()(NULL);
+    }
 }
 
 std::optional<PipelineStep*> Pipeline::getStepByName(const std::string& stepName) {
@@ -77,6 +84,7 @@ void Pipeline::loadPipelineSteps(const json& jsonData) {
             std::unique_ptr<PipelineStep> currentStep = std::make_unique<PipelineStep>();
             currentStep.get()->setStepName(step.value(JSON_PROPERTY_STEP_NAME, UNDEFINED_JSON_DATA));
             currentStep.get()->setLibraryName(step.value(JSON_PROPERTY_LIBRARY_NAME, UNDEFINED_JSON_DATA));
+            currentStep.get()->loadNamedArguments(step);
             try {
                 currentStep.get()->loadLib();
             } catch (const std::exception& e) {
@@ -94,6 +102,21 @@ void Pipeline::loadPipelineSteps(const json& jsonData) {
 }
 
 //-------------------------------------------------------------------
+PipelineStep::~PipelineStep() {
+    if(hLib != NULL) {
+        dlclose(hLib);
+        hLib = NULL;
+    }
+}
+
+void PipelineStep::loadNamedArguments(const json& jsonData) {
+    if(jsonData.contains(JSON_PROPERTY_NAMED_ARGUMENTS) && jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].is_object()) {
+        for (const auto& item : jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].items()) {
+            initData.namedArguments[item.key()] = item.value().get<std::string>();
+        }
+    }
+}
+
 void PipelineStep::setStepName(const std::string stepName) {
     this->stepName = stepName;
 }
@@ -124,6 +147,7 @@ void PipelineStep::loadLib() {
     if(libFinish == NULL) {
         throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_finish : "  + dlerror());
     }
+    getInitFunction()(&initData);
 }
 
 bool PipelineStep::isInitComplete() {

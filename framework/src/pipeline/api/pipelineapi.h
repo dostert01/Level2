@@ -1,9 +1,7 @@
 #ifndef SECOND_TAKE_PIPELINE_API_H
 #define SECOND_TAKE_PIPELINE_API_H
 
-#include <map>
-#include <memory>
-#include <string>
+#include "apihelpers.h"
 
 /** declare as extern "C" or not **/
 #ifdef BEGIN_DECL
@@ -19,16 +17,6 @@
 #define BEGIN_DECL              /* none */
 #define END_DECL                /* none */
 #endif
-
-struct LibInitData
-{
-    /* data */
-};
-
-struct LibProcessingData
-{
-    std::map<std::string, std::unique_ptr<std::string>> namedPayloadData;
-};
 
 BEGIN_DECL 
 int pipeline_step_module_init(LibInitData* initData);

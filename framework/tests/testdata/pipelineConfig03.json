@@ -1,0 +1,23 @@
+{
+    "pipelineName" : "my pipeline with arguments",
+    "pipelineSteps" : [
+        {
+            "stepName":"Step 01",
+            "libraryName":"helloWorld",
+            "namedArguments" : {
+                "first argument":"first hello from step 1",
+                "second argument":"second hello from step 1",
+                "outputFileName":"./argumentsProcessor_output01.txt"
+            }
+        },
+        {
+            "stepName":"test Step 02",
+            "libraryName":"argumentsProcessor",
+            "namedArguments" : {
+                "first argument" : "first hello from step 2",
+                "second argument" : "second hello from step 2",
+                "outputFileName" : "./argumentsProcessor_output02.txt"
+            }
+        }
+    ]
+}

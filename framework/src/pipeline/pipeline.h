@@ -28,6 +28,7 @@ using LibFinishFunction = int (*)();
 class PipelineStep {
     public:
         PipelineStep() = default;
+        ~PipelineStep();
         void setStepName(const std::string stepName);
         std::string getStepName();
         void setLibraryName(const std::string libraryName);
@@ -36,6 +37,7 @@ class PipelineStep {
         LibProcessFunction getProcessFunction() const;
         LibFinishFunction getFinishFunction() const;
         void loadLib();
+        void loadNamedArguments(const json& jsonData);
     private:
         std::string stepName;
         std::string libraryName;
@@ -43,6 +45,7 @@ class PipelineStep {
         LibInitFunction libInit;
         LibProcessFunction libProcess;
         LibFinishFunction libFinish;
+        LibInitData initData;
 };
 
 class Pipeline {
@@ -54,6 +57,7 @@ class Pipeline {
         std::optional<PipelineStep*> getStepByName(const std::string& stepName);
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
+        void execute();
     private:
         std::string pipelineName;
         std::vector<std::unique_ptr<PipelineStep>> pipelineSteps;
