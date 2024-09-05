@@ -25,7 +25,7 @@ std::optional<std::unique_ptr<Pipeline>> Pipeline::getInstance(const std::string
     try {
         instance.get()->loadPipelineConfig(configFilePath);
     } catch (const std::exception& e) {
-        second_take::Logger::getInstance().error("Failed loading pipeline configuration from " + configFilePath + " : " + e.what());
+        LOGGER.error("Failed loading pipeline configuration from " + configFilePath + " : " + e.what());
         return std::nullopt;
     }
     return instance;
@@ -37,7 +37,7 @@ uint Pipeline::getCountOfPipelineSteps() {
 
 void Pipeline::execute() {
     for(const auto& currentStep : pipelineSteps) {
-        currentStep.get()->getProcessFunction()(NULL);
+        currentStep.get()->runProcessFunction();
     }
 }
 
@@ -104,15 +104,19 @@ void Pipeline::loadPipelineSteps(const json& jsonData) {
 //-------------------------------------------------------------------
 PipelineStep::~PipelineStep() {
     if(hLib != NULL) {
-        dlclose(hLib);
-        hLib = NULL;
+        LOGGER.info("Unloading shared object from pipeline: " + this->libraryName);
+        if(dlclose(hLib) == 0) {
+            hLib = NULL;
+        } else {
+            LOGGER.error("Error during unloading of shared object from pipeline: " + this->libraryName + " : " + dlerror());
+        }
     }
 }
 
 void PipelineStep::loadNamedArguments(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_NAMED_ARGUMENTS) && jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].is_object()) {
         for (const auto& item : jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].items()) {
-            initData.namedArguments[item.key()] = item.value().get<std::string>();
+            initData.namedArguments.insert({item.key(), (item.value().get<std::string>())});
         }
     }
 }
@@ -131,9 +135,13 @@ void PipelineStep::setLibraryName(const std::string libraryName) {
 
 void PipelineStep::loadLib() {
     std::string libraryFileName = "lib" + libraryName + ".so";
-    hLib = dlopen(libraryFileName.c_str(), RTLD_LAZY);
-    if(hLib == NULL) {
-        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " : " + dlerror());
+    LOGGER.info("Loading shared object into pipeline: " + libraryFileName);
+    hLib = dlopen(libraryFileName.c_str(), RTLD_NOW);
+    char* error = dlerror();
+    if((hLib == NULL) && (error != NULL)) {
+        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " : " + error);
+    } else if((hLib != NULL) && (error != NULL)) {
+        throw PipelineException("Shared object " + libraryFileName + " loaded into pipeline with error : " + error);
     }
     libInit = (LibInitFunction)(dlsym(hLib, "pipeline_step_module_init"));
     if(libInit == NULL) {
@@ -147,7 +155,7 @@ void PipelineStep::loadLib() {
     if(libFinish == NULL) {
         throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_finish : "  + dlerror());
     }
-    getInitFunction()(&initData);
+    runInitFunction();
 }
 
 bool PipelineStep::isInitComplete() {
@@ -159,16 +167,16 @@ bool PipelineStep::isInitComplete() {
         (libFinish != NULL);
 }
 
-LibInitFunction PipelineStep::getInitFunction() const {
-    return libInit;
-};
-
-LibProcessFunction PipelineStep::getProcessFunction() const {
-    return libProcess;
+void PipelineStep::runInitFunction() {
+    libInit(&initData);
 }
 
-LibFinishFunction PipelineStep::getFinishFunction() const {
-    return libFinish;
+void PipelineStep::runProcessFunction() { 
+    libProcess(processData);
+}
+
+void PipelineStep::runFinishFunction() {
+    libFinish();
 }
 
 //-------------------------------------------------------------------

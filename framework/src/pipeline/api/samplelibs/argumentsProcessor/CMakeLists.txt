@@ -11,7 +11,6 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 # Specify the library
 add_library(argumentsProcessor SHARED
 argumentsProcessor.cpp)
-
 target_link_libraries(argumentsProcessor pipelineapi)
 
 # Specify the include directories for the library

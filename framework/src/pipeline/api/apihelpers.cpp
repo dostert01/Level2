@@ -1,10 +1,10 @@
 #include "apihelpers.h"
 #include <iostream>
 
-std::optional<std::string> getNamedArgument(LibInitData* initData, const std::string& argumentName) {    
-    if(initData->namedArguments.contains(argumentName)) {
-        std::string s = initData->namedArguments[argumentName];
-        return initData->namedArguments[argumentName];
+std::optional<std::string> getNamedArgument(LibInitData& initData, const std::string& argumentName) {
+    auto search = initData.namedArguments.find(argumentName);
+    if(search != initData.namedArguments.end()) {
+        return search->second;
     }
-    return nullptr;
+    return std::nullopt;
 }

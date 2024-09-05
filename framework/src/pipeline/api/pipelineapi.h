@@ -19,8 +19,8 @@
 #endif
 
 BEGIN_DECL 
-int pipeline_step_module_init(LibInitData* initData);
-int pipeline_step_module_process(LibProcessingData* processData);
+int pipeline_step_module_init(LibInitData& initData);
+int pipeline_step_module_process(LibProcessingData& processData);
 int pipeline_step_module_finish();
 END_DECL
 

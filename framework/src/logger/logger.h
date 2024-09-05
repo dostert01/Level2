@@ -11,6 +11,8 @@
 #include "loglevels.h"
 #include "timeproviders.h"
 
+#define LOGGER Logger::getInstance()
+
 namespace second_take {
 
 class Logger {
