@@ -21,8 +21,8 @@ class PipelineException : public std::exception {
         std::string message;
 }; 
 
-using LibInitFunction = int (*)(LibInitData* initData);
-using LibProcessFunction = int (*)(LibProcessingData& initData);
+using LibInitFunction = int (*)(PipelineStepInitData* initData);
+using LibProcessFunction = int (*)(const PipelineProcessingData& processData);
 using LibFinishFunction = int (*)();
 
 class PipelineStep {
@@ -34,7 +34,7 @@ class PipelineStep {
         void setLibraryName(const std::string libraryName);
         bool isInitComplete();
         void runInitFunction();
-        void runProcessFunction();
+        void runProcessingFunction(const PipelineProcessingData& processingData);
         void runFinishFunction();
         void loadLib();
         void loadNamedArguments(const json& jsonData);
@@ -45,8 +45,7 @@ class PipelineStep {
         LibInitFunction libInit;
         LibProcessFunction libProcess;
         LibFinishFunction libFinish;
-        LibInitData initData;
-        LibProcessingData processData;
+        PipelineStepInitData initData;
 };
 
 class Pipeline {
@@ -59,6 +58,7 @@ class Pipeline {
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
         void execute();
+        void execute(const PipelineProcessingData& processData);
     private:
         std::string pipelineName;
         std::vector<std::unique_ptr<PipelineStep>> pipelineSteps;

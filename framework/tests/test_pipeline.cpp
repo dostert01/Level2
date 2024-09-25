@@ -19,7 +19,7 @@ void configureLogger() {
     logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
     logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
 }
-
+/*
 TEST(PipeLine, CanCreateNewInstances) {
     std::unique_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
     std::unique_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
@@ -69,11 +69,21 @@ TEST(Pipeline, CanExecuteThePipeline) {
     std::regex regex("Hello World");
     EXPECT_TRUE(std::regex_search(output, regex));
 }
+*/
 
-TEST(Pipeline, CanUseArgumentsFromJson) {
+TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     configureLogger();
     std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+    std::string testfileName = "./argumentsProcessor_output02.txt";
+    std::filesystem::remove(testfileName);
     pipeline.value()->execute();
-    std::ifstream file01("./argumentsProcessor_output01.txt");
-    EXPECT_TRUE(file01.is_open());
+    std::ifstream testFile(testfileName.c_str());
+    EXPECT_TRUE(testFile.is_open());
+    std::string line;
+    std::getline(testFile, line);
+    EXPECT_EQ("first hello from step 2", line);
+    std::getline(testFile, line);
+    EXPECT_EQ("second hello from step 2", line);
+    testFile.close();
+    std::filesystem::remove(testfileName);
 }

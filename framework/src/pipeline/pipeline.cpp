@@ -36,8 +36,13 @@ uint Pipeline::getCountOfPipelineSteps() {
 }
 
 void Pipeline::execute() {
+    PipelineProcessingData emptyProcessingData;
+    this->execute(emptyProcessingData);
+}
+
+void Pipeline::execute(const PipelineProcessingData& processData) {
     for(const auto& currentStep : pipelineSteps) {
-        currentStep.get()->runProcessFunction();
+        currentStep.get()->runProcessingFunction(processData);
     }
 }
 
@@ -171,8 +176,8 @@ void PipelineStep::runInitFunction() {
     libInit(&initData);
 }
 
-void PipelineStep::runProcessFunction() { 
-    libProcess(processData);
+void PipelineStep::runProcessingFunction(const PipelineProcessingData& processingData) { 
+    libProcess(processingData);
 }
 
 void PipelineStep::runFinishFunction() {

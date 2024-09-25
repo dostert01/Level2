@@ -5,16 +5,16 @@
 #include <string>
 #include <memory>
 
-struct LibInitData
+struct PipelineStepInitData
 {
     std::multimap<std::string, std::string> namedArguments;
 };
 
-struct LibProcessingData
+struct PipelineProcessingData
 {
-    std::multimap<std::string, std::unique_ptr<std::string>> namedPayloadData;
+    mutable std::multimap<std::string, std::unique_ptr<std::string>> namedPayloadData;
 };
 
-std::optional<std::string> getNamedArgument(LibInitData& initData, const std::string& argumentName);
+std::optional<std::string> getNamedArgument(const PipelineStepInitData& initData, const std::string& argumentName);
 
 #endif //#ifndef API_HELPERS_H

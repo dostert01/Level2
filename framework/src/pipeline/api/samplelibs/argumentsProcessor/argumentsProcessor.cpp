@@ -1,11 +1,12 @@
 #include "pipelineapi.h"
 #include <iostream>
+#include <fstream>
 
 std::string outputFileName;
 std::string firstArgument;
 std::string secondArgument;
 
-int pipeline_step_module_init(LibInitData& initData) {
+int pipeline_step_module_init(const PipelineStepInitData& initData) {
 
     std::optional<std::string> s = getNamedArgument(initData, "outputFileName");
     if(s.has_value()) {
@@ -22,10 +23,14 @@ int pipeline_step_module_init(LibInitData& initData) {
     return 0;
 }
 
-int pipeline_step_module_process(LibProcessingData& processData) {
+int pipeline_step_module_process(const PipelineProcessingData& processData) {
     std::cout << "pipeline_step_module_process: " << outputFileName << std::endl;
     std::cout << "pipeline_step_module_process: " << firstArgument << std::endl;
     std::cout << "pipeline_step_module_process: " << secondArgument << std::endl;
+    std::ofstream writer(outputFileName.c_str());
+    writer << firstArgument << std::endl;
+    writer << secondArgument << std::endl;
+    writer.close();
     return 0;
 }
 

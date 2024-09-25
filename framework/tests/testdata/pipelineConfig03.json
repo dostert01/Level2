@@ -6,8 +6,7 @@
             "libraryName":"helloWorld",
             "namedArguments" : {
                 "first argument":"first hello from step 1",
-                "second argument":"second hello from step 1",
-                "outputFileName":"./argumentsProcessor_output01.txt"
+                "second argument":"second hello from step 1"
             }
         },
         {
