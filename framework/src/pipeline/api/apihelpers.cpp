@@ -29,7 +29,7 @@ void PipelineProcessingData::addPayloadData(std::string payloadName, std::string
     ProcessingPayload* payload = new ProcessingPayload();
     payload->mimetype = mimetype;
     payload->payloadData = std::make_unique<std::vector<uint8_t>>(std::vector<uint8_t>(data.begin(), data.end()));
-    namedPayloadData.insert(std::make_pair(payloadName, payload));
+    namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
 }
 
 std::optional<ProcessingPayload*> PipelineProcessingData::getPayload(std::string payloadName) {
