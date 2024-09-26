@@ -53,9 +53,7 @@ TEST(PipeLine, CanLoadTheHelloWordLib) {
     EXPECT_TRUE(pipelineStep.has_value());
     if(pipelineStep.has_value()) {
         PipelineStep* currentStep = pipelineStep.value();
-        EXPECT_TRUE(currentStep->getInitFunction() != NULL);
-        EXPECT_TRUE(currentStep->getProcessFunction() != NULL);
-        EXPECT_TRUE(currentStep->getFinishFunction() != NULL);
+        EXPECT_TRUE(currentStep->isInitComplete());
     }
 }
 
@@ -69,7 +67,7 @@ TEST(Pipeline, CanExecuteThePipeline) {
     std::regex regex("Hello World");
     EXPECT_TRUE(std::regex_search(output, regex));
 }
-*/
+
 
 TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     configureLogger();
@@ -86,4 +84,18 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     EXPECT_EQ("second hello from step 2", line);
     testFile.close();
     std::filesystem::remove(testfileName);
+}
+*/
+TEST(Pipeline, CanUseProcessData) {
+    configureLogger();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+
+
+    PipelineProcessingData processData;
+    //processData.addPayloadData("question", "text/plain", "What is the answer?");
+    pipeline.value()->execute(processData);
+    std::optional<std::unique_ptr<ProcessingPayload>> payload;
+    payload = processData.getPayload("question");
+    EXPECT_TRUE(payload.has_value());
+    payload = processData.getPayload("answer");
 }

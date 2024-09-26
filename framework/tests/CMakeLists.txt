@@ -18,7 +18,8 @@ target_include_directories(test_secondTake PRIVATE
 )
 
 # GTest und GTest Main hinzufügen
-target_link_libraries(test_secondTake 
+target_link_libraries(test_secondTake
+    pipelineapi
     gtest
     gtest_main
     sndtakelogger
