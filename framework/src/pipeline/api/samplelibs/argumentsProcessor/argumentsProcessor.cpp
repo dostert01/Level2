@@ -8,15 +8,15 @@ std::string secondArgument;
 
 int pipeline_step_module_init(PipelineStepInitData& initData) {
 
-    std::optional<std::string> s = getNamedArgument(initData, "outputFileName");
+    std::optional<std::string> s = initData.getNamedArgument("outputFileName");
     if(s.has_value()) {
         outputFileName = s.value();
     }
-    s = getNamedArgument(initData, "first argument");
+    s = initData.getNamedArgument("first argument");
     if(s.has_value()) {
         firstArgument = s.value();
     }
-    s = getNamedArgument(initData, "second argument");
+    s = initData.getNamedArgument("second argument");
     if(s.has_value()) {
         secondArgument = s.value();
     }
@@ -36,7 +36,7 @@ void processTheProcessingData(PipelineProcessingData& processData) {
     std::cout << "adding the answer to the question" << std::endl;
     processData.addPayloadData("answer", "text/plain", "the answer is 42");
   } else {
-    std::cout << "NOT adding the answer to the question: " << p.value()->payloadAsString() << std::endl;
+    std::cout << "NOT adding the answer to the question" << std::endl;
   }
 }
 

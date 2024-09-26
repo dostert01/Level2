@@ -9,6 +9,7 @@
 struct PipelineStepInitData
 {
     std::multimap<std::string, std::string> namedArguments;
+    std::optional<std::string> getNamedArgument(const std::string& argumentName);
 };
 
 struct ProcessingPayload {
@@ -27,6 +28,5 @@ struct PipelineProcessingData
     std::optional<ProcessingPayload*> getPayload(std::string payloadName);
 };
 
-std::optional<std::string> getNamedArgument(const PipelineStepInitData& initData, const std::string& argumentName);
 
 #endif //#ifndef API_HELPERS_H
