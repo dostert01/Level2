@@ -19,8 +19,10 @@
 #endif
 
 BEGIN_DECL 
-int pipeline_step_module_init(const PipelineStepInitData& initData);
-int pipeline_step_module_process(const PipelineProcessingData& processData);
+int pipeline_step_module_init(PipelineStepInitData& initData);
+int pipeline_step_module_process(PipelineProcessingData& processData);
+void processTheProcessingData(PipelineProcessingData & processData);
+void processArgumentsFromJson();
 int pipeline_step_module_finish();
 END_DECL
 

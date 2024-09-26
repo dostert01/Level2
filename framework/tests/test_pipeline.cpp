@@ -19,7 +19,7 @@ void configureLogger() {
     logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
     logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
 }
-/*
+
 TEST(PipeLine, CanCreateNewInstances) {
     std::unique_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
     std::unique_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
@@ -85,17 +85,17 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     testFile.close();
     std::filesystem::remove(testfileName);
 }
-*/
+
 TEST(Pipeline, CanUseProcessData) {
     configureLogger();
     std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
-
-
     PipelineProcessingData processData;
-    //processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
     pipeline.value()->execute(processData);
-    std::optional<std::unique_ptr<ProcessingPayload>> payload;
+    std::optional<ProcessingPayload*> payload;
     payload = processData.getPayload("question");
     EXPECT_TRUE(payload.has_value());
     payload = processData.getPayload("answer");
+    EXPECT_TRUE(payload.has_value());
+    EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
 }
