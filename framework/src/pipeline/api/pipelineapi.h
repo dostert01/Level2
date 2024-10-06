@@ -1,7 +1,7 @@
 #ifndef SECOND_TAKE_PIPELINE_API_H
 #define SECOND_TAKE_PIPELINE_API_H
 
-#include "apihelpers.h"
+#include "apistructs.h"
 
 /** declare as extern "C" or not **/
 #ifdef BEGIN_DECL

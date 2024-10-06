@@ -1,4 +1,4 @@
-#include "apihelpers.h"
+#include "apistructs.h"
 #include <iostream>
 
 std::optional<std::string> PipelineStepInitData::getNamedArgument(const std::string& argumentName) {
@@ -13,7 +13,6 @@ std::string ProcessingPayload::payloadAsString() {
     std::string s(payloadData.get()->begin(), payloadData.get()->end());
     return s;
 }
-
 
 PipelineProcessingData::~PipelineProcessingData() {
     std::multimap<std::string, ProcessingPayload*>::iterator it;
