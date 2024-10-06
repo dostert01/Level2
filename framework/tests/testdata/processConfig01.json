@@ -1,0 +1,11 @@
+{
+    "processName" : "my first testProcess",
+    "pipelines" : [
+        {
+            "pipelineConfig":"pipelineConfig02.json"
+        },
+        {
+            "pipelineConfig":"pipelineConfig03.json"
+        }
+    ]
+}

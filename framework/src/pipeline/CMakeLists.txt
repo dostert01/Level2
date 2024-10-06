@@ -20,7 +20,8 @@ add_subdirectory(api)
 
 # Specify the library
 add_library(pipeline OBJECT 
-    pipeline.cpp)
+    pipeline.cpp
+    process.cpp)
 
 target_include_directories(pipeline PRIVATE api)
 
