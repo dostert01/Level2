@@ -89,6 +89,8 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
 TEST(Pipeline, CanUseProcessData) {
     configureLogger();
     std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+    std::string testfileName = "./argumentsProcessor_output02.txt";
+    std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
     processData.addPayloadData("question", "text/plain", "What is the answer?");
     pipeline.value()->execute(processData);
@@ -98,4 +100,5 @@ TEST(Pipeline, CanUseProcessData) {
     payload = processData.getPayload("answer");
     EXPECT_TRUE(payload.has_value());
     EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
+    std::filesystem::remove(testfileName);
 }
