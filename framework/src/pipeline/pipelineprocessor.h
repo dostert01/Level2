@@ -1,5 +1,5 @@
-#ifndef SECOND_TAKE_PROCESS
-#define SECOND_TAKE_PROCESS
+#ifndef SECOND_TAKE_PIPELINE_PROCESSOR
+#define SECOND_TAKE_PIPELINE_PROCESSOR
 
 #include <memory>
 #include <optional>
@@ -8,16 +8,16 @@
 
 namespace second_take {
 
-    class Process {
+    class PipeLineProcessor {
         public:
-            Process() = default;
-            ~Process();
-            static std::unique_ptr<Process> getInstance();
-            static std::optional<std::unique_ptr<Process>> getInstance(const std::string configFilePath);
+            PipeLineProcessor() = default;
+            ~PipeLineProcessor();
+            static std::unique_ptr<PipeLineProcessor> getInstance();
+            static std::optional<std::unique_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
             uint getCountOfPipelines();
         private:
             void loadProcessConfig(const std::string& configFilePath);
     };
 }
 
-#endif //SECOND_TAKE_PROCESS
+#endif //SECOND_TAKE_PIPELINE_PROCESSOR

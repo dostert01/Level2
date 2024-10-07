@@ -12,7 +12,7 @@ using namespace second_take;
 #define TEST_DATA_DIR "testdata"
 #define PROCESS_CONFIG_TEST_FILE_01 TEST_DATA_DIR "/processConfig01.json"
 
-namespace test_process {
+namespace test_pipeline_processor {
     void configureLogger() {
         Logger& logger = second_take::Logger::getInstance();
         logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
@@ -21,9 +21,9 @@ namespace test_process {
 }
 
 TEST(Process, CanLoadConfigFromJson) {
-    test_process::configureLogger();
-    std::optional<std::unique_ptr<Process>> process = Process::getInstance(PROCESS_CONFIG_TEST_FILE_01);
-    EXPECT_TRUE(process.has_value());
-    if(process.has_value())
-        EXPECT_TRUE((process.value()->getCountOfPipelines() == 2));
+    test_pipeline_processor::configureLogger();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(PROCESS_CONFIG_TEST_FILE_01);
+    EXPECT_TRUE(processor.has_value());
+    if(processor.has_value())
+        EXPECT_TRUE((processor.value()->getCountOfPipelines() == 2));
 }

@@ -3,17 +3,17 @@
 
 namespace second_take {
 
-Process::~Process() {
+PipeLineProcessor::~PipeLineProcessor() {
 
 }
 
-std::unique_ptr<Process> Process::getInstance() {
-    std::unique_ptr<Process> instance = std::make_unique<Process>();
+std::unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
+    std::unique_ptr<PipeLineProcessor> instance = std::make_unique<PipeLineProcessor>();
     return instance;
 }
 
-std::optional<std::unique_ptr<Process>> Process::getInstance(const std::string configFilePath) {
-    std::unique_ptr<Process> instance = getInstance();
+std::optional<std::unique_ptr<PipeLineProcessor>> PipeLineProcessor::getInstance(const std::string configFilePath) {
+    std::unique_ptr<PipeLineProcessor> instance = getInstance();
     try {
         instance.get()->loadProcessConfig(configFilePath);
     } catch (const std::exception& e) {
@@ -23,11 +23,11 @@ std::optional<std::unique_ptr<Process>> Process::getInstance(const std::string c
     return instance;
 }
 
-void Process::loadProcessConfig(const std::string& configFilePath) {
+void PipeLineProcessor::loadProcessConfig(const std::string& configFilePath) {
 
 }
 
-uint Process::getCountOfPipelines() {
+uint PipeLineProcessor::getCountOfPipelines() {
     return 0;
 }
 
