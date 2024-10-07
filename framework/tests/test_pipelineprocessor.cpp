@@ -4,7 +4,7 @@
 #include <iostream>
 #include <regex>
 #include <fstream>
-#include "process.h"
+#include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
 using namespace second_take;

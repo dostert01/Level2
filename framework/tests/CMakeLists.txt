@@ -7,7 +7,7 @@ add_executable(test_secondTake
     test_timeproviders.cpp
     test_loggingdestinations.cpp
     test_pipeline.cpp
-    test_process.cpp
+    test_pipelineprocessor.cpp
     $<TARGET_OBJECTS:pipeline>)
 
 # Include the necessary directories

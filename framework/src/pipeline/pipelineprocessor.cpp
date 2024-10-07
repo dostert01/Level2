@@ -1,4 +1,4 @@
-#include "process.h"
+#include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
 namespace second_take {
