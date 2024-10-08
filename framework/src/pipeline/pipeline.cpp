@@ -8,7 +8,6 @@
 
 namespace second_take {
 
-#define UNDEFINED_JSON_DATA "undefined"
 #define JSON_PROPERTY_PIPELINE_NAME "pipelineName"
 #define JSON_PROPERTY_PIPELINE_STEPS "pipelineSteps"
 #define JSON_PROPERTY_STEP_NAME "stepName"

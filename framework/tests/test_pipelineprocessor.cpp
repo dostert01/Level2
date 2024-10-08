@@ -20,7 +20,13 @@ namespace test_pipeline_processor {
     }
 }
 
-TEST(Process, CanLoadConfigFromJson) {
+TEST(PipeLineProcessor, ReturnsEmptyOptionalIfConfigFileNotPresent) {
+    test_pipeline_processor::configureLogger();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance("noFileHere");
+    EXPECT_FALSE(processor.has_value());
+}
+
+TEST(PipeLineProcessor, CanLoadConfigFromJson) {
     test_pipeline_processor::configureLogger();
     std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(PROCESS_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(processor.has_value());

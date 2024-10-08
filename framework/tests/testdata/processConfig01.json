@@ -2,10 +2,10 @@
     "processName" : "my first testProcess",
     "pipelines" : [
         {
-            "pipelineConfig":"pipelineConfig02.json"
+            "pipelineConfigFile":"pipelineConfig01.json"
         },
         {
-            "pipelineConfig":"pipelineConfig03.json"
+            "pipelineConfigFile":"pipelineConfig03.json"
         }
     ]
 }

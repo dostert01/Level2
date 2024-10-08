@@ -1,7 +1,15 @@
+#include <iostream>
+#include <fstream>
+
 #include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
 namespace second_take {
+
+#define JSON_PROPERTY_PIPELINES "pipelines"
+#define JSON_PROPERTY_PIPELINE_CONFIG_FILE "pipelineConfigFile"
+
+#define DIR_SEPARATOR "/"
 
 PipeLineProcessor::~PipeLineProcessor() {
 
@@ -15,20 +23,66 @@ std::unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
 std::optional<std::unique_ptr<PipeLineProcessor>> PipeLineProcessor::getInstance(const std::string configFilePath) {
     std::unique_ptr<PipeLineProcessor> instance = getInstance();
     try {
-        instance.get()->loadProcessConfig(configFilePath);
+        LOGGER.info("Loading pipeline processor configuration from file: " + configFilePath);
+        instance.get()->loadProcessorConfig(configFilePath);
     } catch (const std::exception& e) {
-        LOGGER.error("Failed loading process configuration from " + configFilePath + " : " + e.what());
+        LOGGER.error("Failed loading pipeline processor configuration from " + configFilePath + " : " + e.what());
         return std::nullopt;
     }
     return instance;
 }
 
-void PipeLineProcessor::loadProcessConfig(const std::string& configFilePath) {
+void PipeLineProcessor::loadProcessorConfig(const std::string& configFilePath) {
+  setConfigFileDirFromConfigFileName(configFilePath);
+  try {
+    std::ifstream jsonFile(configFilePath);
+    json jsonData = json::parse(jsonFile);
+    jsonFile.close();
+    loadPipelines(jsonData);
+    } catch (const std::exception& e) {
+        throw;
+    }
+}
 
+void PipeLineProcessor::setConfigFileDirFromConfigFileName(
+    const std::string& configFilePath) {
+  configFileDir = getDirNameFromPath(configFilePath);
+  LOGGER.info("Reading config files from directory: '" + configFileDir + "'");
+}
+
+std::string PipeLineProcessor::getDirNameFromPath(const std::string path) {
+    size_t lastSlashPos = path.find_last_of(DIR_SEPARATOR);
+    return (lastSlashPos == std::string::npos) ? "" : path.substr(0, lastSlashPos);
+}
+
+void PipeLineProcessor::loadPipelines(const json& jsonData) {
+    if(jsonData.contains(JSON_PROPERTY_PIPELINES) && jsonData[JSON_PROPERTY_PIPELINES].is_array()) {
+        for (const auto& currentPipelineDefinition : jsonData[JSON_PROPERTY_PIPELINES]) {
+            std::optional<std::unique_ptr<second_take::Pipeline, std::default_delete<second_take::Pipeline>>> currentPipeline =
+                Pipeline::getInstance(getPipelineConfigFileNameFromJsonData(currentPipelineDefinition));
+            if(currentPipeline.has_value()) {
+                pipelines.push_back(std::move(currentPipeline.value()));
+            } else {
+                throw PipelineException("Failed to load pipeline from file: " +
+                    getPipelineConfigFileNameFromJsonData(currentPipelineDefinition));
+            }
+        }
+    } else {
+        throw PipelineException("Failed to load pipelines: No pipelines array found in json.");
+    }
+}
+
+std::string PipeLineProcessor::getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition) {
+    std::string currentPipelineConfigFileName = currentPipelineDefinition.value(JSON_PROPERTY_PIPELINE_CONFIG_FILE, UNDEFINED_JSON_DATA);
+    if(!configFileDir.empty()) {
+        currentPipelineConfigFileName = configFileDir + DIR_SEPARATOR + currentPipelineConfigFileName;
+    }
+    LOGGER.info("Loading pipeline from config file: " + currentPipelineConfigFileName);
+    return currentPipelineConfigFileName;
 }
 
 uint PipeLineProcessor::getCountOfPipelines() {
-    return 0;
+    return pipelines.size();
 }
 
 }

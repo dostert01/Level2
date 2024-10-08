@@ -12,6 +12,10 @@ using json = nlohmann::json;
 
 namespace second_take {
 
+#ifndef UNDEFINED_JSON_DATA
+#define UNDEFINED_JSON_DATA "undefined"
+#endif
+
 class PipelineException : public std::exception {
     public:
         explicit PipelineException(const std::string& message);

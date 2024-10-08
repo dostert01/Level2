@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <optional>
+#include <nlohmann/json.hpp>
+#include <vector>
 
 #include "pipeline.h"
 
@@ -16,8 +18,15 @@ namespace second_take {
             static std::optional<std::unique_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
             uint getCountOfPipelines();
         private:
-            void loadProcessConfig(const std::string& configFilePath);
+            std::string configFileDir;
+            std::vector<std::unique_ptr<second_take::Pipeline>> pipelines;
+            void loadProcessorConfig(const std::string& configFilePath);
+            void setConfigFileDirFromConfigFileName(
+                const std::string& configFilePath);
+            void loadPipelines(const json& jsonData);
+            std::string getDirNameFromPath(const std::string path);
+            std::string getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition);
     };
-}
+    }  // namespace second_take
 
-#endif //SECOND_TAKE_PIPELINE_PROCESSOR
+#endif  // SECOND_TAKE_PIPELINE_PROCESSOR
