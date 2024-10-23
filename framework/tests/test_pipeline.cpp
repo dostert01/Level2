@@ -6,6 +6,7 @@
 #include <fstream>
 #include "pipeline.h"
 #include "../logger/logger.h"
+#include "binaryDataProcessor.h"
 
 using namespace second_take;
 
@@ -13,6 +14,7 @@ using namespace second_take;
 #define PIPELINE_CONFIG_TEST_FILE_01 TEST_DATA_DIR "/pipelineConfig01.json"
 #define PIPELINE_CONFIG_TEST_FILE_02 TEST_DATA_DIR "/pipelineConfig02.json"
 #define PIPELINE_CONFIG_TEST_FILE_03 TEST_DATA_DIR "/pipelineConfig03.json"
+#define PIPELINE_CONFIG_TEST_FILE_04 TEST_DATA_DIR "/pipelineConfig04.json"
 
 namespace test_pipeline {
     void configureLogger() {
@@ -103,4 +105,19 @@ TEST(Pipeline, CanUseProcessData) {
     EXPECT_TRUE(payload.has_value());
     EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
     std::filesystem::remove(testfileName);
+}
+
+TEST(Pipeline, CanUseBinaryProcessData) {
+    test_pipeline::configureLogger();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_04);
+    PipelineProcessingData processData;
+    pipeline.value()->execute(processData);
+    EXPECT_EQ(1, processData.getCountOfPayloads());
+    std::optional<ProcessingPayload*> payload;
+    payload = processData.getPayload("myBinaryPayloadData");
+    EXPECT_TRUE(payload.has_value());
+    EXPECT_EQ("first hello from arguments",
+        ((SpecificBinaryProcessingData*)(payload.value()->payloadAsBinaryData().get()))->firstArgument);    
+    EXPECT_EQ("second hello from arguments",
+        ((SpecificBinaryProcessingData*)(payload.value()->payloadAsBinaryData().get()))->secondArgument);
 }

@@ -10,3 +10,4 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 add_subdirectory(helloWorld)
 add_subdirectory(argumentsProcessor)
+add_subdirectory(binaryDataProcessor)

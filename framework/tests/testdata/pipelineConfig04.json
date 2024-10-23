@@ -1,0 +1,13 @@
+{
+    "pipelineName" : "my pipeline with binaryData",
+    "pipelineSteps" : [
+        {
+            "stepName":"test Step 01",
+            "libraryName":"binaryDataProcessor",
+            "namedArguments" : {
+                "first argument" : "first hello from arguments",
+                "second argument" : "second hello from arguments"
+            }
+        }
+    ]
+}

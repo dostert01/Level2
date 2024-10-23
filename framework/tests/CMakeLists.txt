@@ -16,6 +16,7 @@ target_include_directories(test_secondTake PRIVATE
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api
     ${CMAKE_SOURCE_DIR}/_deps/json-src/single_include/
+    ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api/samplelibs/binaryDataProcessor/
 )
 
 # GTest und GTest Main hinzufügen

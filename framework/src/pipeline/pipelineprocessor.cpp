@@ -12,7 +12,7 @@ namespace second_take {
 #define DIR_SEPARATOR "/"
 
 PipeLineProcessor::~PipeLineProcessor() {
-
+    LOGGER.info("Unloading the PipeLineProcessor");
 }
 
 std::unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {

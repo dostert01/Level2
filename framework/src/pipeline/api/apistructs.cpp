@@ -1,6 +1,14 @@
 #include "apistructs.h"
 #include <iostream>
 
+/*
+    BinaryProcessingData
+*/
+BinaryProcessingData::~BinaryProcessingData() {}
+
+/*
+    PipelineStepInitData
+*/
 std::optional<std::string> PipelineStepInitData::getNamedArgument(const std::string& argumentName) {
     auto search = namedArguments.find(argumentName);
     if(search != namedArguments.end()) {
@@ -9,11 +17,44 @@ std::optional<std::string> PipelineStepInitData::getNamedArgument(const std::str
     return std::nullopt;
 }
 
-std::string ProcessingPayload::payloadAsString() {
-    std::string s(payloadData.get()->begin(), payloadData.get()->end());
-    return s;
+/*
+    ProcessingPayload
+*/
+ProcessingPayload::ProcessingPayload(std::string mimetype, std::string payload) {
+    setMimeType(mimetype);
+    setPayload(payload);
 }
 
+ProcessingPayload::ProcessingPayload(std::string mimetype, std::shared_ptr<BinaryProcessingData> payload){
+    setMimeType(mimetype);
+    setPayload(payload);
+}
+
+ProcessingPayload::~ProcessingPayload() {}
+
+std::string ProcessingPayload::payloadAsString() {
+    return stringPayloadData;
+}
+
+std::shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
+    return binaryPayloadData;
+}
+
+void ProcessingPayload::setMimeType(std::string mimetype) {
+    this->mimetype = mimetype;
+}
+
+void ProcessingPayload::setPayload(std::string payload) {
+    this->stringPayloadData = payload;
+}
+
+void ProcessingPayload::setPayload(std::shared_ptr<BinaryProcessingData> payload) {
+    this->binaryPayloadData = payload;
+}
+
+/*
+    PipelineProcessingData
+*/
 PipelineProcessingData::~PipelineProcessingData() {
     std::multimap<std::string, ProcessingPayload*>::iterator it;
     for(it = namedPayloadData.begin(); it != namedPayloadData.end(); ++it) {
@@ -25,9 +66,12 @@ PipelineProcessingData::~PipelineProcessingData() {
 }
 
 void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::string data) {
-    ProcessingPayload* payload = new ProcessingPayload();
-    payload->mimetype = mimetype;
-    payload->payloadData = std::make_unique<std::vector<uint8_t>>(std::vector<uint8_t>(data.begin(), data.end()));
+    ProcessingPayload* payload = new ProcessingPayload(mimetype, data);
+    namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
+}
+
+void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data) {
+    ProcessingPayload* payload = new ProcessingPayload(mimetype, data);
     namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
 }
 
@@ -37,4 +81,8 @@ std::optional<ProcessingPayload*> PipelineProcessingData::getPayload(std::string
         return search->second;
     }
     return std::nullopt;
+}
+
+uint PipelineProcessingData::getCountOfPayloads() {
+    return namedPayloadData.size();
 }
