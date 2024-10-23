@@ -140,3 +140,41 @@ TEST(Pipeline, CanUseBinaryProcessData) {
     EXPECT_EQ("second hello from arguments",
         ((SpecificBinaryProcessingData*)(payload.value()->payloadAsBinaryData().get()))->secondArgument);
 }
+
+TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    pipeline.value()->addSelectorPattern("key01", "value01");
+    pipeline.value()->addSelectorPattern("key02", "value02");
+    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+}
+
+TEST(Pipeline, SelectorPatternCanBeOverwritten) {
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    pipeline.value()->addSelectorPattern("key01", "value01");
+    pipeline.value()->addSelectorPattern("key02", "value02");
+    EXPECT_EQ("value02", pipeline.value()->getSelectorPattern("key02").value());
+    pipeline.value()->addSelectorPattern("key02", "value03");
+    EXPECT_EQ("value03", pipeline.value()->getSelectorPattern("key02").value());
+    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+}
+
+TEST(Pipeline, SelectorPatternCanBeRemoved) {
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    pipeline.value()->addSelectorPattern("key01", "value01");
+    pipeline.value()->addSelectorPattern("key02", "value02");
+    pipeline.value()->removeSelectorPattern("key01");
+    EXPECT_FALSE(pipeline.value()->getSelectorPattern("key01").has_value());
+    EXPECT_EQ(1, pipeline.value()->getCountOfSelectorPatterns());
+}
+
+TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    pipeline.value()->addSelectorPattern("key01", "value01");
+    pipeline.value()->addSelectorPattern("key02", "value02");
+    pipeline.value()->removeSelectorPattern("key03");
+    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+}

@@ -26,12 +26,16 @@ add_executable(test_secondTake
     test_logger.cpp
     test_timeproviders.cpp
     test_loggingdestinations.cpp
-    test_pipeline.cpp
     $<TARGET_OBJECTS:pipeline>)
 
 # Tests hinzufügen
 add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
+    $<TARGET_OBJECTS:pipeline>)
+
+# Tests hinzufügen
+add_executable(test_pipeline
+    test_pipeline.cpp
     $<TARGET_OBJECTS:pipeline>)
 
 # Tests registrieren
@@ -40,3 +44,6 @@ set_tests_properties(test_secondTake PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TE
 
 add_test(NAME test_pipelineprocessor COMMAND test_pipelineprocessor)
 set_tests_properties(test_pipelineprocessor PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_pipeline COMMAND test_pipeline)
+set_tests_properties(test_pipeline PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

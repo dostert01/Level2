@@ -8,6 +8,7 @@ namespace second_take {
 
 #define JSON_PROPERTY_PIPELINES "pipelines"
 #define JSON_PROPERTY_PIPELINE_CONFIG_FILE "pipelineConfigFile"
+#define JSON_PROPERTY_PROCESS_NAME "processName"
 
 #define DIR_SEPARATOR "/"
 
@@ -38,6 +39,7 @@ void PipeLineProcessor::loadProcessorConfig(const std::string& configFilePath) {
     std::ifstream jsonFile(configFilePath);
     json jsonData = json::parse(jsonFile);
     jsonFile.close();
+    loadHeaderData(jsonData);
     loadPipelines(jsonData);
     } catch (const std::exception& e) {
         throw;
@@ -53,6 +55,16 @@ void PipeLineProcessor::setConfigFileDirFromConfigFileName(
 std::string PipeLineProcessor::getDirNameFromPath(const std::string path) {
     size_t lastSlashPos = path.find_last_of(DIR_SEPARATOR);
     return (lastSlashPos == std::string::npos) ? "" : path.substr(0, lastSlashPos);
+}
+
+void PipeLineProcessor::loadHeaderData(const json& jsonData) {
+    if(jsonData.contains(JSON_PROPERTY_PROCESS_NAME) && jsonData[JSON_PROPERTY_PROCESS_NAME].is_string()) {
+        processName = jsonData[JSON_PROPERTY_PROCESS_NAME];
+        LOGGER.info("Setting processName to: " + processName);
+    } else {
+        LOGGER.warn("Property '" + std::string(JSON_PROPERTY_PROCESS_NAME ) +
+            "' not found while loading the process definition!");
+    }
 }
 
 void PipeLineProcessor::loadPipelines(const json& jsonData) {
@@ -83,6 +95,10 @@ std::string PipeLineProcessor::getPipelineConfigFileNameFromJsonData(const nlohm
 
 uint PipeLineProcessor::getCountOfPipelines() {
     return pipelines.size();
+}
+
+std::string PipeLineProcessor::getProcessName() {
+    return processName;
 }
 
 }

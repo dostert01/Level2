@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "pipelineapi.h"
+#include "selecable.h"
 
 using json = nlohmann::json;
 
@@ -52,7 +53,7 @@ class PipelineStep {
         PipelineStepInitData initData;
 };
 
-class Pipeline {
+class Pipeline : public Selectable {
     public:
         Pipeline() = default;
         static std::unique_ptr<Pipeline> getInstance();
