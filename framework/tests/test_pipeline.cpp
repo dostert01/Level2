@@ -10,18 +10,36 @@
 
 using namespace second_take;
 
-#define TEST_DATA_DIR "testdata"
-#define PIPELINE_CONFIG_TEST_FILE_01 TEST_DATA_DIR "/pipelineConfig01.json"
-#define PIPELINE_CONFIG_TEST_FILE_02 TEST_DATA_DIR "/pipelineConfig02.json"
-#define PIPELINE_CONFIG_TEST_FILE_03 TEST_DATA_DIR "/pipelineConfig03.json"
-#define PIPELINE_CONFIG_TEST_FILE_04 TEST_DATA_DIR "/pipelineConfig04.json"
+#define PIPELINE_CONFIG_TEST_FILE_01 "/pipelineConfig01.json"
+#define PIPELINE_CONFIG_TEST_FILE_02 "/pipelineConfig02.json"
+#define PIPELINE_CONFIG_TEST_FILE_03 "/pipelineConfig03.json"
+#define PIPELINE_CONFIG_TEST_FILE_04 "/pipelineConfig04.json"
 
 namespace test_pipeline {
+    std::string workingDir;
+    std::string testFilesDir;
+
     void configureLogger() {
         Logger& logger = second_take::Logger::getInstance();
         logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
         logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
     }
+
+    void configureTestVariables() {
+        workingDir = std::filesystem::current_path();
+        LOGGER.info("Running test in directory: " + workingDir);
+        if(std::getenv("TEST_FILES_DIR") != NULL) {
+            testFilesDir = std::getenv("TEST_FILES_DIR");
+            LOGGER.info("Testfiles expected to be present in directory: " + testFilesDir);
+        } else {
+            LOGGER.error("Environment variable TEST_FILES_DIR must be set to where the tests expect the testfiles to live!");
+        }  
+    }
+}
+
+void configureTest() {
+    test_pipeline::configureLogger();
+    test_pipeline::configureTestVariables();
 }
 
 TEST(PipeLine, CanCreateNewInstances) {
@@ -31,7 +49,8 @@ TEST(PipeLine, CanCreateNewInstances) {
 }
 
 TEST(PipeLine, CanLoadConfigFromJson) {
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.has_value());
     if(pipeline1.has_value())
         EXPECT_TRUE((pipeline1.value()->getCountOfPipelineSteps() == 2));
@@ -45,14 +64,14 @@ TEST(PipeLine, ReturnsEmptyIfLoadingFails) {
 
 
 TEST(PipeLine, PipelineHasName) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.value()->getPipelineName() == "my first testPipeline");
 }
 
 TEST(PipeLine, CanLoadTheHelloWordLib) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     std::optional<PipelineStep*> pipelineStep = pipeline1.value()->getStepByName("test Step 02");
     EXPECT_TRUE(pipelineStep.has_value());
     if(pipelineStep.has_value()) {
@@ -62,8 +81,8 @@ TEST(PipeLine, CanLoadTheHelloWordLib) {
 }
 
 TEST(Pipeline, CanExecuteThePipeline) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_01);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     testing::internal::CaptureStdout();
     pipeline.value()->execute();
     std::string output = testing::internal::GetCapturedStdout();
@@ -74,8 +93,8 @@ TEST(Pipeline, CanExecuteThePipeline) {
 
 
 TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     pipeline.value()->execute();
@@ -91,8 +110,8 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
 }
 
 TEST(Pipeline, CanUseProcessData) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_03);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
@@ -108,8 +127,8 @@ TEST(Pipeline, CanUseProcessData) {
 }
 
 TEST(Pipeline, CanUseBinaryProcessData) {
-    test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(PIPELINE_CONFIG_TEST_FILE_04);
+    configureTest();
+    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     PipelineProcessingData processData;
     pipeline.value()->execute(processData);
     EXPECT_EQ(1, processData.getCountOfPayloads());
