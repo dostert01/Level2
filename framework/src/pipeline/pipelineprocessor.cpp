@@ -70,7 +70,7 @@ void PipeLineProcessor::loadHeaderData(const json& jsonData) {
 void PipeLineProcessor::loadPipelines(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_PIPELINES) && jsonData[JSON_PROPERTY_PIPELINES].is_array()) {
         for (const auto& currentPipelineDefinition : jsonData[JSON_PROPERTY_PIPELINES]) {
-            std::optional<std::unique_ptr<second_take::Pipeline, std::default_delete<second_take::Pipeline>>> currentPipeline =
+            std::optional<std::shared_ptr<second_take::Pipeline>> currentPipeline =
                 Pipeline::getInstance(getPipelineConfigFileNameFromJsonData(currentPipelineDefinition));
             if(currentPipeline.has_value()) {
                 pipelines.push_back(std::move(currentPipeline.value()));

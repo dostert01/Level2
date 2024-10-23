@@ -14,13 +14,13 @@ namespace second_take {
 #define JSON_PROPERTY_LIBRARY_NAME "libraryName"
 #define JSON_PROPERTY_NAMED_ARGUMENTS "namedArguments"
 
-std::unique_ptr<Pipeline> Pipeline::getInstance() {
-    std::unique_ptr<Pipeline> instance = std::make_unique<Pipeline>();
+std::shared_ptr<Pipeline> Pipeline::getInstance() {
+    std::shared_ptr<Pipeline> instance = std::make_shared<Pipeline>();
     return instance;
 }
 
-std::optional<std::unique_ptr<Pipeline>> Pipeline::getInstance(const std::string configFilePath) {
-    std::unique_ptr<Pipeline> instance = getInstance();
+std::optional<std::shared_ptr<Pipeline>> Pipeline::getInstance(const std::string configFilePath) {
+    std::shared_ptr<Pipeline> instance = getInstance();
     try {
         instance.get()->loadPipelineConfig(configFilePath);
     } catch (const std::exception& e) {

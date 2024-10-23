@@ -21,7 +21,7 @@ namespace second_take {
         private:
             std::string configFileDir;
             std::string processName;
-            std::vector<std::unique_ptr<second_take::Pipeline>> pipelines;
+            std::vector<std::shared_ptr<second_take::Pipeline>> pipelines;
             void loadProcessorConfig(const std::string& configFilePath);
             void setConfigFileDirFromConfigFileName(
                 const std::string& configFilePath);

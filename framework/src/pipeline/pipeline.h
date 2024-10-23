@@ -56,8 +56,8 @@ class PipelineStep {
 class Pipeline : public Selectable {
     public:
         Pipeline() = default;
-        static std::unique_ptr<Pipeline> getInstance();
-        static std::optional<std::unique_ptr<Pipeline>> getInstance(const std::string configFilePath);
+        static std::shared_ptr<Pipeline> getInstance();
+        static std::optional<std::shared_ptr<Pipeline>> getInstance(const std::string configFilePath);
         uint getCountOfPipelineSteps();
         std::optional<PipelineStep*> getStepByName(const std::string& stepName);
         void setPipelineName(const std::string& pipelineName);

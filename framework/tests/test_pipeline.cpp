@@ -43,14 +43,14 @@ void configureTest() {
 }
 
 TEST(PipeLine, CanCreateNewInstances) {
-    std::unique_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
-    std::unique_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
+    std::shared_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
+    std::shared_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
     EXPECT_FALSE(pipeline1.get() == pipeline2.get());
 }
 
 TEST(PipeLine, CanLoadConfigFromJson) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.has_value());
     if(pipeline1.has_value())
         EXPECT_TRUE((pipeline1.value()->getCountOfPipelineSteps() == 2));
@@ -58,20 +58,20 @@ TEST(PipeLine, CanLoadConfigFromJson) {
 
 TEST(PipeLine, ReturnsEmptyIfLoadingFails) {
     test_pipeline::configureLogger();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance("/this/is/and/invalid/path");
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance("/this/is/and/invalid/path");
     EXPECT_FALSE(pipeline1.has_value());
 }
 
 
 TEST(PipeLine, PipelineHasName) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.value()->getPipelineName() == "my first testPipeline");
 }
 
 TEST(PipeLine, CanLoadTheHelloWordLib) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     std::optional<PipelineStep*> pipelineStep = pipeline1.value()->getStepByName("test Step 02");
     EXPECT_TRUE(pipelineStep.has_value());
     if(pipelineStep.has_value()) {
@@ -82,7 +82,7 @@ TEST(PipeLine, CanLoadTheHelloWordLib) {
 
 TEST(Pipeline, CanExecuteThePipeline) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     testing::internal::CaptureStdout();
     pipeline.value()->execute();
     std::string output = testing::internal::GetCapturedStdout();
@@ -94,7 +94,7 @@ TEST(Pipeline, CanExecuteThePipeline) {
 
 TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     pipeline.value()->execute();
@@ -111,7 +111,7 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
 
 TEST(Pipeline, CanUseProcessData) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
@@ -128,7 +128,7 @@ TEST(Pipeline, CanUseProcessData) {
 
 TEST(Pipeline, CanUseBinaryProcessData) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     PipelineProcessingData processData;
     pipeline.value()->execute(processData);
     EXPECT_EQ(1, processData.getCountOfPayloads());
@@ -143,7 +143,7 @@ TEST(Pipeline, CanUseBinaryProcessData) {
 
 TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addSelectorPattern("key01", "value01");
     pipeline.value()->addSelectorPattern("key02", "value02");
     EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
@@ -151,7 +151,7 @@ TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
 
 TEST(Pipeline, SelectorPatternCanBeOverwritten) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addSelectorPattern("key01", "value01");
     pipeline.value()->addSelectorPattern("key02", "value02");
     EXPECT_EQ("value02", pipeline.value()->getSelectorPattern("key02").value());
@@ -162,7 +162,7 @@ TEST(Pipeline, SelectorPatternCanBeOverwritten) {
 
 TEST(Pipeline, SelectorPatternCanBeRemoved) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addSelectorPattern("key01", "value01");
     pipeline.value()->addSelectorPattern("key02", "value02");
     pipeline.value()->removeSelectorPattern("key01");
@@ -172,7 +172,7 @@ TEST(Pipeline, SelectorPatternCanBeRemoved) {
 
 TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
     configureTest();
-    std::optional<std::unique_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addSelectorPattern("key01", "value01");
     pipeline.value()->addSelectorPattern("key02", "value02");
     pipeline.value()->removeSelectorPattern("key03");
