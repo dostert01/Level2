@@ -9,6 +9,7 @@ namespace second_take {
 #define JSON_PROPERTY_PIPELINES "pipelines"
 #define JSON_PROPERTY_PIPELINE_CONFIG_FILE "pipelineConfigFile"
 #define JSON_PROPERTY_PROCESS_NAME "processName"
+#define JSON_PROPERTY_SELECTION_PATTERNS_ARRAY "selectorPatterns"
 
 #define DIR_SEPARATOR "/"
 
@@ -70,9 +71,10 @@ void PipeLineProcessor::loadHeaderData(const json& jsonData) {
 void PipeLineProcessor::loadPipelines(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_PIPELINES) && jsonData[JSON_PROPERTY_PIPELINES].is_array()) {
         for (const auto& currentPipelineDefinition : jsonData[JSON_PROPERTY_PIPELINES]) {
-            std::optional<std::shared_ptr<second_take::Pipeline>> currentPipeline =
+            std::optional<std::shared_ptr<Pipeline>> currentPipeline =
                 Pipeline::getInstance(getPipelineConfigFileNameFromJsonData(currentPipelineDefinition));
             if(currentPipeline.has_value()) {
+                readSelectionPatterns(currentPipeline.value(), currentPipelineDefinition);
                 pipelines.push_back(std::move(currentPipeline.value()));
             } else {
                 throw PipelineException("Failed to load pipeline from file: " +
@@ -84,6 +86,18 @@ void PipeLineProcessor::loadPipelines(const json& jsonData) {
     }
 }
 
+void PipeLineProcessor::readSelectionPatterns(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition) {
+    if(pipelineDefinition.contains(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) && pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].is_array()) {
+        LOGGER.debug("Reading " + std::string(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) + " for pipeline");
+        for(auto& pattern : pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].items()) {
+            for(auto& object : pattern.value().items()) {
+                LOGGER.debug(object.key() + " = " + object.value().get<std::string>());
+                pipeline.get()->addSelectorPattern(object.key(), object.value().get<std::string>());
+            }
+        }
+    }
+}
+
 std::string PipeLineProcessor::getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition) {
     std::string currentPipelineConfigFileName = currentPipelineDefinition.value(JSON_PROPERTY_PIPELINE_CONFIG_FILE, UNDEFINED_JSON_DATA);
     if(!configFileDir.empty()) {
@@ -91,6 +105,14 @@ std::string PipeLineProcessor::getPipelineConfigFileNameFromJsonData(const nlohm
     }
     LOGGER.info("Loading pipeline from config file: " + currentPipelineConfigFileName);
     return currentPipelineConfigFileName;
+}
+
+std::optional<std::shared_ptr<Pipeline>> PipeLineProcessor::getPipelineByName(std::string pipelineName) {
+    for(const auto& currentPipeline : pipelines) {
+        if(currentPipeline.get()->getPipelineName() == pipelineName)
+            return currentPipeline;
+    }
+    return std::nullopt;
 }
 
 uint PipeLineProcessor::getCountOfPipelines() {

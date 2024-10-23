@@ -52,7 +52,7 @@ TEST(PipeLineProcessor, CanLoadConfigFromJson) {
     std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(processor.has_value());
     if(processor.has_value())
-        EXPECT_TRUE((processor.value()->getCountOfPipelines() == 2));
+        EXPECT_EQ(3, processor.value()->getCountOfPipelines());
 }
 
 TEST(PipeLineProcessor, ProcessHasAName) {
@@ -65,14 +65,14 @@ TEST(PipeLineProcessor, CanGetPipelineByName) {
     configureTest();
     std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     PipeLineProcessor* prc = processor.value().get();
-
-    //"my first testPipeline"
-
-    EXPECT_TRUE(false);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = prc->getPipelineByName("my first testPipeline");
+    EXPECT_TRUE(pipeline.has_value());
+    EXPECT_EQ("my first testPipeline", pipeline.value().get()->getPipelineName());
 }
 
 TEST(PipeLineProcessor, PipelineHasSelectionPatterns) {
     configureTest();
     std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
-    EXPECT_TRUE(false);
+    std::shared_ptr<Pipeline> pipeline = processor.value().get()->getPipelineByName("my first testPipeline").value();
+    EXPECT_EQ(5, pipeline.get()->getCountOfSelectorPatterns());
 }

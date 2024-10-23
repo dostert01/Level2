@@ -2,10 +2,21 @@
     "processName" : "my first testProcess",
     "pipelines" : [
         {
-            "pipelineConfigFile":"pipelineConfig01.json"
+            "pipelineConfigFile":"pipelineConfig01.json",
+            "selectorPatterns" : [
+                {"key01": "value01"},
+                {"key02": "value02"},
+                {"key03": "value03"},
+                {"key04": "value04", "key05": "value05"}
+            ]
         },
         {
-            "pipelineConfigFile":"pipelineConfig03.json"
+            "pipelineConfigFile":"pipelineConfig03.json",
+            "selectorPatterns" : []
+        },
+        {
+            "pipelineConfigFile":"pipelineConfig04.json"
         }
+
     ]
 }

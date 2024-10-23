@@ -18,6 +18,7 @@ namespace second_take {
             static std::optional<std::unique_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
             uint getCountOfPipelines();
             std::string getProcessName();
+            std::optional<std::shared_ptr<Pipeline>> getPipelineByName(std::string pipelineName);
         private:
             std::string configFileDir;
             std::string processName;
@@ -29,6 +30,7 @@ namespace second_take {
             void loadPipelines(const json& jsonData);
             std::string getDirNameFromPath(const std::string path);
             std::string getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition);
+            void readSelectionPatterns(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition);
     };
 
 }  // namespace second_take
