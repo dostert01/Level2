@@ -30,9 +30,9 @@ int pipeline_step_module_process(PipelineProcessingData& processData) {
 }
 
 void processTheProcessingData(PipelineProcessingData& processData) {
-  std::optional<ProcessingPayload*> p = processData.getPayload("question");
+  std::optional<std::shared_ptr<ProcessingPayload>> p = processData.getPayload("question");
   if ((p.has_value()) &&
-      (p.value()->payloadAsString().compare("What is the answer?") == 0)) {
+      (p.value().get()->payloadAsString().compare("What is the answer?") == 0)) {
     std::cout << "adding the answer to the question" << std::endl;
     processData.addPayloadData("answer", "text/plain", "the answer is 42");
   } else {

@@ -59,14 +59,14 @@ class Pipeline : public Selectable {
         static std::shared_ptr<Pipeline> getInstance();
         static std::optional<std::shared_ptr<Pipeline>> getInstance(const std::string configFilePath);
         uint getCountOfPipelineSteps();
-        std::optional<PipelineStep*> getStepByName(const std::string& stepName);
+        std::optional<std::shared_ptr<PipelineStep>> getStepByName(const std::string& stepName);
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
         void execute();
         void execute(const PipelineProcessingData& processData);
     private:
         std::string pipelineName;
-        std::vector<std::unique_ptr<PipelineStep>> pipelineSteps;
+        std::vector<std::shared_ptr<PipelineStep>> pipelineSteps;
         void loadPipelineConfig(const std::string& configFilePath);
         void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);

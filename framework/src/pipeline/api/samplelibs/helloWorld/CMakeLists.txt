@@ -11,6 +11,7 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 # Specify the library
 add_library(helloWorld SHARED
     helloWorld.cpp)
+target_link_libraries(helloWorld pipelineapi)
 
 # Specify the include directories for the library
 target_include_directories(helloWorld PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PIPELINE_API_INCLUDE_DIR})

@@ -56,26 +56,28 @@ void ProcessingPayload::setPayload(std::shared_ptr<BinaryProcessingData> payload
     PipelineProcessingData
 */
 PipelineProcessingData::~PipelineProcessingData() {
-    std::multimap<std::string, ProcessingPayload*>::iterator it;
+    /*
+    std::multimap<std::string, std::shared_ptr<ProcessingPayload>>::iterator it;
     for(it = namedPayloadData.begin(); it != namedPayloadData.end(); ++it) {
         if(it->second != NULL) {
             std::cout << "deleting payload of name: " << it->first << std::endl;
             delete it->second;
         }
     }
+    */
 }
 
 void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::string data) {
-    ProcessingPayload* payload = new ProcessingPayload(mimetype, data);
+    std::shared_ptr<ProcessingPayload> payload = std::make_shared<ProcessingPayload>(mimetype, data);
     namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
 }
 
 void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data) {
-    ProcessingPayload* payload = new ProcessingPayload(mimetype, data);
+    std::shared_ptr<ProcessingPayload> payload = std::make_shared<ProcessingPayload>(mimetype, data);
     namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
 }
 
-std::optional<ProcessingPayload*> PipelineProcessingData::getPayload(std::string payloadName) {
+std::optional<std::shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(std::string payloadName) {
     auto search = namedPayloadData.find(payloadName);
     if(search != namedPayloadData.end()) {
         return search->second;

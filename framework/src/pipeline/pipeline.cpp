@@ -45,10 +45,10 @@ void Pipeline::execute(const PipelineProcessingData& processData) {
     }
 }
 
-std::optional<PipelineStep*> Pipeline::getStepByName(const std::string& stepName) {
+std::optional<std::shared_ptr<PipelineStep>> Pipeline::getStepByName(const std::string& stepName) {
     for(const auto& currentStep : pipelineSteps) {
         if(currentStep.get()->getStepName() == stepName){
-            return currentStep.get();
+            return currentStep;
         }
     }
     return nullptr;
@@ -85,7 +85,7 @@ void Pipeline::loadPipelineMetaData(const json& jsonData) {
 void Pipeline::loadPipelineSteps(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_PIPELINE_STEPS) && jsonData[JSON_PROPERTY_PIPELINE_STEPS].is_array()) {
         for (const auto& step : jsonData[JSON_PROPERTY_PIPELINE_STEPS]) {
-            std::unique_ptr<PipelineStep> currentStep = std::make_unique<PipelineStep>();
+            std::shared_ptr<PipelineStep> currentStep = std::make_shared<PipelineStep>();
             currentStep.get()->setStepName(step.value(JSON_PROPERTY_STEP_NAME, UNDEFINED_JSON_DATA));
             currentStep.get()->setLibraryName(step.value(JSON_PROPERTY_LIBRARY_NAME, UNDEFINED_JSON_DATA));
             currentStep.get()->loadNamedArguments(step);
@@ -95,7 +95,7 @@ void Pipeline::loadPipelineSteps(const json& jsonData) {
                 throw;
             }
             if(currentStep.get()->isInitComplete()) {
-                pipelineSteps.push_back(std::move(currentStep));
+                pipelineSteps.push_back(currentStep);
             } else {
                 throw PipelineException("Failed to load pipeline step: Definition of pipeline steps in json might be incomplete.");
             }

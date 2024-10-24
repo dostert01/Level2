@@ -38,13 +38,13 @@ class ProcessingPayload {
 class PipelineProcessingData
 {
     private:
-        std::multimap<std::string, ProcessingPayload*> namedPayloadData;
+        std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
     public:
         PipelineProcessingData() = default;
         ~PipelineProcessingData();
         void addPayloadData(std::string payloadName, std::string mimetype, std::string data);
         void addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data);
-        std::optional<ProcessingPayload*> getPayload(std::string payloadName);
+        std::optional<std::shared_ptr<ProcessingPayload>> getPayload(std::string payloadName);
         uint getCountOfPayloads();
 };
 
