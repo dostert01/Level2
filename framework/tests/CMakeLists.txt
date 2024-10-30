@@ -38,7 +38,12 @@ add_executable(test_pipeline
     test_pipeline.cpp
     $<TARGET_OBJECTS:pipeline>)
 
-# Tests registrieren
+# Tests hinzufügen
+add_executable(test_pipeline_payload_matching
+    test_pipeline_payload_matching.cpp
+    $<TARGET_OBJECTS:pipeline>)
+
+    # Tests registrieren
 add_test(NAME test_secondTake COMMAND test_secondTake)
 set_tests_properties(test_secondTake PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
@@ -47,3 +52,6 @@ set_tests_properties(test_pipelineprocessor PROPERTIES ENVIRONMENT "TEST_FILES_D
 
 add_test(NAME test_pipeline COMMAND test_pipeline)
 set_tests_properties(test_pipeline PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_pipeline_payload_matching COMMAND test_pipeline_payload_matching)
+set_tests_properties(test_pipeline_payload_matching PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

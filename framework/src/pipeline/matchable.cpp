@@ -1,4 +1,8 @@
+#include <regex>
+#include <iostream>
+
 #include "matchable.h"
+#include "../logger/logger.h"
 
 namespace second_take {
 
@@ -11,7 +15,7 @@ uint Matchable::getCountOfMatchingPatterns() {
 }
 
 std::optional<std::string> Matchable::getMatchingPattern(std::string key) {
-    if(matchingPatterns.find(key) != matchingPatterns.end()) {
+    if(matchingPatterns.contains(key)) {
         return matchingPatterns[key];
     } else {
         return std::nullopt;
@@ -20,6 +24,37 @@ std::optional<std::string> Matchable::getMatchingPattern(std::string key) {
 
 void Matchable::removeMatchingPattern(std::string key) {
     matchingPatterns.erase(key);
+}
+
+bool Matchable::matchesAll(Matchable& other) {
+    int matchCount = 0;
+    if(this->getCountOfMatchingPatterns() == other.getCountOfMatchingPatterns()) {
+        for(const auto& [key, value] : matchingPatterns) {
+            std::optional<std::string> foundMatchingPattern = other.getMatchingPattern(key);
+            if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
+                matchCount++;
+            }
+        }
+    } else {
+        LOGGER.info("Patterns do not match because of different counts");
+    }
+    LOGGER.info("Patterns matched " + std::to_string(matchCount) + "/" + std::to_string(getCountOfMatchingPatterns()));
+    return matchCount == getCountOfMatchingPatterns();
+}
+
+bool Matchable::RegexMatch(std::string s1, std::string s2) {
+    bool match = false;
+    try {
+        std::regex regex(s1);
+        match = std::regex_match(s2, regex);
+    } catch (const std::exception& e) {
+        LOGGER.error("Failed to match regular expression '" + s1 + "' with value '" + s2 + "' - " + e.what());
+    }
+    return match;
+}
+
+bool Matchable::hasMatchingPatterns() {
+    return getCountOfMatchingPatterns() > 0;
 }
 
 }

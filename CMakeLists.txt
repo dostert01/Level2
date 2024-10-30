@@ -6,7 +6,7 @@ project(secondTake VERSION 1.0)
 execute_process(COMMAND ./getDependencies.sh)
 
 # Festlegen des Standards für C++
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add sub projects

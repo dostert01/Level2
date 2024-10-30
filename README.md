@@ -1,6 +1,6 @@
-# secondtake-logger
+# secondtake
 
-This project is all about providing a simple to use c++ logger
+This project is all about providing a easy to use c++ logger
 
 ## How to build
 

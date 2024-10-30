@@ -39,9 +39,14 @@ void Pipeline::execute() {
     this->execute(emptyProcessingData);
 }
 
-void Pipeline::execute(const PipelineProcessingData& processData) {
-    for(const auto& currentStep : pipelineSteps) {
-        currentStep.get()->runProcessingFunction(processData);
+void Pipeline::execute(PipelineProcessingData& processData) {
+    if(!hasMatchingPatterns() || matchesAll(processData)) {
+        LOGGER.info("Start processing payload by pipeline '" + getPipelineName() + "'");
+        for(const auto& currentStep : pipelineSteps) {
+            currentStep.get()->runProcessingFunction(processData);
+        }
+    } else {
+        LOGGER.info("Pipeline '" + getPipelineName() + "' rejects processing of payload because of non matching patterns.");
     }
 }
 

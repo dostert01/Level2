@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+#include "../matchable.h"
+
 struct PipelineStepInitData
 {
     std::multimap<std::string, std::string> namedArguments;
@@ -35,8 +37,7 @@ class ProcessingPayload {
         std::shared_ptr<BinaryProcessingData> payloadAsBinaryData();
 };
 
-class PipelineProcessingData
-{
+class PipelineProcessingData : public second_take::Matchable {
     private:
         std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
     public:

@@ -62,7 +62,7 @@ class Pipeline : public Matchable {
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
         void execute();
-        void execute(const PipelineProcessingData& processData);
+        void execute(PipelineProcessingData& processData);
     private:
         std::string pipelineName;
         std::vector<std::shared_ptr<PipelineStep>> pipelineSteps;

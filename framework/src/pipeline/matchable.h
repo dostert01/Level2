@@ -1,5 +1,5 @@
-#ifndef PIPELINE_SELECTABLE_H
-#define PIPELINE_SELECTABLE_H
+#ifndef PIPELINE_MATCHABLE_H
+#define PIPELINE_MATCHABLE_H
 
 #include <map>
 #include <string>
@@ -15,11 +15,14 @@ class Matchable {
         uint getCountOfMatchingPatterns();
         std::optional<std::string> getMatchingPattern(std::string key);
         void removeMatchingPattern(std::string key);
+        bool matchesAll(Matchable& other);
+        bool hasMatchingPatterns();
     private:
         std::map<std::string, std::string> matchingPatterns;
+        bool RegexMatch(std::string s1, std::string s2);
 
 };
 
 }
 
-#endif //PIPELINE_SELECTABLE_H
+#endif //PIPELINE_MATCHABLE_H

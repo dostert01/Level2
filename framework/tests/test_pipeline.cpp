@@ -178,3 +178,36 @@ TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
     pipeline.value()->removeMatchingPattern("key03");
     EXPECT_EQ(2, pipeline.value()->getCountOfMatchingPatterns());
 }
+
+TEST(Pipeline, ProcessesDataOnlyIfPayloadPatternsMatchThePipelinePatterns) {
+    configureTest();
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::string testfileName = "./argumentsProcessor_output02.txt";
+    std::filesystem::remove(testfileName);
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processData.addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key01", "value01");
+    pipeline.value()->execute(processData);
+    std::optional<std::shared_ptr<ProcessingPayload>> payload;
+    payload = processData.getPayload("answer");
+    EXPECT_TRUE(payload.has_value());
+    EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
+    std::filesystem::remove(testfileName);
+}
+
+TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
+    configureTest();
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::string testfileName = "./argumentsProcessor_output02.txt";
+    std::filesystem::remove(testfileName);
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processData.addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key01", "value02");
+    pipeline.value()->execute(processData);
+    std::optional<std::shared_ptr<ProcessingPayload>> payload;
+    payload = processData.getPayload("answer");
+    EXPECT_FALSE(payload.has_value());
+    std::filesystem::remove(testfileName);
+}
