@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "pipelineapi.h"
-#include "selecable.h"
+#include "matchable.h"
 
 using json = nlohmann::json;
 
@@ -20,13 +20,12 @@ namespace second_take {
 class PipelineException : public std::exception {
     public:
         explicit PipelineException(const std::string& message);
-        //virtual const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW  noexcept override;
         virtual const char* what() const noexcept override;
     private:
         std::string message;
 }; 
 
-using LibInitFunction = int (*)(PipelineStepInitData* initData);
+using LibInitFunction = int (*)(PipelineStepInitData& initData);
 using LibProcessFunction = int (*)(const PipelineProcessingData& processData);
 using LibFinishFunction = int (*)();
 
@@ -53,7 +52,7 @@ class PipelineStep {
         PipelineStepInitData initData;
 };
 
-class Pipeline : public Selectable {
+class Pipeline : public Matchable {
     public:
         Pipeline() = default;
         static std::shared_ptr<Pipeline> getInstance();

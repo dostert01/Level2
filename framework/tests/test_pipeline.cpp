@@ -41,7 +41,7 @@ void configureTest() {
     test_pipeline::configureLogger();
     test_pipeline::configureTestVariables();
 }
-/*
+
 TEST(PipeLine, CanCreateNewInstances) {
     std::shared_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
     std::shared_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
@@ -144,37 +144,37 @@ TEST(Pipeline, CanUseBinaryProcessData) {
 TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
-    pipeline.value()->addSelectorPattern("key01", "value01");
-    pipeline.value()->addSelectorPattern("key02", "value02");
-    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+    pipeline.value()->addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key02", "value02");
+    EXPECT_EQ(2, pipeline.value()->getCountOfMatchingPatterns());
 }
 
 TEST(Pipeline, SelectorPatternCanBeOverwritten) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
-    pipeline.value()->addSelectorPattern("key01", "value01");
-    pipeline.value()->addSelectorPattern("key02", "value02");
-    EXPECT_EQ("value02", pipeline.value()->getSelectorPattern("key02").value());
-    pipeline.value()->addSelectorPattern("key02", "value03");
-    EXPECT_EQ("value03", pipeline.value()->getSelectorPattern("key02").value());
-    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+    pipeline.value()->addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key02", "value02");
+    EXPECT_EQ("value02", pipeline.value()->getMatchingPattern("key02").value());
+    pipeline.value()->addMatchingPattern("key02", "value03");
+    EXPECT_EQ("value03", pipeline.value()->getMatchingPattern("key02").value());
+    EXPECT_EQ(2, pipeline.value()->getCountOfMatchingPatterns());
 }
 
 TEST(Pipeline, SelectorPatternCanBeRemoved) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
-    pipeline.value()->addSelectorPattern("key01", "value01");
-    pipeline.value()->addSelectorPattern("key02", "value02");
-    pipeline.value()->removeSelectorPattern("key01");
-    EXPECT_FALSE(pipeline.value()->getSelectorPattern("key01").has_value());
-    EXPECT_EQ(1, pipeline.value()->getCountOfSelectorPatterns());
+    pipeline.value()->addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key02", "value02");
+    pipeline.value()->removeMatchingPattern("key01");
+    EXPECT_FALSE(pipeline.value()->getMatchingPattern("key01").has_value());
+    EXPECT_EQ(1, pipeline.value()->getCountOfMatchingPatterns());
 }
-*/
+
 TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
-    pipeline.value()->addSelectorPattern("key01", "value01");
-    pipeline.value()->addSelectorPattern("key02", "value02");
-    pipeline.value()->removeSelectorPattern("key03");
-    EXPECT_EQ(2, pipeline.value()->getCountOfSelectorPatterns());
+    pipeline.value()->addMatchingPattern("key01", "value01");
+    pipeline.value()->addMatchingPattern("key02", "value02");
+    pipeline.value()->removeMatchingPattern("key03");
+    EXPECT_EQ(2, pipeline.value()->getCountOfMatchingPatterns());
 }

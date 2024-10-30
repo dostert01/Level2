@@ -140,7 +140,7 @@ void PipelineStep::setLibraryName(const std::string libraryName) {
 void PipelineStep::loadLib() {
     std::string libraryFileName = "lib" + libraryName + ".so";
     LOGGER.info("Loading shared object into pipeline: " + libraryFileName);
-    hLib = dlopen(libraryFileName.c_str(), RTLD_NOW);
+    hLib = dlopen(libraryFileName.c_str(), RTLD_LAZY);
     char* error = dlerror();
     if((hLib == NULL) && (error != NULL)) {
         throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " : " + error);
@@ -172,7 +172,7 @@ bool PipelineStep::isInitComplete() {
 }
 
 void PipelineStep::runInitFunction() {
-    libInit(&initData);
+    libInit(initData);
 }
 
 void PipelineStep::runProcessingFunction(const PipelineProcessingData& processingData) { 

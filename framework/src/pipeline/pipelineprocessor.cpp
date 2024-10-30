@@ -74,7 +74,7 @@ void PipeLineProcessor::loadPipelines(const json& jsonData) {
             std::optional<std::shared_ptr<Pipeline>> currentPipeline =
                 Pipeline::getInstance(getPipelineConfigFileNameFromJsonData(currentPipelineDefinition));
             if(currentPipeline.has_value()) {
-                readSelectionPatterns(currentPipeline.value(), currentPipelineDefinition);
+                readMatchingPatternsFromJson(currentPipeline.value(), currentPipelineDefinition);
                 pipelines.push_back(std::move(currentPipeline.value()));
             } else {
                 throw PipelineException("Failed to load pipeline from file: " +
@@ -86,13 +86,13 @@ void PipeLineProcessor::loadPipelines(const json& jsonData) {
     }
 }
 
-void PipeLineProcessor::readSelectionPatterns(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition) {
+void PipeLineProcessor::readMatchingPatternsFromJson(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition) {
     if(pipelineDefinition.contains(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) && pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].is_array()) {
         LOGGER.debug("Reading " + std::string(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) + " for pipeline");
         for(auto& pattern : pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].items()) {
             for(auto& object : pattern.value().items()) {
                 LOGGER.debug(object.key() + " = " + object.value().get<std::string>());
-                pipeline.get()->addSelectorPattern(object.key(), object.value().get<std::string>());
+                pipeline.get()->addMatchingPattern(object.key(), object.value().get<std::string>());
             }
         }
     }

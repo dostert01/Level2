@@ -22,7 +22,7 @@ add_subdirectory(api)
 add_library(pipeline OBJECT 
     pipeline.cpp
     pipelineprocessor.cpp
-    selectable.cpp)
+    matchable.cpp)
 
 target_include_directories(pipeline PRIVATE api)
 
