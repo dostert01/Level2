@@ -1,8 +1,9 @@
 #ifndef BINARY_DATA_PROCESSOR_H
 #define BINARY_DATA_PROCESSOR_H
 
-#include "pipelineapi.h"
 #include <string>
+
+#include "pipelineapi.h"
 
 class SpecificBinaryProcessingData : public BinaryProcessingData {
   public:

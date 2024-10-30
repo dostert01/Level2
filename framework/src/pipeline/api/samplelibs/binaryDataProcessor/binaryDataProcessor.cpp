@@ -1,11 +1,15 @@
-#include "pipelineapi.h"
 #include <iostream>
 #include <fstream>
 #include <memory>
+
+#include "pipelineapi.h"
 #include "binaryDataProcessor.h"
 
 std::string firstArgument;
 std::string secondArgument;
+
+void processTheProcessingData(PipelineProcessingData& processData);
+void processArgumentsFromJson();
 
 SpecificBinaryProcessingData::SpecificBinaryProcessingData() : BinaryProcessingData() {}
 

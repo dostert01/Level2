@@ -1,10 +1,14 @@
-#include "pipelineapi.h"
 #include <iostream>
 #include <fstream>
+
+#include "pipelineapi.h"
 
 std::string outputFileName;
 std::string firstArgument;
 std::string secondArgument;
+
+void processTheProcessingData(PipelineProcessingData& processData);
+void processArgumentsFromJson();
 
 int pipeline_step_module_init(PipelineStepInitData& initData) {
 

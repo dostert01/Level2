@@ -1,6 +1,7 @@
 #include "pipelineapi.h"
 #include <iostream>
 #include <vector>
+
 int pipeline_step_module_init(PipelineStepInitData& initData) {
     return 0;
 }
