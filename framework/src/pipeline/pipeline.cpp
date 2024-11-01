@@ -40,14 +40,20 @@ void Pipeline::execute() {
 }
 
 void Pipeline::execute(PipelineProcessingData& processData) {
-    if(!hasMatchingPatterns() || matchesAll(processData)) {
+    if((!hasMatchingPatterns() && !processData.hasMatchingPatterns()) || matchesAll(processData)) {
         LOGGER.info("Start processing payload by pipeline '" + getPipelineName() + "'");
+        tagProcessingData(processData);
         for(const auto& currentStep : pipelineSteps) {
             currentStep.get()->runProcessingFunction(processData);
         }
     } else {
         LOGGER.info("Pipeline '" + getPipelineName() + "' rejects processing of payload because of non matching patterns.");
     }
+}
+
+void Pipeline::tagProcessingData(PipelineProcessingData& processData) {
+    processData.increaseProcessingCounter();
+    processData.setLastProcessedPipelineName(getPipelineName());
 }
 
 std::optional<std::shared_ptr<PipelineStep>> Pipeline::getStepByName(const std::string& stepName) {

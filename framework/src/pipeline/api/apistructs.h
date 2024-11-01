@@ -40,6 +40,8 @@ class ProcessingPayload {
 class PipelineProcessingData : public second_take::Matchable {
     private:
         std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
+        std::string lastProcessedPipelineName;
+        uint processingCounter = 0;
     public:
         PipelineProcessingData() = default;
         ~PipelineProcessingData();
@@ -47,6 +49,10 @@ class PipelineProcessingData : public second_take::Matchable {
         void addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data);
         std::optional<std::shared_ptr<ProcessingPayload>> getPayload(std::string payloadName);
         uint getCountOfPayloads();
+        uint getProcessingCounter();
+        void increaseProcessingCounter();
+        void setLastProcessedPipelineName(std::string pipelineName);
+        std::string getLastProcessedPipelineName();
 };
 
 #endif //#ifndef API_HELPERS_H

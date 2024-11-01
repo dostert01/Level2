@@ -123,4 +123,10 @@ std::string PipeLineProcessor::getProcessName() {
     return processName;
 }
 
+void PipeLineProcessor::processPayload(PipelineProcessingData& payload) {
+    for(const auto& currentPipeline : pipelines) {
+        currentPipeline.get()->execute(payload);
+    }
+}
+
 }

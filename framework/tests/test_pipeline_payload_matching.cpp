@@ -1,11 +1,6 @@
 #include <gtest/gtest.h>
-//#include <memory>
-//#include <unistd.h>
-//#include <iostream>
-//#include <regex>
-//#include <fstream>
-#include "pipeline.h"
 #include "../logger/logger.h"
+#include "matchable.h"
 
 using namespace second_take;
 
@@ -88,5 +83,11 @@ TEST(PipeLinePayloadMating, ReturnsFalseIfInvalidRegEx) {
     Matchable m2;
     m1.addMatchingPattern("key01", "^[a-z]{5}[0-9]{2$");
     m2.addMatchingPattern("key01", "value01");
+    EXPECT_FALSE(m1.matchesAll(m2));
+}
+
+TEST(PipeLinePayloadMating, DoesNotMatchIfBothHaveNoMatchingPatterns) {
+    Matchable m1;
+    Matchable m2;
     EXPECT_FALSE(m1.matchesAll(m2));
 }

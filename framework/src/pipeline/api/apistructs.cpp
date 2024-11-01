@@ -88,3 +88,19 @@ std::optional<std::shared_ptr<ProcessingPayload>> PipelineProcessingData::getPay
 uint PipelineProcessingData::getCountOfPayloads() {
     return namedPayloadData.size();
 }
+
+uint PipelineProcessingData::getProcessingCounter() {
+    return processingCounter;
+}
+
+void PipelineProcessingData::increaseProcessingCounter() {
+    processingCounter++;
+}
+
+void PipelineProcessingData::setLastProcessedPipelineName(std::string pipelineName) {
+    lastProcessedPipelineName = pipelineName;
+}
+
+std::string PipelineProcessingData::getLastProcessedPipelineName() {
+    return lastProcessedPipelineName;
+}

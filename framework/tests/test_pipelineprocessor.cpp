@@ -76,3 +76,39 @@ TEST(PipeLineProcessor, PipelineHasMatchingPatterns) {
     std::shared_ptr<Pipeline> pipeline = processor.value().get()->getPipelineByName("my first testPipeline").value();
     EXPECT_EQ(5, pipeline.get()->getCountOfMatchingPatterns());
 }
+
+TEST(PipeLineProcessor, OneOfThreePipelinesProcessesTheMatchingPayload) {
+    configureTest();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processData.addMatchingPattern("key01", "value01");
+    processData.addMatchingPattern("key02", "value02");
+    processData.addMatchingPattern("key03", "value03");
+    processData.addMatchingPattern("key04", "value04");
+    processData.addMatchingPattern("key05", "value05");
+    processor.value().get()->processPayload(processData);
+    EXPECT_EQ(1, processData.getProcessingCounter());
+    EXPECT_EQ("my first testPipeline", processData.getLastProcessedPipelineName());
+}
+
+TEST(PipeLineProcessor, NoneOfThreePipelinesProcessesTheMatchingPayload) {
+    configureTest();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processData.addMatchingPattern("thisPattern", "does not match any pipeline");
+    processor.value().get()->processPayload(processData);
+    EXPECT_EQ(0, processData.getProcessingCounter());
+    EXPECT_EQ("", processData.getLastProcessedPipelineName());
+}
+
+TEST(PipeLineProcessor, TwoOfThreePipelinesProcessesThePayloadWithoutAnyMatchingPattern) {
+    configureTest();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    processor.value().get()->processPayload(processData);
+    EXPECT_EQ(2, processData.getProcessingCounter());
+    EXPECT_EQ("my pipeline with binaryData", processData.getLastProcessedPipelineName());
+}

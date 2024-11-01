@@ -20,7 +20,8 @@ class Matchable {
     private:
         std::map<std::string, std::string> matchingPatterns;
         bool RegexMatch(std::string s1, std::string s2);
-
+        bool bothHaveMatchingPatterns(Matchable& other);
+        bool bothHaveSameNumberOfMatchingPatterns(Matchable& other);
 };
 
 }

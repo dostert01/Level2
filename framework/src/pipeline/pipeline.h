@@ -69,6 +69,7 @@ class Pipeline : public Matchable {
         void loadPipelineConfig(const std::string& configFilePath);
         void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);
+        void tagProcessingData(PipelineProcessingData& processData);
 };
 
 }

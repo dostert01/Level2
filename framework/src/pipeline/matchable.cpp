@@ -28,7 +28,7 @@ void Matchable::removeMatchingPattern(std::string key) {
 
 bool Matchable::matchesAll(Matchable& other) {
     int matchCount = 0;
-    if(this->getCountOfMatchingPatterns() == other.getCountOfMatchingPatterns()) {
+    if(bothHaveMatchingPatterns(other) && bothHaveSameNumberOfMatchingPatterns(other)) {
         for(const auto& [key, value] : matchingPatterns) {
             std::optional<std::string> foundMatchingPattern = other.getMatchingPattern(key);
             if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
@@ -39,7 +39,15 @@ bool Matchable::matchesAll(Matchable& other) {
         LOGGER.info("Patterns do not match because of different counts");
     }
     LOGGER.info("Patterns matched " + std::to_string(matchCount) + "/" + std::to_string(getCountOfMatchingPatterns()));
-    return matchCount == getCountOfMatchingPatterns();
+    return (matchCount == getCountOfMatchingPatterns()) && (matchCount > 0);
+}
+
+bool Matchable::bothHaveMatchingPatterns(Matchable& other) {
+    return (this->getCountOfMatchingPatterns() > 0) && (other.getCountOfMatchingPatterns() > 0);
+}
+
+bool Matchable::bothHaveSameNumberOfMatchingPatterns(Matchable& other) {
+    return this->getCountOfMatchingPatterns() == other.getCountOfMatchingPatterns();
 }
 
 bool Matchable::RegexMatch(std::string s1, std::string s2) {

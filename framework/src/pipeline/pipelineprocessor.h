@@ -19,6 +19,7 @@ namespace second_take {
             uint getCountOfPipelines();
             std::string getProcessName();
             std::optional<std::shared_ptr<Pipeline>> getPipelineByName(std::string pipelineName);
+            void processPayload(PipelineProcessingData& payload);
         private:
             std::string configFileDir;
             std::string processName;
