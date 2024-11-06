@@ -54,9 +54,9 @@ void processTheProcessingData(PipelineProcessingData& processData) {
   }
 
   if(!error01.empty())
-    processData.addError("error 01", error01);
+    processData.addError("first error", error01);
   if(!error02.empty())
-    processData.addError("error 02", error02);
+    processData.addError("second error", error02);
 }
 
 void processArgumentsFromJson() {

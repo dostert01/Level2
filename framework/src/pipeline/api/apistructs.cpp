@@ -86,6 +86,18 @@ bool PipelineProcessingData::hasError() {
     return namedPayloadData.contains(PAYLOAD_NAME_PROCESSING_ERROR);
 }
 
+std::vector<ProcessingError> PipelineProcessingData::getAllErrors() {
+    std::vector<ProcessingError> returnVector;
+    if(hasError()) {
+        auto allErrors = namedPayloadData.equal_range(PAYLOAD_NAME_PROCESSING_ERROR);
+        for(auto iterator = allErrors.first; iterator != allErrors.second; ++iterator) {
+            ProcessingError* error = (ProcessingError*)(iterator->second.get()->payloadAsBinaryData().get());
+            returnVector.emplace_back(error);
+        }
+    }
+    return returnVector;
+}
+
 std::optional<std::shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(std::string payloadName) {
     auto search = namedPayloadData.find(payloadName);
     if(search != namedPayloadData.end()) {
@@ -120,4 +132,17 @@ std::string PipelineProcessingData::getLastProcessedPipelineName() {
 ProcessingError::ProcessingError(std::string errorCode, std::string errorMessage) : BinaryProcessingData() {
     this->errorCode = errorCode;
     this->errorMessage = errorMessage;
+}
+
+ProcessingError::ProcessingError(ProcessingError* other) : BinaryProcessingData() {
+    errorCode = other->getErrorCode();
+    errorMessage = other->getErrorMessage();
+}
+
+std::string ProcessingError::getErrorCode() {
+    return errorCode;
+}
+
+std::string ProcessingError::getErrorMessage() {
+    return errorMessage;
 }

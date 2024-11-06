@@ -220,3 +220,16 @@ TEST(Pipeline, PipelineCanLogErrors) {
     pipeline.value()->execute(processData);
     EXPECT_TRUE(processData.hasError());
 }
+
+TEST(Pipeline, CanGetAllErrors) {
+    configureTest();
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
+    PipelineProcessingData processData;
+    pipeline.value()->execute(processData);
+    std::vector<ProcessingError> allErrors = processData.getAllErrors();
+    EXPECT_EQ(2, allErrors.size());
+    EXPECT_EQ("first error", allErrors.at(0).getErrorCode());
+    EXPECT_EQ("this is a test error", allErrors.at(0).getErrorMessage());
+    EXPECT_EQ("second error", allErrors.at(1).getErrorCode());
+    EXPECT_EQ("this is yet another test error", allErrors.at(1).getErrorMessage());
+}

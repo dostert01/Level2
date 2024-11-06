@@ -23,6 +23,9 @@ class BinaryProcessingData {
 class ProcessingError :public BinaryProcessingData {
     public:
         ProcessingError(std::string errorCode, std::string errorMessage);
+        ProcessingError(ProcessingError* other);
+        std::string getErrorCode();
+        std::string getErrorMessage();
     private:
         std::string errorCode;
         std::string errorMessage;
@@ -60,6 +63,7 @@ class PipelineProcessingData : public second_take::Matchable {
         void addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data);
         void addError(std::string errorCode, std::string errorMessage);
         bool hasError();
+        std::vector<ProcessingError> getAllErrors();
         std::optional<std::shared_ptr<ProcessingPayload>> getPayload(std::string payloadName);
         uint getCountOfPayloads();
         uint getProcessingCounter();
