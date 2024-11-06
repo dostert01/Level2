@@ -9,7 +9,7 @@ namespace second_take {
 #define JSON_PROPERTY_PIPELINES "pipelines"
 #define JSON_PROPERTY_PIPELINE_CONFIG_FILE "pipelineConfigFile"
 #define JSON_PROPERTY_PROCESS_NAME "processName"
-#define JSON_PROPERTY_SELECTION_PATTERNS_ARRAY "selectorPatterns"
+#define JSON_PROPERTY_MATCHING_PATTERNS_ARRAY "matchingPatterns"
 
 #define DIR_SEPARATOR "/"
 
@@ -87,9 +87,9 @@ void PipeLineProcessor::loadPipelines(const json& jsonData) {
 }
 
 void PipeLineProcessor::readMatchingPatternsFromJson(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition) {
-    if(pipelineDefinition.contains(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) && pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].is_array()) {
-        LOGGER.debug("Reading " + std::string(JSON_PROPERTY_SELECTION_PATTERNS_ARRAY) + " for pipeline");
-        for(auto& pattern : pipelineDefinition[JSON_PROPERTY_SELECTION_PATTERNS_ARRAY].items()) {
+    if(pipelineDefinition.contains(JSON_PROPERTY_MATCHING_PATTERNS_ARRAY) && pipelineDefinition[JSON_PROPERTY_MATCHING_PATTERNS_ARRAY].is_array()) {
+        LOGGER.debug("Reading " + std::string(JSON_PROPERTY_MATCHING_PATTERNS_ARRAY) + " for pipeline");
+        for(auto& pattern : pipelineDefinition[JSON_PROPERTY_MATCHING_PATTERNS_ARRAY].items()) {
             for(auto& object : pattern.value().items()) {
                 LOGGER.debug(object.key() + " = " + object.value().get<std::string>());
                 pipeline.get()->addMatchingPattern(object.key(), object.value().get<std::string>());

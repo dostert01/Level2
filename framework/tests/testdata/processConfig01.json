@@ -3,7 +3,7 @@
     "pipelines" : [
         {
             "pipelineConfigFile":"pipelineConfig01.json",
-            "selectorPatterns" : [
+            "matchingPatterns" : [
                 {"key01": "value01"},
                 {"key02": "value02"},
                 {"key03": "value03"},
@@ -12,7 +12,7 @@
         },
         {
             "pipelineConfigFile":"pipelineConfig03.json",
-            "selectorPatterns" : []
+            "matchingPatterns" : []
         },
         {
             "pipelineConfigFile":"pipelineConfig04.json"
