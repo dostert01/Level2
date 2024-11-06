@@ -14,6 +14,7 @@ using namespace second_take;
 #define PIPELINE_CONFIG_TEST_FILE_02 "/pipelineConfig02.json"
 #define PIPELINE_CONFIG_TEST_FILE_03 "/pipelineConfig03.json"
 #define PIPELINE_CONFIG_TEST_FILE_04 "/pipelineConfig04.json"
+#define PIPELINE_CONFIG_TEST_FILE_05 "/pipelineConfig05.json"
 
 namespace test_pipeline {
     std::string workingDir;
@@ -210,4 +211,12 @@ TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
     payload = processData.getPayload("answer");
     EXPECT_FALSE(payload.has_value());
     std::filesystem::remove(testfileName);
+}
+
+TEST(Pipeline, PipelineCanLogErrors) {
+    configureTest();
+    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
+    PipelineProcessingData processData;
+    pipeline.value()->execute(processData);
+    EXPECT_TRUE(processData.hasError());
 }

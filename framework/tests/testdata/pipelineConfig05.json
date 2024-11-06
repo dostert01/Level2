@@ -1,0 +1,21 @@
+{
+    "pipelineName" : "my pipeline with arguments",
+    "pipelineSteps" : [
+        {
+            "stepName":"Step 01",
+            "libraryName":"helloWorld",
+            "namedArguments" : {
+                "first argument":"first hello from step 1",
+                "second argument":"second hello from step 1"
+            }
+        },
+        {
+            "stepName":"test Step 02 with logging two errors",
+            "libraryName":"argumentsProcessor",
+            "namedArguments" : {
+                "raise Error 01" : "this is a test error",
+                "raise Error 02" : "this is yet another test error"
+            }
+        }
+    ]
+}

@@ -6,6 +6,8 @@
 std::string outputFileName;
 std::string firstArgument;
 std::string secondArgument;
+std::string error01;
+std::string error02;
 
 void processTheProcessingData(PipelineProcessingData& processData);
 void processArgumentsFromJson();
@@ -23,6 +25,14 @@ int pipeline_step_module_init(PipelineStepInitData& initData) {
     s = initData.getNamedArgument("second argument");
     if(s.has_value()) {
         secondArgument = s.value();
+    }
+    s = initData.getNamedArgument("raise Error 01");
+    if(s.has_value()) {
+        error01 = s.value();
+    }
+    s = initData.getNamedArgument("raise Error 02");
+    if(s.has_value()) {
+        error02 = s.value();
     }
     return 0;
 }
@@ -42,16 +52,23 @@ void processTheProcessingData(PipelineProcessingData& processData) {
   } else {
     std::cout << "NOT adding the answer to the question" << std::endl;
   }
+
+  if(!error01.empty())
+    processData.addError("error 01", error01);
+  if(!error02.empty())
+    processData.addError("error 02", error02);
 }
 
 void processArgumentsFromJson() {
-  std::cout << "pipeline_step_module_process: " << outputFileName << std::endl;
-  std::cout << "pipeline_step_module_process: " << firstArgument << std::endl;
-  std::cout << "pipeline_step_module_process: " << secondArgument << std::endl;
-  std::ofstream writer(outputFileName.c_str());
-  writer << firstArgument << std::endl;
-  writer << secondArgument << std::endl;
-  writer.close();
+  if(!outputFileName.empty()) {
+    std::cout << "pipeline_step_module_process: " << outputFileName << std::endl;
+    std::cout << "pipeline_step_module_process: " << firstArgument << std::endl;
+    std::cout << "pipeline_step_module_process: " << secondArgument << std::endl;
+    std::ofstream writer(outputFileName.c_str());
+    writer << firstArgument << std::endl;
+    writer << secondArgument << std::endl;
+    writer.close();
+  }
 }
 
 int pipeline_step_module_finish() {

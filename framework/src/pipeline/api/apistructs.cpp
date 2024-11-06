@@ -77,6 +77,15 @@ void PipelineProcessingData::addPayloadData(std::string payloadName, std::string
     namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
 }
 
+void PipelineProcessingData::addError(std::string errorCode, std::string errorMessage) {
+    std::shared_ptr<BinaryProcessingData> error = std::make_shared<ProcessingError>(errorCode, errorMessage);
+    addPayloadData(PAYLOAD_NAME_PROCESSING_ERROR, PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM, error);
+}
+
+bool PipelineProcessingData::hasError() {
+    return namedPayloadData.contains(PAYLOAD_NAME_PROCESSING_ERROR);
+}
+
 std::optional<std::shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(std::string payloadName) {
     auto search = namedPayloadData.find(payloadName);
     if(search != namedPayloadData.end()) {
@@ -103,4 +112,12 @@ void PipelineProcessingData::setLastProcessedPipelineName(std::string pipelineNa
 
 std::string PipelineProcessingData::getLastProcessedPipelineName() {
     return lastProcessedPipelineName;
+}
+
+/*
+    ProcessingError
+*/
+ProcessingError::ProcessingError(std::string errorCode, std::string errorMessage) : BinaryProcessingData() {
+    this->errorCode = errorCode;
+    this->errorMessage = errorMessage;
 }

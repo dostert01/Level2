@@ -36,7 +36,7 @@ uint Pipeline::getCountOfPipelineSteps() {
 
 void Pipeline::execute() {
     PipelineProcessingData emptyProcessingData;
-    this->execute(emptyProcessingData);
+    execute(emptyProcessingData);
 }
 
 void Pipeline::execute(PipelineProcessingData& processData) {

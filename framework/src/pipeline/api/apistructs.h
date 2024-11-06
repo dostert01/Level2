@@ -20,6 +20,14 @@ class BinaryProcessingData {
         virtual ~BinaryProcessingData();
 };
 
+class ProcessingError :public BinaryProcessingData {
+    public:
+        ProcessingError(std::string errorCode, std::string errorMessage);
+    private:
+        std::string errorCode;
+        std::string errorMessage;
+};
+
 class ProcessingPayload {
     private:
         std::string mimetype;
@@ -37,6 +45,9 @@ class ProcessingPayload {
         std::shared_ptr<BinaryProcessingData> payloadAsBinaryData();
 };
 
+#define PAYLOAD_NAME_PROCESSING_ERROR "___processingError___"
+#define PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM "application/octet-stream"
+
 class PipelineProcessingData : public second_take::Matchable {
     private:
         std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
@@ -47,6 +58,8 @@ class PipelineProcessingData : public second_take::Matchable {
         ~PipelineProcessingData();
         void addPayloadData(std::string payloadName, std::string mimetype, std::string data);
         void addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data);
+        void addError(std::string errorCode, std::string errorMessage);
+        bool hasError();
         std::optional<std::shared_ptr<ProcessingPayload>> getPayload(std::string payloadName);
         uint getCountOfPayloads();
         uint getProcessingCounter();
