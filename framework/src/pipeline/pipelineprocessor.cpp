@@ -123,7 +123,7 @@ std::string PipeLineProcessor::getProcessName() {
     return processName;
 }
 
-void PipeLineProcessor::processPayload(PipelineProcessingData& payload) {
+void PipeLineProcessor::execute(PipelineProcessingData& payload) {
     for(const auto& currentPipeline : pipelines) {
         currentPipeline.get()->execute(payload);
     }
