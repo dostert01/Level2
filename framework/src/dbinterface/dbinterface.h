@@ -9,6 +9,8 @@
 using namespace std;
 namespace second_take {
 
+#define DB_CONNECTION_PARAM_FILE_NAME "fileName"
+
 class RecordSet {
     public:
         virtual ~RecordSet() = 0;
@@ -25,8 +27,6 @@ class Database {
         bool connectionIsOpen = false;
 };
 
-#define SQLITE_DB_CONNECTION_PARAM_FILE_NAME "fileName"
-
 class DatabaseSQLite : public Database {
     public:
         DatabaseSQLite() = default;
@@ -36,6 +36,9 @@ class DatabaseSQLite : public Database {
         shared_ptr<RecordSet> executeQuery(string sql);
     private:
         sqlite3* dbConnection;
+        void logSqLiteError(string errorMsgPrefix);
+        void logErrorLackingParameter(string paramaterName);
+        void logOpenSuccess();
 };
 
 }

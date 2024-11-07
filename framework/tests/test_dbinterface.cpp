@@ -30,7 +30,7 @@ TEST(DBInterface, canOpenAndCloseSQLiteDb) {
     map<string, string> connectionParams;
     string dbFileName = TEST_DB_FILE_NAME;
     filesystem::remove(dbFileName);
-    connectionParams.insert(pair{SQLITE_DB_CONNECTION_PARAM_FILE_NAME, TEST_DB_FILE_NAME});
+    connectionParams.insert(pair{DB_CONNECTION_PARAM_FILE_NAME, TEST_DB_FILE_NAME});
     EXPECT_FALSE(db->isOpen());
     EXPECT_TRUE(db->open(connectionParams));
     EXPECT_TRUE(db->isOpen());
@@ -44,7 +44,7 @@ TEST(DBInterface, canOpenAndCloseSQLiteDb) {
 TEST(DBInterface, doesNotOpenIfFilePathIsInvalid) {
     Database* db = new DatabaseSQLite();
     map<string, string> connectionParams;
-    connectionParams.insert(pair{SQLITE_DB_CONNECTION_PARAM_FILE_NAME, "no/valid/file/path"});
+    connectionParams.insert(pair{DB_CONNECTION_PARAM_FILE_NAME, "no/valid/file/path"});
     EXPECT_FALSE(db->isOpen());
     EXPECT_FALSE(db->open(connectionParams));
     EXPECT_FALSE(db->isOpen());

@@ -15,21 +15,15 @@ bool Database::isOpen() {
 */
 bool DatabaseSQLite::open(map<string, string>& connectionParams) {
     if(!isOpen()) {
-        auto fileName = connectionParams.find(SQLITE_DB_CONNECTION_PARAM_FILE_NAME);
+        auto fileName = connectionParams.find(DB_CONNECTION_PARAM_FILE_NAME);
         if(fileName != connectionParams.end()) {
             int status = sqlite3_open(fileName->second.c_str(), &dbConnection);
             connectionIsOpen = (status == SQLITE_OK);
         } else {
-            string s = SQLITE_DB_CONNECTION_PARAM_FILE_NAME;
-            LOGGER.error("Failed to open DB. connectionParams is lacking parameter '" + s + "'");
+          logErrorLackingParameter(DB_CONNECTION_PARAM_FILE_NAME);
         }
     }
-    if(!isOpen()) {
-        string errorMsgPrefix = "Opening DB failed. sqlite3_errmsg reports: ";
-        LOGGER.error(errorMsgPrefix + sqlite3_errmsg(dbConnection));
-    } else {
-        LOGGER.info("DB opened successful!");
-    }
+    logOpenSuccess();
     return isOpen();
 }
 
@@ -39,14 +33,29 @@ void DatabaseSQLite::close() {
             connectionIsOpen = false;
             LOGGER.info("DB closed successful!");
         } else {
-            string errorMsgPrefix = "Closing DB failed. sqlite3_errmsg reports: ";
-            LOGGER.error(errorMsgPrefix + sqlite3_errmsg(dbConnection));
+            logSqLiteError("Closing DB failed.");
         }
     }
 }
 
 shared_ptr<RecordSet> DatabaseSQLite::executeQuery(string sql) {
     return nullptr;
+}
+
+void DatabaseSQLite::logOpenSuccess() {
+    if (!isOpen()) {
+        logSqLiteError("Opening DB failed.");
+    } else {
+        LOGGER.info("DB opened successful!");
+    }
+}
+
+void DatabaseSQLite::logSqLiteError(string errorMsgPrefix) {
+    LOGGER.error(errorMsgPrefix + "  sqlite3_errmsg reports: '" + sqlite3_errmsg(dbConnection) + "'");
+}
+
+void DatabaseSQLite::logErrorLackingParameter(string paramaterName) {
+    LOGGER.error("Failed to open DB. connectionParams is lacking parameter '" + paramaterName + "'");
 }
 
 
