@@ -7,10 +7,11 @@ project(secondTake VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Google Test hinzufügen
+# add subdirs
 add_subdirectory(src)
 add_subdirectory(src/logger)
 add_subdirectory(src/pipeline)
+add_subdirectory(src/dbinterface)
 
 # Tests hinzufügen
 enable_testing()
