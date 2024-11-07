@@ -50,3 +50,12 @@ TEST(DBInterface, doesNotOpenIfFilePathIsInvalid) {
     EXPECT_FALSE(db->isOpen());
     delete db;
 }
+
+TEST(DBInterface, doesNotOpenIfConnectionParamIsMissing) {
+    Database* db = new DatabaseSQLite();
+    map<string, string> connectionParams;
+    EXPECT_FALSE(db->isOpen());
+    EXPECT_FALSE(db->open(connectionParams));
+    EXPECT_FALSE(db->isOpen());
+    delete db;
+}
