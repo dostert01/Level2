@@ -17,7 +17,6 @@ tests/CTestTestfile.cmake
 tests/Makefile
 tests/cmake_install.cmake
 tests/test_secondTake
-.vscode/
 Testing/
 _deps/
 framework/Testing/

@@ -20,7 +20,7 @@ class BinaryProcessingData {
         virtual ~BinaryProcessingData();
 };
 
-class ProcessingError :public BinaryProcessingData {
+class ProcessingError : public BinaryProcessingData {
     public:
         ProcessingError(std::string errorCode, std::string errorMessage);
         ProcessingError(ProcessingError* other);
