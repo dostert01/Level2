@@ -59,3 +59,28 @@ TEST(DBInterface, doesNotOpenIfConnectionParamIsMissing) {
     EXPECT_FALSE(db->isOpen());
     delete db;
 }
+
+TEST(DBInterface, canExecuteSomeSQLs) {
+    Database* db = new DatabaseSQLite();
+    map<string, string> connectionParams;
+    connectionParams.insert(pair{DB_CONNECTION_PARAM_FILE_NAME, "./canExecuteSomeSQLs.db"});
+    db->open(connectionParams);
+    db->executeQuery("create table cars(" \
+        "id integer primary key, " \
+        "model char(50) not null," \
+        "license_plate char(30))");
+    db->executeQuery("insert into cars" \
+        "(id, model, license_plate) values" \
+        "(null, 'A4', 'GÖ BL 4711')");
+    db->executeQuery("insert into cars" \
+        "(id, model, license_plate) values" \
+        "(null, 'California', 'GÖ CA 0815')");
+    shared_ptr<RecordSet> result = db->executeQuery("select * from cars order by id");
+    EXPECT_EQ(2, result->getRowCount());
+    EXPECT_EQ("California", result->getValue("model", 1));
+    EXPECT_EQ("GÖ BL 4711", result->getValue("license_plate", 0));
+    EXPECT_EQ(false, result->getIsNull("id", 0));
+    db->close();
+    filesystem::remove("./canExecuteSomeSQLs.db");
+    delete db;
+}
