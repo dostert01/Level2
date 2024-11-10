@@ -24,7 +24,7 @@ link_libraries(
     pipelineapi
     gtest
     gtest_main
-    sndtakelogger
+    logger
     dl)
 
 # set variables

@@ -7,11 +7,31 @@
 #include <vector>
 
 #include "../matchable.h"
+#include "../../dbinterface/dbinterface.h"
+
+using namespace std;
+using namespace second_take;
 
 struct PipelineStepInitData
 {
     std::multimap<std::string, std::string> namedArguments;
     std::optional<std::string> getNamedArgument(const std::string& argumentName);
+};
+
+class SerializableDB {
+    public:
+        SerializableDB() = default;
+        virtual ~SerializableDB() = default;
+        virtual bool writeToDataBase(shared_ptr<Database> db) = 0;
+        virtual bool initFromDataBase(shared_ptr<Database> db) = 0;
+};
+
+class SerializableJson {
+    public:
+        SerializableJson() = default;
+        virtual ~SerializableJson() = default;
+        virtual string toJson() = 0;
+        virtual void initFromJson(string jsonString) = 0;
 };
 
 class BinaryProcessingData {

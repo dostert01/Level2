@@ -21,4 +21,4 @@ target_include_directories(secondTake PRIVATE
     ${CMAKE_SOURCE_DIR}/src/pipeline
 )
 
-target_link_libraries(secondTake PRIVATE sndtakelogger)
+target_link_libraries(secondTake PRIVATE logger)

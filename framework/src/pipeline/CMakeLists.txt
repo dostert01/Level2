@@ -19,7 +19,7 @@ cmake_print_variables(PIPELINE_API_INCLUDE_DIR)
 add_subdirectory(api)
 
 # Specify the library
-add_library(pipeline OBJECT 
+add_library(pipeline STATIC
     pipeline.cpp
     pipelineprocessor.cpp
     matchable.cpp)

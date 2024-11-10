@@ -17,7 +17,7 @@ cmake_print_variables(SQLite3_LIBRARIES)
 cmake_print_variables(SQLite3_VERSION)
 
 # Specify the library
-add_library(dbinterface OBJECT 
+add_library(dbinterface STATIC
     dbinterface.cpp)
 
 target_link_libraries(dbinterface PRIVATE ${SQLite3_LIBRARIES})

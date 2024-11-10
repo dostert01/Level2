@@ -9,13 +9,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 # Specify the library
-#add_library(loggerlib STATIC logger.cpp)
-add_library(sndtakelogger SHARED 
+add_library(logger STATIC
     logger.cpp 
     timeproviders.cpp 
     loggingdestinations.cpp
     loglevels.cpp)
 
 # Specify the include directories for the library
-target_include_directories(sndtakelogger PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(sndtakelogger PRIVATE BUILDING_DLL)
+target_include_directories(logger PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(logger PRIVATE BUILDING_DLL)
