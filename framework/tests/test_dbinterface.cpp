@@ -13,6 +13,7 @@ using namespace std;
 namespace test_db_interface {
     string workingDir;
     string testFilesDir;
+    string testDBFileName = "./testDBFile.db";
 
     void configureLogger() {
         Logger& logger = second_take::Logger::getInstance();
@@ -63,7 +64,7 @@ TEST(DBInterface, doesNotOpenIfConnectionParamIsMissing) {
 TEST(DBInterface, canExecuteSomeSQLs) {
     Database* db = new DatabaseSQLite();
     map<string, string> connectionParams;
-    connectionParams.insert(pair{DB_CONNECTION_PARAM_FILE_NAME, "./canExecuteSomeSQLs.db"});
+    connectionParams.insert(pair{DB_CONNECTION_PARAM_FILE_NAME, test_db_interface::testDBFileName});
     db->open(connectionParams);
     db->executeQuery("create table cars(" \
         "id integer primary key, " \
@@ -81,6 +82,6 @@ TEST(DBInterface, canExecuteSomeSQLs) {
     EXPECT_EQ("GÖ BL 4711", result->getValue("license_plate", 0));
     EXPECT_EQ(false, result->getIsNull("id", 0));
     db->close();
-    filesystem::remove("./canExecuteSomeSQLs.db");
+    filesystem::remove(test_db_interface::testDBFileName);
     delete db;
 }
