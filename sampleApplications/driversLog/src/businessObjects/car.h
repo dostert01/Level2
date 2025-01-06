@@ -11,7 +11,7 @@ class Car : public BusinessObject {
         Car(string model, string licensePlate);
         string getModel();
         string getLicensePlate();
-        bool writeToDataBase(shared_ptr<Database> db){};
+        bool writeToDataBase(shared_ptr<Database> db);
         bool initFromDataBase(shared_ptr<Database> db){};
         string toJson(){};
         void initFromJson(string jsonString){};

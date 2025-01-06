@@ -11,5 +11,5 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(./samplelibs)
 
-add_library(pipelineapi STATIC apistructs.cpp)
+add_library(pipelineapi SHARED apistructs.cpp)
 

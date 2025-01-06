@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <typeinfo>
+#include <filesystem>
 #include "car.h"
 #include "businessObject.h"
 
@@ -29,4 +30,20 @@ TEST(Car, isInstanceOfSerializableDB) {
 TEST(Car, isInstanceOfSerializableJson) {
     Car car("California", "Gö BL 0815");
     EXPECT_FALSE(dynamic_cast<SerializableJson*>(&car) == NULL);
+}
+
+TEST(Car, doesNotWriteToClosedDataBase) {
+    Car car("California", "Gö BL 0815");
+    shared_ptr<Database> db = make_shared<DatabaseSQLite>();
+    EXPECT_FALSE(car.writeToDataBase(db));
+}
+
+TEST(Car, canWriteToDB) {
+    Car car("California", "Gö BL 0815");
+    shared_ptr<Database> db = make_shared<DatabaseSQLite>();
+    map<string, string> connectionParams;
+    connectionParams.emplace(pair{"fileName", "./test.db"});
+    db->open(connectionParams);
+    EXPECT_TRUE(car.writeToDataBase(db));
+    filesystem::remove("./test.db");
 }

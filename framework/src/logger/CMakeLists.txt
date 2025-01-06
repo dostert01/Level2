@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 # Specify the library
-add_library(logger STATIC
+add_library(logger SHARED
     logger.cpp 
     timeproviders.cpp 
     loggingdestinations.cpp

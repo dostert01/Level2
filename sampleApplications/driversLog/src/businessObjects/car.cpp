@@ -15,3 +15,11 @@ string Car::getModel() {
 string Car::getLicensePlate() {
     return licensePlate;
 }
+
+bool Car::writeToDataBase(shared_ptr<Database> db) {
+    bool returnValue = false;
+    if(db->isOpen()) {
+
+    }
+    return returnValue;
+};

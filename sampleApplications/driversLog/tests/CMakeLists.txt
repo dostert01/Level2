@@ -35,10 +35,13 @@ link_libraries(
     businessObjects
 )
 
-
 # Tests hinzufügen
 add_executable(test_car
     test_car.cpp)
+
+target_link_libraries(test_car
+    dbinterface
+    logger)
 
 # Tests registrieren
 add_test(NAME test_car COMMAND test_car)

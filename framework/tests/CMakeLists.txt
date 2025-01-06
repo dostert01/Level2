@@ -19,6 +19,10 @@ include_directories(
     ${SQLite3_INCLUDE_DIRS}
 )
 
+link_directories(
+    ${CMAKE_SOURCE_DIR}/lib/
+)
+
 # GTest und GTest Main hinzufügen
 link_libraries(
     pipelineapi
