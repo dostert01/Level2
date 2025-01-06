@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Projektname und Version
-project(secondTake VERSION 1.0)
+project(eventForge VERSION 1.0)
 
 execute_process(COMMAND ./getDependencies.sh)
 

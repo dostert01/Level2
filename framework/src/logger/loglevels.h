@@ -5,7 +5,7 @@
 #include <string>
 #include <optional>
 
-namespace second_take {
+namespace event_forge {
 
 #define LOG_PREFIX_TRACE "TRACE"
 #define LOG_PREFIX_DEBUG "DEBUG"
@@ -37,6 +37,6 @@ class LogLevelStringMapper {
   std::map<LogLevel, std::string> logLevels;
 };
 
-}  // namespace second_take
+}  // namespace event_forge
 
 #endif  // LOG_LEVELS_H

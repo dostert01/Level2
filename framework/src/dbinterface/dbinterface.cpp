@@ -1,7 +1,7 @@
 #include "dbinterface.h"
 #include "../logger/logger.h"
 
-namespace second_take {
+namespace event_forge {
     
 /*
     Database

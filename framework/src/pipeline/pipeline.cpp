@@ -6,7 +6,7 @@
 #include "../logger/logger.h"
 #include "pipeline.h"
 
-namespace second_take {
+namespace event_forge {
 
 #define JSON_PROPERTY_PIPELINE_NAME "pipelineName"
 #define JSON_PROPERTY_PIPELINE_STEPS "pipelineSteps"

@@ -8,7 +8,7 @@
 
 #include "pipeline.h"
 
-namespace second_take {
+namespace event_forge {
 
     class PipeLineProcessor {
         public:
@@ -23,7 +23,7 @@ namespace second_take {
         private:
             std::string configFileDir;
             std::string processName;
-            std::vector<std::shared_ptr<second_take::Pipeline>> pipelines;
+            std::vector<std::shared_ptr<Pipeline>> pipelines;
             void loadProcessorConfig(const std::string& configFilePath);
             void setConfigFileDirFromConfigFileName(
                 const std::string& configFilePath);
@@ -34,6 +34,6 @@ namespace second_take {
             void readMatchingPatternsFromJson(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition);
     };
 
-}  // namespace second_take
+}  // namespace event_forge
 
 #endif  // SECOND_TAKE_PIPELINE_PROCESSOR

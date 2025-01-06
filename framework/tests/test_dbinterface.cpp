@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <map>
 
-using namespace second_take;
+using namespace event_forge;
 using namespace std;
 
 #define TEST_DB_FILE_NAME "test.db"
@@ -16,8 +16,8 @@ namespace test_db_interface {
     string testDBFileName = "./testDBFile.db";
 
     void configureLogger() {
-        Logger& logger = second_take::Logger::getInstance();
-        logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+        Logger& logger = Logger::getInstance();
+        logger.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
         logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
     }
 }

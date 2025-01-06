@@ -2,7 +2,7 @@
 
 #include <ctime>
 
-namespace second_take {
+namespace event_forge {
 
 TimeProvider::~TimeProvider() {}
 
@@ -18,4 +18,4 @@ std::string DefaultTimeProvider::getTimeStampOfNow() {
   return str;
 }
 
-}  // namespace second_take
+}  // namespace event_forge

@@ -10,8 +10,10 @@
 
 #define ONE_SECOND 1000000
 
+using namespace event_forge;
+
 TEST(LoggingDestinations, DefaultIsStdOut) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.error("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -21,23 +23,23 @@ TEST(LoggingDestinations, DefaultIsStdOut) {
 }
 
 TEST(LoggingDestinations, CanRemoveAllDestinations) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     EXPECT_EQ(1, logger.getCountOfLoggingDestinations());
     logger.removeAllDestinations();
     EXPECT_EQ(0, logger.getCountOfLoggingDestinations());
 }
 
 TEST(LoggingDestinations, CanAddNewDestinations) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     EXPECT_EQ(0, logger.getCountOfLoggingDestinations());
-    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.addLoggingDestination(factory.createDestinationStdOut());
     EXPECT_EQ(1, logger.getCountOfLoggingDestinations());
 }
 
 TEST(LoggingDestinations, CanLogToStdErr) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    Logger& logger = Logger::getInstance();
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.addLoggingDestination(factory.createDestinationStdErr());
     EXPECT_EQ(2, logger.getCountOfLoggingDestinations());
     testing::internal::CaptureStderr();
@@ -49,9 +51,9 @@ TEST(LoggingDestinations, CanLogToStdErr) {
 }
 
 TEST(LoggingDestinations, CanReplaceLoggingDestinations) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     EXPECT_EQ(2, logger.getCountOfLoggingDestinations());
-    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.setLoggingDestination(factory.createDestinationStdOut());
     EXPECT_EQ(1, logger.getCountOfLoggingDestinations());
 }
@@ -65,8 +67,8 @@ std::string readFirstLineFromFile(const std::string fileName) {
 
 TEST(LoggingDestinations, CanLogToAFile) {
     std::string fileName = "./testFile.log";
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    Logger& logger = Logger::getInstance();
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.setLoggingDestination(factory.createDestinationFile(fileName));
     logger.error("Hello Log");
     std::string output = readFirstLineFromFile(fileName);    
@@ -111,10 +113,10 @@ bool stringPresentInSyslog(const std::string logString) {
 
 TEST(LoggingDestinations, CanLogToSyslog) {
     std::string fileName = "./testFile.log";
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    second_take::LoggingDestinationFactory factory = second_take::LoggingDestinationFactory();
+    Logger& logger = Logger::getInstance();
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.setLoggingDestination(factory.createDestinationSyslog("testapp"));
-    second_take::DefaultTimeProvider timeProvider;
+    DefaultTimeProvider timeProvider;
     std::string logString = "Hello Log at " + timeProvider.getTimeStampOfNow();
     logger.error(logString);
     EXPECT_TRUE(stringPresentInSyslog(logString));

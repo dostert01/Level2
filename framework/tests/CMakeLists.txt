@@ -35,8 +35,8 @@ link_libraries(
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/framework/tests/testdata/" CACHE STRING "Directory where test data is expected by the tests")
 
 # Tests hinzufügen
-add_executable(test_secondTake
-    test_secondTake.cpp
+add_executable(test_eventForge
+    test_eventForge.cpp
     test_logger.cpp
     test_timeproviders.cpp
     test_loggingdestinations.cpp
@@ -65,8 +65,8 @@ target_link_libraries(test_dbinterface
     ${SQLite3_LIBRARIES})
 
 # Tests registrieren
-add_test(NAME test_secondTake COMMAND test_secondTake)
-set_tests_properties(test_secondTake PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+add_test(NAME test_eventForge COMMAND test_eventForge)
+set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_pipelineprocessor COMMAND test_pipelineprocessor)
 set_tests_properties(test_pipelineprocessor PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

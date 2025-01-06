@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Projektname und Version
-project(secondTake VERSION 1.0)
+project(eventForge VERSION 1.0)
 
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)
@@ -13,12 +13,12 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 
 # Hinzufügen der ausführbaren Datei
-add_executable(secondTake main.cpp)
+add_executable(eventForge main.cpp)
 
 # Include the necessary directories
-target_include_directories(secondTake PRIVATE
+target_include_directories(eventForge PRIVATE
     ${CMAKE_SOURCE_DIR}/src/logger
     ${CMAKE_SOURCE_DIR}/src/pipeline
 )
 
-target_link_libraries(secondTake PRIVATE logger)
+target_link_libraries(eventForge PRIVATE logger)

@@ -5,20 +5,22 @@
 #include <stdlib.h>
 #include "logger.h"
 
+using namespace event_forge;
+
 TEST(Logger, AlwaysCreatesASingletonInstanceAsPointer) {
-    second_take::Logger* logger1 = second_take::Logger::getInstanceAsPointer();
-    second_take::Logger* logger2 = second_take::Logger::getInstanceAsPointer();
+    Logger* logger1 = Logger::getInstanceAsPointer();
+    Logger* logger2 = Logger::getInstanceAsPointer();
     EXPECT_EQ(logger1, logger2);
 }
 
 TEST(Logger, AlwaysCreatesASingletonInstanceAsReference) {
-    second_take::Logger& logger1 = second_take::Logger::getInstance();
-    second_take::Logger& logger2 = second_take::Logger::getInstance();
+    Logger& logger1 = Logger::getInstance();
+    Logger& logger2 = Logger::getInstance();
     EXPECT_EQ(logger1, logger2);
 }
 
 TEST(Logger, CanLogTraceToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.trace("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -28,7 +30,7 @@ TEST(Logger, CanLogTraceToStdout) {
 }
 
 TEST(Logger, CanLogDebugToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.debug("Hello Debug");
     std::string output = testing::internal::GetCapturedStdout();
@@ -38,7 +40,7 @@ TEST(Logger, CanLogDebugToStdout) {
 }
 
 TEST(Logger, CanLogInfoToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.info("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -48,7 +50,7 @@ TEST(Logger, CanLogInfoToStdout) {
 }
 
 TEST(Logger, CanLogWarnToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.warn("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -58,7 +60,7 @@ TEST(Logger, CanLogWarnToStdout) {
 }
 
 TEST(Logger, CanLogErrorToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.error("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -68,7 +70,7 @@ TEST(Logger, CanLogErrorToStdout) {
 }
 
 TEST(Logger, CanLogFatalToStdout) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
+    Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.fatal("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -78,8 +80,8 @@ TEST(Logger, CanLogFatalToStdout) {
 }
 
 TEST(Logger, DoesNotLogInfoIfMaxLogLevelIsWarn) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    Logger& logger = Logger::getInstance();
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_WARN);
     testing::internal::CaptureStdout();
     logger.info("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -89,8 +91,8 @@ TEST(Logger, DoesNotLogInfoIfMaxLogLevelIsWarn) {
 }
 
 TEST(Logger, LogsWarnIfMaxLogLevelIsWarn) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    Logger& logger = Logger::getInstance();
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_WARN);
     testing::internal::CaptureStdout();
     logger.warn("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -100,8 +102,8 @@ TEST(Logger, LogsWarnIfMaxLogLevelIsWarn) {
 }
 
 TEST(Logger, LogsErrorIfMaxLogLevelIsWarn) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_WARN);
+    Logger& logger = Logger::getInstance();
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_WARN);
     testing::internal::CaptureStdout();
     logger.error("Hello Log");
     std::string output = testing::internal::GetCapturedStdout();
@@ -121,13 +123,13 @@ void unsetLogLevelEnv() {
 }
 
 TEST(Logger, environmentCanOverrideLogLevelSuppressing) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_DEBUG);
+    Logger& logger = Logger::getInstance();
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_DEBUG);
     setLogLevelEnv(LOG_PREFIX_ERROR);
     testing::internal::CaptureStdout();
     logger.debug("Hello Log");
     unsetLogLevelEnv();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
     std::string output = testing::internal::GetCapturedStdout();
     std::cout << "output: " << output << std::endl;
     std::regex regex("^\\[DEBUG\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
@@ -135,13 +137,13 @@ TEST(Logger, environmentCanOverrideLogLevelSuppressing) {
 }
 
 TEST(Logger, environmentCanOverrideLogLevelNotSuppressing) {
-    second_take::Logger& logger = second_take::Logger::getInstance();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_FATAL);
+    Logger& logger = Logger::getInstance();
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_FATAL);
     setLogLevelEnv(LOG_PREFIX_DEBUG);
     testing::internal::CaptureStdout();
     logger.debug("Hello Log");
     unsetLogLevelEnv();
-    logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+    logger.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
     std::string output = testing::internal::GetCapturedStdout();
     std::cout << "output: " << output << std::endl;
     std::regex regex("^\\[DEBUG\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");

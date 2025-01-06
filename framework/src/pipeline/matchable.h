@@ -6,7 +6,7 @@
 #include <optional>
 
 
-namespace second_take {
+namespace event_forge {
 
 class Matchable {
     public:
