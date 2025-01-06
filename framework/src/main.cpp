@@ -2,7 +2,7 @@
 
 #include "logger/logger.h"
 
-using namespace second_take;
+using namespace event_forge;
 using namespace std;
 
 int main() {

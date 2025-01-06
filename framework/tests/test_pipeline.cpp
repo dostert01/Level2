@@ -8,7 +8,7 @@
 #include "../logger/logger.h"
 #include "binaryDataProcessor.h"
 
-using namespace second_take;
+using namespace event_forge;
 
 #define PIPELINE_CONFIG_TEST_FILE_01 "/pipelineConfig01.json"
 #define PIPELINE_CONFIG_TEST_FILE_02 "/pipelineConfig02.json"
@@ -21,8 +21,8 @@ namespace test_pipeline {
     std::string testFilesDir;
 
     void configureLogger() {
-        Logger& logger = second_take::Logger::getInstance();
-        logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+        Logger& logger = Logger::getInstance();
+        logger.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
         logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
     }
 
@@ -44,14 +44,14 @@ void configureTest() {
 }
 
 TEST(PipeLine, CanCreateNewInstances) {
-    std::shared_ptr<Pipeline> pipeline1 = second_take::Pipeline::getInstance();
-    std::shared_ptr<Pipeline> pipeline2 = second_take::Pipeline::getInstance();
+    std::shared_ptr<Pipeline> pipeline1 = Pipeline::getInstance();
+    std::shared_ptr<Pipeline> pipeline2 = Pipeline::getInstance();
     EXPECT_FALSE(pipeline1.get() == pipeline2.get());
 }
 
 TEST(PipeLine, CanLoadConfigFromJson) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.has_value());
     if(pipeline1.has_value())
         EXPECT_TRUE((pipeline1.value()->getCountOfPipelineSteps() == 2));
@@ -59,20 +59,20 @@ TEST(PipeLine, CanLoadConfigFromJson) {
 
 TEST(PipeLine, ReturnsEmptyIfLoadingFails) {
     test_pipeline::configureLogger();
-    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance("/this/is/and/invalid/path");
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance("/this/is/and/invalid/path");
     EXPECT_FALSE(pipeline1.has_value());
 }
 
 
 TEST(PipeLine, PipelineHasName) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(pipeline1.value()->getPipelineName() == "my first testPipeline");
 }
 
 TEST(PipeLine, CanLoadTheHelloWordLib) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline1 = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     std::optional<std::shared_ptr<PipelineStep>> pipelineStep = pipeline1.value()->getStepByName("test Step 02");
     EXPECT_TRUE(pipelineStep.has_value());
     if(pipelineStep.has_value()) {
@@ -83,7 +83,7 @@ TEST(PipeLine, CanLoadTheHelloWordLib) {
 
 TEST(Pipeline, CanExecuteThePipeline) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_01);
     testing::internal::CaptureStdout();
     pipeline.value()->execute();
     std::string output = testing::internal::GetCapturedStdout();
@@ -95,7 +95,7 @@ TEST(Pipeline, CanExecuteThePipeline) {
 
 TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     pipeline.value()->execute();
@@ -112,7 +112,7 @@ TEST(Pipeline, CanUseArgumentsFromInitDataInJson) {
 
 TEST(Pipeline, CanUseProcessData) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
@@ -129,7 +129,7 @@ TEST(Pipeline, CanUseProcessData) {
 
 TEST(Pipeline, CanUseBinaryProcessData) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     PipelineProcessingData processData;
     pipeline.value()->execute(processData);
     EXPECT_EQ(1, processData.getCountOfPayloads());
@@ -144,7 +144,7 @@ TEST(Pipeline, CanUseBinaryProcessData) {
 
 TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key02", "value02");
     EXPECT_EQ(2, pipeline.value()->getCountOfMatchingPatterns());
@@ -152,7 +152,7 @@ TEST(Pipeline, PipelineCanHaveSelectorPatterns) {
 
 TEST(Pipeline, SelectorPatternCanBeOverwritten) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key02", "value02");
     EXPECT_EQ("value02", pipeline.value()->getMatchingPattern("key02").value());
@@ -163,7 +163,7 @@ TEST(Pipeline, SelectorPatternCanBeOverwritten) {
 
 TEST(Pipeline, SelectorPatternCanBeRemoved) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key02", "value02");
     pipeline.value()->removeMatchingPattern("key01");
@@ -173,7 +173,7 @@ TEST(Pipeline, SelectorPatternCanBeRemoved) {
 
 TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
     pipeline.value()->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key02", "value02");
     pipeline.value()->removeMatchingPattern("key03");
@@ -182,7 +182,7 @@ TEST(Pipeline, RemovingNonExistingSelectorHasNoEffect) {
 
 TEST(Pipeline, ProcessesDataOnlyIfPayloadPatternsMatchThePipelinePatterns) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
@@ -199,7 +199,7 @@ TEST(Pipeline, ProcessesDataOnlyIfPayloadPatternsMatchThePipelinePatterns) {
 
 TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
     PipelineProcessingData processData;
@@ -215,7 +215,7 @@ TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
 
 TEST(Pipeline, PipelineCanLogErrors) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
     PipelineProcessingData processData;
     pipeline.value()->execute(processData);
     EXPECT_TRUE(processData.hasError());
@@ -223,7 +223,7 @@ TEST(Pipeline, PipelineCanLogErrors) {
 
 TEST(Pipeline, CanGetAllErrors) {
     configureTest();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = second_take::Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
+    std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
     PipelineProcessingData processData;
     pipeline.value()->execute(processData);
     std::vector<ProcessingError> allErrors = processData.getAllErrors();

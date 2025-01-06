@@ -11,7 +11,7 @@
 
 using json = nlohmann::json;
 
-namespace second_take {
+namespace event_forge {
 
 #ifndef UNDEFINED_JSON_DATA
 #define UNDEFINED_JSON_DATA "undefined"

@@ -7,10 +7,10 @@
 #include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
-using namespace second_take;
+using namespace event_forge;
 
 #ifndef LOGGER
-#define LOGGER second_take::Logger::getInstance()
+#define LOGGER Logger::getInstance()
 #endif
 
 #define PROCESS_CONFIG_TEST_FILE_01 "/processConfig01.json"
@@ -20,7 +20,7 @@ namespace test_pipeline_processor {
     std::string testFilesDir;
 
     void configureLogger() {
-        LOGGER.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+        LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
         LOGGER.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
     }
 

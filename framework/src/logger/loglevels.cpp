@@ -1,6 +1,6 @@
 #include "loglevels.h"
 
-namespace second_take {
+namespace event_forge {
 
 LogLevelStringMapper::LogLevelStringMapper() {
   logLevels = {{LogLevel::LOG_LEVEL_NO_LOGGING, LOG_PREFIX_NO_LOGGING},
@@ -30,4 +30,4 @@ std::optional<std::string> LogLevelStringMapper::logLevel2String(const LogLevel 
     }
 }
 
-}  // namespace second_take
+}  // namespace event_forge

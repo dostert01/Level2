@@ -2,15 +2,15 @@
 #include "../logger/logger.h"
 #include "matchable.h"
 
-using namespace second_take;
+using namespace event_forge;
 
 namespace test_pipeline_payload_matching {
     std::string workingDir;
     std::string testFilesDir;
 
     void configureLogger() {
-        Logger& logger = second_take::Logger::getInstance();
-        logger.setMaxLogLevel(second_take::LogLevel::LOG_LEVEL_TRACE);
+        Logger& logger = Logger::getInstance();
+        logger.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
         logger.setLoggingDestination(LoggingDestinationFactory().createDestinationStdErr());
     }
 }

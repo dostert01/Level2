@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 
-namespace second_take {
+namespace event_forge {
 
 Logger::Logger() {
   logLevelStringMapper = LogLevelStringMapper();
@@ -103,4 +103,4 @@ void Logger::setMaxLogLevel(LogLevel logLevel) {
   maxLogLevel = logLevel;
 }
 
-}  // namespace second_take
+}  // namespace event_forge

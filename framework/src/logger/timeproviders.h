@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace second_take {
+namespace event_forge {
 
 class TimeProvider {
  public:
@@ -18,6 +18,6 @@ class DefaultTimeProvider : public TimeProvider {
   std::string getTimeStampOfNow() override;
 };
 
-}  // namespace second_take
+}  // namespace event_forge
 
 #endif  // TIME_PROVIDERS_H

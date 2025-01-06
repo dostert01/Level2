@@ -9,7 +9,7 @@
 #include <sqlite3.h>
 
 using namespace std;
-namespace second_take {
+namespace event_forge {
 
 #define DB_CONNECTION_PARAM_FILE_NAME "fileName"
 

@@ -10,7 +10,7 @@
 #include "../../dbinterface/dbinterface.h"
 
 using namespace std;
-using namespace second_take;
+using namespace event_forge;
 
 struct PipelineStepInitData
 {
@@ -71,7 +71,7 @@ class ProcessingPayload {
 #define PAYLOAD_NAME_PROCESSING_ERROR "___processingError___"
 #define PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM "application/octet-stream"
 
-class PipelineProcessingData : public second_take::Matchable {
+class PipelineProcessingData : public Matchable {
     private:
         std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
         std::string lastProcessedPipelineName;

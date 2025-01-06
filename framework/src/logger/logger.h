@@ -13,7 +13,7 @@
 
 #define LOGGER Logger::getInstance()
 
-namespace second_take {
+namespace event_forge {
 
 class Logger {
  public:
@@ -46,6 +46,6 @@ class Logger {
   void checkLogLevelInEnvironment();
 };
 
-}  // namespace second_take
+}  // namespace event_forge
 
 #endif  // SECOND_TAKE_LOGGER

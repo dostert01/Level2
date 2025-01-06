@@ -4,7 +4,7 @@
 #include "matchable.h"
 #include "../logger/logger.h"
 
-namespace second_take {
+namespace event_forge {
 
 void Matchable::addMatchingPattern(std::string key, std::string value) {
     matchingPatterns[key] = value;

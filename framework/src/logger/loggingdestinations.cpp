@@ -4,7 +4,7 @@
 
 #include "loggingdestinations.h"
 
-namespace second_take {
+namespace event_forge {
 
 //-------------------------------------------------------------------
 LoggingDestination::~LoggingDestination() {}
@@ -98,4 +98,4 @@ std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestination
     return destination;
 }
 
-}  // namespace second_take
+}  // namespace event_forge

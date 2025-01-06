@@ -5,15 +5,15 @@
 
 #include "timeproviders.h"
 
-using namespace second_take;
+using namespace event_forge;
 
 TEST(TimeProvider, DefaultTimeProviderIsInstanceOfTimeProvider) {
-    second_take::DefaultTimeProvider provider;
+    DefaultTimeProvider provider;
     EXPECT_TRUE(dynamic_cast<TimeProvider*>(&provider) != NULL);
 }
 
 TEST(TimeProvider, DefaultTimeProviderReturnsATimeStamp) {
-    second_take::DefaultTimeProvider provider;
+    DefaultTimeProvider provider;
     std::string timeStamp = provider.getTimeStampOfNow();
     std::cout << "timeStamp: " << timeStamp << std::endl;
     std::regex regex("^20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}");

@@ -4,7 +4,7 @@
 #include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
-namespace second_take {
+namespace event_forge {
 
 #define JSON_PROPERTY_PIPELINES "pipelines"
 #define JSON_PROPERTY_PIPELINE_CONFIG_FILE "pipelineConfigFile"
