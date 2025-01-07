@@ -1,0 +1,14 @@
+{
+    "pipelineName" : "Just sending some info to MQTT",
+    "pipelineSteps" : [
+        {
+            "stepName":"Send Data",
+            "libraryName":"mqttconnector",
+            "namedArguments" : {
+                "host":"127.0.0.1",
+                "port":"1833",
+                "channel":"channel01"
+            }
+        }
+    ]
+}

@@ -1,18 +1,29 @@
 cmake_minimum_required(VERSION 3.10)
 
+include(CMakePrintHelpers)
+
 # Projektname und Version
 project(eventForge VERSION 1.0)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+cmake_print_variables(CMAKE_MODULE_PATH)
+find_package(Mosquito REQUIRED)
+cmake_print_variables(MOSQUITTO_LIBRARY)
+cmake_print_variables(MOSQUITTO_INCLUDE_DIR)
+cmake_print_variables(MOSQUITTO_FOUND)
+
+if(NOT MOSQUITTO_FOUND)
+    message("ERROR: mosquitto not found! Please install this dependency and rerun cmake!")
+    return()
+endif()
 
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(SRC_DIR $(CMAKE_CURRENT_SOURCE_DIR/src))
 
 # add subdirs
 add_subdirectory(src)
-add_subdirectory(src/logger)
-add_subdirectory(src/pipeline)
-add_subdirectory(src/dbinterface)
-add_subdirectory(src/applicationcontext)
 
 # Tests hinzufügen
 enable_testing()

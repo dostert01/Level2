@@ -13,6 +13,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api
     ${CMAKE_SOURCE_DIR}/framework/src/dbinterface
     ${CMAKE_SOURCE_DIR}/framework/src/applicationcontext
+    ${CMAKE_SOURCE_DIR}/framework/src/connectors
     ${CMAKE_SOURCE_DIR}/_deps/json-src/single_include/
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api/samplelibs/binaryDataProcessor/
     ${CMAKE_SOURCE_DIR}/_deps/googletest/googletest/include/
@@ -65,7 +66,11 @@ add_executable(test_dbinterface
 target_link_libraries(test_dbinterface
     ${SQLite3_LIBRARIES})
 
-# Register tests
+add_executable(test_mqttconnector
+    test_mqttconnector.cpp
+    $<TARGET_OBJECTS:pipeline>)
+
+    # Register tests
 add_test(NAME test_eventForge COMMAND test_eventForge)
 set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
@@ -83,3 +88,6 @@ set_tests_properties(test_pipeline_payload_matching PROPERTIES ENVIRONMENT "TEST
 
 add_test(NAME test_dbinterface COMMAND test_dbinterface)
 set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_mqttconnector COMMAND test_mqttconnector)
+set_tests_properties(test_mqttconnector PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

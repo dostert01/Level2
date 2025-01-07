@@ -23,3 +23,4 @@ if [ ! -d $DEPS_DIR ]; then
 fi
 
 getGoogleTests
+getMosquito
