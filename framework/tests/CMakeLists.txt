@@ -12,6 +12,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api
     ${CMAKE_SOURCE_DIR}/framework/src/dbinterface
+    ${CMAKE_SOURCE_DIR}/framework/src/applicationcontext
     ${CMAKE_SOURCE_DIR}/_deps/json-src/single_include/
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api/samplelibs/binaryDataProcessor/
     ${CMAKE_SOURCE_DIR}/_deps/googletest/googletest/include/
@@ -34,7 +35,7 @@ link_libraries(
 # set variables
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/framework/tests/testdata/" CACHE STRING "Directory where test data is expected by the tests")
 
-# Tests hinzufügen
+# Adding tests
 add_executable(test_eventForge
     test_eventForge.cpp
     test_logger.cpp
@@ -42,31 +43,34 @@ add_executable(test_eventForge
     test_loggingdestinations.cpp
     $<TARGET_OBJECTS:pipeline>)
 
-# Tests hinzufügen
+add_executable(test_applicationcontext
+    test_applicationcontext.cpp
+    $<TARGET_OBJECTS:applicationcontext>)
+
 add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
     $<TARGET_OBJECTS:pipeline>)
 
-# Tests hinzufügen
 add_executable(test_pipeline
     test_pipeline.cpp
     $<TARGET_OBJECTS:pipeline>)
 
-# Tests hinzufügen
 add_executable(test_pipeline_payload_matching
     test_pipeline_payload_matching.cpp
     $<TARGET_OBJECTS:pipeline>)
 
-# Tests hinzufügen
 add_executable(test_dbinterface
     test_dbinterface.cpp
     $<TARGET_OBJECTS:dbinterface>)
 target_link_libraries(test_dbinterface
     ${SQLite3_LIBRARIES})
 
-# Tests registrieren
+# Register tests
 add_test(NAME test_eventForge COMMAND test_eventForge)
 set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_applicationcontext COMMAND test_applicationcontext)
+set_tests_properties(test_applicationcontext PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_pipelineprocessor COMMAND test_pipelineprocessor)
 set_tests_properties(test_pipelineprocessor PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

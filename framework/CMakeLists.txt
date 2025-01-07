@@ -12,6 +12,7 @@ add_subdirectory(src)
 add_subdirectory(src/logger)
 add_subdirectory(src/pipeline)
 add_subdirectory(src/dbinterface)
+add_subdirectory(src/applicationcontext)
 
 # Tests hinzufügen
 enable_testing()

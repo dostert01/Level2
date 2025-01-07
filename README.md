@@ -2,26 +2,28 @@
 
 ## What it is
 
-EventForge is just a simple event driven Business Application Framework written in C++ with a Focus on:
+EventForge is just a simple event driven Business Application Framework written in C++ with a focus on:
 
 - Ability to run anywhere (on Linux) from small embedded systems to big cloud instances
-- Small Memory Footprint
-- As few external Dependencies a possible or rather reasonable
+- Small memory footprint
+- As few external dependencies as possible or rather reasonable
 - Modularity
 - Performance
-- Ability to modify and add new Business Logic after Deployment
+- Ability to modify and add new business logic after deployment
 
 ## Provided Modules
 
-- Formatted and filtered **Logging** to any destination. Currently implemented are Logging destinations for `stdout`, `stderr`, `file` and `syslog`. See [here](./framework/src/logger/README.md) for Details.
+- Formatted and filtered **Logging** to any destination. Currently implemented are logging destinations for `stdout`, `stderr`, `file` and `syslog`. See [here](./framework/src/logger/README.md) for details.
 
-- **Process Pipelining** allows declarative Definition of Process Pipelines. Such Pipelines consist of a series of Business Logic specific Modules, that can be chained together. As Pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements. Processing Pipelines can be extended by making use of a **lean API**, that allows quick implementation of new Business Logic Modules. For further Details refer to the [Pipeline Implementation Part of the Framework](./framework/src/pipeline/README.md)
+- **Process Pipelining** allows declarative definition of processing pipelines. Such pipelines consist of a series of business logic specific modules, that can be chained together. As pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements. Processing pipelines can be extended by making use of a **lean API**, that allows quick implementation of new business logic modules. For further details refer to the [Pipeline Implementation Part of the Framework](./framework/src/pipeline/README.md)
 
-- Generic **SQL Database Interface** to enable Processing Pipelines to communicate with any RDBMS. Currently SQLite is implemented as the first one. See [here](./framework/src/dbinterface/README.md) how to use the existing implementation and to extend for the support of further RDBMSs.
+- Generic **SQL Database Interface** to enable processing pipelines to communicate with any RDBMS. Currently SQLite is implemented as the first one. See [here](./framework/src/dbinterface/README.md) how to use the existing implementation and to extend for the support of further RDBMSs.
 
 - Connectors to external Systems using HTTP and MQTT (coming next)
 
 - Event Receptors for HTTP and MQTT (coming soon)
+
+- **Application Context** covers thread save access to environmental information about the application
 
 ## How to build it
 
