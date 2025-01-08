@@ -5,9 +5,10 @@
             "stepName":"Send Data",
             "libraryName":"mqttconnector",
             "namedArguments" : {
-                "host":"127.0.0.1",
-                "port":"1833",
-                "channel":"channel01"
+                "hostName":"127.0.0.1",
+                "port":"1883",
+                "clientId":"mqttconnectorClient01",
+                "topic":"test/mqttconnector"
             }
         }
     ]

@@ -18,7 +18,7 @@
 #define END_DECL                /* none */
 #endif
 
-BEGIN_DECL 
+BEGIN_DECL
 int pipeline_step_module_init(PipelineStepInitData& initData);
 int pipeline_step_module_process(PipelineProcessingData& processData);
 int pipeline_step_module_finish();

@@ -119,6 +119,7 @@ void Pipeline::loadPipelineSteps(const json& jsonData) {
 //-------------------------------------------------------------------
 PipelineStep::~PipelineStep() {
     if(hLib != NULL) {
+        runFinishFunction();
         LOGGER.info("Unloading shared object from pipeline: " + this->libraryName);
         if(dlclose(hLib) == 0) {
             hLib = NULL;
@@ -191,6 +192,7 @@ void PipelineStep::runProcessingFunction(const PipelineProcessingData& processin
 }
 
 void PipelineStep::runFinishFunction() {
+    LOGGER.info("Invoking the finish function for: " + this->libraryName);
     libFinish();
 }
 

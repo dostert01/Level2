@@ -19,7 +19,8 @@ endif()
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(SRC_DIR $(CMAKE_CURRENT_SOURCE_DIR/src))
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # add subdirs
 add_subdirectory(src)

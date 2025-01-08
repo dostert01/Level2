@@ -14,6 +14,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(PIPELINE_API_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pipeline/api)
 cmake_print_variables(PIPELINE_API_INCLUDE_DIR)
+set(LOGGER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/logger)
+cmake_print_variables(LOGGER_INCLUDE_DIR)
 
 # add subdirs
 add_subdirectory(logger)

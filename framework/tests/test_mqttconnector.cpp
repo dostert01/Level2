@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-#include <filesystem>
-#include "../logger/logger.h"
+#include "logger.h"
 #include "pipeline.h"
 
 using namespace std;
@@ -27,6 +26,22 @@ namespace test_mqttconnector {
             LOGGER.error("Environment variable TEST_FILES_DIR must be set to where the tests expect the testfiles to live!");
         }  
     }
+
+    void listenToIncomingMessages() {
+        string command = "mosquitto_sub -v -t 'test/mqttconnector' -W 3";
+        FILE *file = popen(command.c_str(), "r");
+        string result = "";
+        if(file) {
+            LOGGER.info("popen returned valid file pointer");
+            char buffer[2048];
+            while(fgets(buffer, 2048, file) != NULL) {
+                LOGGER.info("reding result ...");
+                result.append(buffer);
+            }
+            pclose(file);
+        }
+        LOGGER.info("result returned by call to " + command + " : '" + result + "'");
+    }
 }
 
 void configureTest() {
@@ -37,6 +52,10 @@ void configureTest() {
 TEST(MQTTConnector, CanSend) {
     configureTest();
     optional<shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance(test_mqttconnector::testFilesDir + PIPELINE_CONFIG_TEST_FILE_06);
-    pipeline1.value()->execute();
+    PipelineProcessingData processData;
+    processData.addPayloadData("MQTT_SEND_TEXT_DATA", "text/plain", "Hello via MQTT");
+    //thread t(test_mqttconnector::listenToIncomingMessages);
+    pipeline1.value()->execute(processData);
+    //t.join();
     EXPECT_EQ(1, 1);
 }

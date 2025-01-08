@@ -16,8 +16,12 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 
 # Specify the library
 add_library(mqttconnector SHARED mqttconnector.cpp)
-target_link_libraries(mqttconnector pipelineapi)
+target_link_libraries(mqttconnector pipelineapi ${MOSQUITTO_LIBRARY})
 
 # Specify the include directories for the library
-target_include_directories(mqttconnector PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PIPELINE_API_INCLUDE_DIR})
+target_include_directories(mqttconnector PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PIPELINE_API_INCLUDE_DIR}
+    ${LOGGER_INCLUDE_DIR}
+)
 target_compile_definitions(mqttconnector PRIVATE BUILDING_DLL)

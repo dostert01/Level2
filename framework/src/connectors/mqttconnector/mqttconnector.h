@@ -1,17 +1,17 @@
-#ifndef BINARY_DATA_PROCESSOR_H
-#define BINARY_DATA_PROCESSOR_H
+#ifndef MQTT_CONNECTOR_h
+#define MQTT_CONNECTOR_h
 
 #include <string>
 
 #include "pipelineapi.h"
 
-class SpecificBinaryProcessingData : public BinaryProcessingData {
-  public:
-    std::string firstArgument;
-    std::string secondArgument;
-    SpecificBinaryProcessingData();
-    ~SpecificBinaryProcessingData();
-};
+#define MQTT_CONNECTOR_PARAM_NAME_HOSTNAME "hostName"
+#define MQTT_CONNECTOR_PARAM_NAME_PORT "port"
+#define MQTT_CONNECTOR_PARAM_NAME_CLIENT_ID "clientId"
+#define MQTT_CONNECTOR_PARAM_NAME_TOPIC "topic"
+#define PAYLOAD_NAME_MQTT_SEND_TEXT_DATA "MQTT_SEND_TEXT_DATA"
+
+using namespace std;
 
 
-#endif //BINARY_DATA_PROCESSOR_H
+#endif //MQTT_CONNECTOR_h
