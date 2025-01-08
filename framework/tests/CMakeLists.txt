@@ -6,6 +6,8 @@ cmake_print_variables(SQLite3_INCLUDE_DIRS)
 cmake_print_variables(SQLite3_LIBRARIES)
 cmake_print_variables(SQLite3_VERSION)
 
+cmake_print_variables(MOSQUITTO_LIBRARY)
+
 # Include the necessary directories
 include_directories(
     ${CMAKE_SOURCE_DIR}/framework/src/logger
@@ -18,6 +20,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api/samplelibs/binaryDataProcessor/
     ${CMAKE_SOURCE_DIR}/_deps/googletest/googletest/include/
     ${CMAKE_SOURCE_DIR}/_deps/json-src/include/
+    ${MQTT_CONNECTOR_DIR}
     ${SQLite3_INCLUDE_DIRS}
 )
 
@@ -69,7 +72,12 @@ target_link_libraries(test_dbinterface
 if(MOSQUITTO_FOUND)
     add_executable(test_mqttconnector
         test_mqttconnector.cpp
-        $<TARGET_OBJECTS:pipeline>)
+        $<TARGET_OBJECTS:pipeline>
+        $<TARGET_OBJECTS:mqttconnector>
+    )
+    target_link_libraries(test_mqttconnector
+        ${MOSQUITTO_LIBRARY}
+    )
 else()
     message("INFO: Building without support for MQTT")
 endif()

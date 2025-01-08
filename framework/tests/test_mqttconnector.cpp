@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "logger.h"
 #include "pipeline.h"
+#include "mosquittowrapper.h"
 
 using namespace std;
 using namespace event_forge;
@@ -58,4 +59,14 @@ TEST(MQTTConnector, CanSend) {
     pipeline1.value()->execute(processData);
     //t.join();
     EXPECT_EQ(1, 1);
+}
+
+TEST(MosquittoWrapper, canCreateInstance) {
+    shared_ptr<MosquittoWrapper> wrapper = MosquittoWrapper::getInstance("127.0.0.1", 1883, "someNiceClient", "test/topic");
+    EXPECT_TRUE(wrapper != nullptr);
+}
+
+TEST(MosquittoWrapper, canInitMosquittoLib) {
+    shared_ptr<MosquittoWrapper> wrapper = MosquittoWrapper::getInstance("127.0.0.1", 1883, "someNiceClient", "test/topic");
+    EXPECT_TRUE(wrapper->isInitComplete());
 }
