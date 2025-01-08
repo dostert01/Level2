@@ -13,8 +13,7 @@ cmake_print_variables(MOSQUITTO_INCLUDE_DIR)
 cmake_print_variables(MOSQUITTO_FOUND)
 
 if(NOT MOSQUITTO_FOUND)
-    message("ERROR: mosquitto not found! Please install this dependency and rerun cmake!")
-    return()
+    message("WARNING: mosquitto not found! Building without support for MQTT!")
 endif()
 
 # Festlegen des Standards für C++

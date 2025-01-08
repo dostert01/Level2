@@ -11,4 +11,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-add_subdirectory(mqttconnector)
+if(MOSQUITTO_FOUND)
+    add_subdirectory(mqttconnector)
+else()
+    message("INFO: Building without support for MQTT")
+endif()
+
