@@ -23,6 +23,7 @@ add_subdirectory(pipeline)
 add_subdirectory(dbinterface)
 add_subdirectory(applicationcontext)
 add_subdirectory(connectors)
+add_subdirectory(listeners)
 
 # Hinzufügen der ausführbaren Datei
 add_executable(eventForge main.cpp)

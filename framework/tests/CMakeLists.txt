@@ -21,7 +21,9 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/_deps/googletest/googletest/include/
     ${CMAKE_SOURCE_DIR}/_deps/json-src/include/
     ${MQTT_CONNECTOR_DIR}
+    ${MQTT_LISTENER_DIR}
     ${SQLite3_INCLUDE_DIRS}
+    ${LISTENERS_DIR}
 )
 
 link_directories(
@@ -78,6 +80,15 @@ if(MOSQUITTO_FOUND)
     target_link_libraries(test_mqttconnector
         ${MOSQUITTO_LIBRARY}
     )
+
+    add_executable(test_mqttlistener
+        test_mqttlistener.cpp
+        $<TARGET_OBJECTS:pipeline>
+        $<TARGET_OBJECTS:mqttlistener>
+    )
+    target_link_libraries(test_mqttlistener
+        ${MOSQUITTO_LIBRARY}
+    )
 else()
     message("INFO: Building without support for MQTT")
 endif()
@@ -104,4 +115,7 @@ set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${T
 if(MOSQUITTO_FOUND)
     add_test(NAME test_mqttconnector COMMAND test_mqttconnector)
     set_tests_properties(test_mqttconnector PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+    add_test(NAME test_mqttlistener COMMAND test_mqttlistener)
+    set_tests_properties(test_mqttlistener PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 endif()

@@ -1,10 +1,14 @@
-#include "mosquittowrapper.h"
+/*
+  for usage of mosquitto related stuff please refer to
+  https://mosquitto.org/api/files/mosquitto-h.html
+*/
 
 #include <error.h>
 #include <mosquitto.h>
 #include <string.h>
 
 #include "logger.h"
+#include "mosquittowrapper.h"
 
 using namespace event_forge;
 
@@ -20,13 +24,17 @@ std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
 }
 
 MosquittoWrapper::~MosquittoWrapper() {
+  disconnectFromBroker();
+  mosquitto_destroy(mosquittoHandle);
+  mosquitto_lib_cleanup();
+}
+
+void MosquittoWrapper::disconnectFromBroker() {
   if(isConnected) {
-    LOGGER.info("Disconnecting from MQTT broker at "+ hostName);
+    LOGGER.info("Disconnecting from MQTT broker at " + hostName);
     mosquitto_disconnect(mosquittoHandle);
     isConnected = false;
   }
-  mosquitto_destroy(mosquittoHandle);
-  mosquitto_lib_cleanup();
 }
 
 void MosquittoWrapper::init(string hostName, int port, string clientId, string topic) {

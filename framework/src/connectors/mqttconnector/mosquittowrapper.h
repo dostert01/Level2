@@ -36,6 +36,7 @@ class MosquittoWrapper {
                   std::string &topic);
   void initMosquittoLib();
   void initMosquittoConnection();
+  void disconnectFromBroker();
 };
 
 #endif  // MOSQUITTO_WRAPPER_H

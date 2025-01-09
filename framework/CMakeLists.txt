@@ -22,6 +22,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(MQTT_CONNECTOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/connectors/mqttconnector)
+set(LISTENERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/listeners)
+set(MQTT_LISTENER_DIR ${LISTENERS_DIR}/mqttlistener)
 
 # add subdirs
 add_subdirectory(src)

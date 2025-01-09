@@ -10,11 +10,6 @@
 #include "mqttconnector.h"
 #include "logger.h"
 
-/*
-  for usage of mosquitto related stuff please refer to
-  https://mosquitto.org/api/files/mosquitto-h.html
-*/
-
 std::shared_ptr<MosquittoWrapper> mqtt;
 
 string getNamedArgument(PipelineStepInitData& initData, string paramName) {

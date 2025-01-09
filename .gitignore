@@ -1,3 +1,4 @@
+*.a
 CMakeCache.txt
 CMakeFiles/
 CTestTestfile.cmake
@@ -6,6 +7,7 @@ bin/
 cmake_install.cmake
 googletest/
 lib/
+build
 framework/src/CMakeFiles/
 framework/src/Makefile
 framework/src/cmake_install.cmake
@@ -23,4 +25,12 @@ framework/Testing/
 framework/src/logger/Testing/
 framework/src/pipeline/.CMakeLists.txt.swp
 framework/tests/test_secondTake
+framework/tests/test_applicationcontext
+framework/tests/test_dbinterface
+framework/tests/test_eventForge
+framework/tests/test_mqttconnector
+framework/tests/test_pipeline
+framework/tests/test_pipeline_payload_matching
+framework/tests/test_pipelineprocessor
+sampleApplications/driversLog/tests/test_car
 
