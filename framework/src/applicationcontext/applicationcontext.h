@@ -18,7 +18,7 @@ class ApplicationContext {
   friend bool operator==(const ApplicationContext &lhs, const ApplicationContext &rhs);
   optional<string> readEnv(string variableName);
   optional<string> getCurrentWorkingDirectory();
-
+  void loadApplicationConfig(const std::string& configFilePath);
  private:
   ApplicationContext() = default;
 };

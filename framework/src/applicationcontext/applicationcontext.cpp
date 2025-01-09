@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <nlohmann/json.hpp>
 #include <applicationcontext.h>
 #include <logger.h>
 
@@ -41,6 +42,19 @@ optional<string> ApplicationContext::getCurrentWorkingDirectory() {
         char* errorText = strerror_r(errno, buffer, DEFAULT_BUFFER_SIZE);
         LOGGER.warn(string(errorText));
         return nullopt;
+    }
+}
+
+
+void ApplicationContext::loadApplicationConfig(const std::string& configFilePath) {
+  try {
+    std::ifstream jsonFile(configFilePath);
+    json jsonData = json::parse(jsonFile);
+    jsonFile.close();
+    loadHeaderData(jsonData);
+    loadPipelines(jsonData);
+    } catch (const std::exception& e) {
+        throw;
     }
 }
 
