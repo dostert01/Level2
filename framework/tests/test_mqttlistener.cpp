@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
 #include "logger.h"
 #include "pipeline.h"
+#include "applicationcontext.h"
+
 #include "mqttlistener.h"
 
 using namespace std;
 using namespace event_forge;
 
 #define PIPELINE_CONFIG_TEST_FILE_06 "/pipelineConfig06.json"
+#define APP_CONFIG_TEST_FILE_01 "/applicationConfig01.json"
 
 namespace test_mqttlistener {
     std::string workingDir;
@@ -52,7 +55,17 @@ TEST(MQTTListener, CanBeStoredAsNetworkListener) {
     EXPECT_TRUE(l != NULL);
 }
 
+TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    EXPECT_EQ(2, listeners.size());
+    EXPECT_EQ("test/mqttconnector01", listeners[0]->getTopic());
+    EXPECT_EQ("test/mqttconnector02", listeners[1]->getTopic());
+}
+
 TEST(MQTTListener, CanStartListening) {
+    configureTest();
     shared_ptr<NetworkListener> listener = MQTTListener::getInstance();
     listener->startListening();
     EXPECT_TRUE(listener->isListening());

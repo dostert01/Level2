@@ -85,6 +85,7 @@ if(MOSQUITTO_FOUND)
         test_mqttlistener.cpp
         $<TARGET_OBJECTS:pipeline>
         $<TARGET_OBJECTS:mqttlistener>
+        $<TARGET_OBJECTS:applicationcontext>
     )
     target_link_libraries(test_mqttlistener
         ${MOSQUITTO_LIBRARY}

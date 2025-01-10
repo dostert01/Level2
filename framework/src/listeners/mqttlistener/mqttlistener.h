@@ -7,21 +7,20 @@
 #include "networklistener.h"
 
 using namespace std;
+using namespace nlohmann::json_abi_v3_11_3;
 
 class MQTTListener : public NetworkListener {
     public:
         MQTTListener() = default;
-        MQTTListener(MQTTListener& other){
-            hostName = other.hostName;
-            port = other.port;
-            clientId = other.clientId;
-            topic = other.topic;
-        };
+        MQTTListener(json jsonObject);
         static shared_ptr<MQTTListener> getInstance();
         void init();
         void startListening();
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(MQTTListener, hostName, port, clientId, topic)
-    public:
+        string getHostName();
+        int getPort();
+        string getClientId();
+        string getTopic();
+    private:
         string hostName = "none";
         int port = 1234;
         string clientId = "hallo";
