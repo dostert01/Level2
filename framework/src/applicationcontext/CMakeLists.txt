@@ -12,6 +12,8 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 add_library(applicationcontext SHARED
     applicationcontext.cpp)
 
+target_link_libraries(applicationcontext PRIVATE nlohmann_json::nlohmann_json dl)
+
 # Specify the include directories for the library
 target_include_directories(applicationcontext PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../logger)
 target_compile_definitions(applicationcontext PRIVATE BUILDING_DLL)

@@ -1,0 +1,23 @@
+{
+    "Listeners": {
+        "MQTTListeners": [
+            {
+                "hostName": "127.0.0.1",
+                "port": "parsing this will fail because port needs to be an integer",
+                "clientId": "mqttconnectorClient01",
+                "topic": "test/mqttconnector01"
+            },
+            {
+                "hostName": "127.0.0.1",
+                "port": 1883,
+                "clientId": "mqttconnectorClient01",
+                "topic": "test/mqttconnector02"
+            }
+        ],
+        "HTTPListeners": [
+            {
+                "port": "8889"
+            }
+        ]
+    }
+}

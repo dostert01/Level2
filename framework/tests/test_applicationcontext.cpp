@@ -2,14 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <optional>
+#include <filesystem>
+#include <regex>
+#include <vector>
 #include "applicationcontext.h"
 #include "logger.h"
 
 using namespace event_forge;
 using namespace std;
+using namespace nlohmann::json_abi_v3_11_3;
 
 #define ENV_VAR_NAME "MY_TEST_VARIABLE"
-
+#define APP_CONFIG_TEST_FILE_01 "/applicationConfig01.json"
+#define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 
 namespace test_applicationcontext {
     std::string workingDir;
@@ -68,7 +73,98 @@ TEST(ApplicationContext, CanReadTheCurrentWorkingDirectory) {
     EXPECT_TRUE(value.has_value());
 }
 
-TEST(ApplicationContext, CanLoadApplicationConfigFromFile) {
-    APP_CONTEXT.loadApplicationConfig();
-    EXPECT_TRUE(value.has_value());
+TEST(ApplicationContext, LogsFailureIfParsingJsonFails) {
+    testing::internal::CaptureStdout();
+    APP_CONTEXT.loadApplicationConfig("");
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("parse error at line 1, column 1: attempting to parse an empty input");
+    EXPECT_TRUE(std::regex_search(output, regex));
+}
+
+TEST(ApplicationContext, CanLoadAppConfigFromJsonFile) {
+    configureTest();
+    testing::internal::CaptureStdout();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    std::string output = testing::internal::GetCapturedStdout();
+    std::cout << "output: " << output << std::endl;
+    std::regex regex("parse error at line 1, column 1: attempting to parse an empty input");
+    EXPECT_FALSE(std::regex_search(output, regex));
+}
+
+TEST(ApplicationContext, canSplitStrings01) {
+    vector<string> result = APP_CONTEXT.splitString("Listeners", "/");
+    EXPECT_EQ(1, result.size());
+    EXPECT_EQ("Listeners", result[0]);
+}
+
+TEST(ApplicationContext, canSplitStrings02) {
+    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners", "/");
+    for(auto &s : result) {
+        LOGGER.info("split result: " + s);
+    }
+    EXPECT_EQ(2, result.size());
+    EXPECT_EQ("Listeners", result[0]);
+    EXPECT_EQ("MQTTListeners", result[1]);
+}
+
+TEST(ApplicationContext, canSplitStrings03) {
+    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners/AndMuchMore", "/");
+    for(auto &s : result) {
+        LOGGER.info("split result: " + s);
+    }
+    EXPECT_EQ(3, result.size());
+    EXPECT_EQ("Listeners", result[0]);
+    EXPECT_EQ("MQTTListeners", result[1]);
+    EXPECT_EQ("AndMuchMore", result[2]);
+}
+
+TEST(ApplicationContext, canSplitStrings04) {
+    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners/And/Much/More", "/");
+    for(auto &s : result) {
+        LOGGER.info("split result: " + s);
+    }
+    EXPECT_EQ(5, result.size());
+    EXPECT_EQ("Listeners", result[0]);
+    EXPECT_EQ("MQTTListeners", result[1]);
+    EXPECT_EQ("And", result[2]);
+    EXPECT_EQ("Much", result[3]);
+    EXPECT_EQ("More", result[4]);
+}
+
+class MockListener {
+    public:
+        MockListener() = default;
+        MockListener(json jsonObject){
+            hostName = jsonObject["hostName"];
+            port = jsonObject["port"];
+            clientId = jsonObject["clientId"];
+            topic = jsonObject["topic"];
+        };
+    public:
+        string hostName = "none";
+        int port = 1234;
+        string clientId = "hallo";
+        string topic = "test/topic";
+};
+
+TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/Not/To/Be/Found/In/Json");
+    EXPECT_EQ(0, listeners.size());
+}
+
+TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
+    EXPECT_EQ(2, listeners.size());
+}
+
+TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
+    vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
+    EXPECT_EQ(1, listeners.size());
 }

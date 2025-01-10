@@ -18,7 +18,7 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 add_library(mqttlistener SHARED
     mqttlistener.cpp
 )
-target_link_libraries(mqttlistener pipelineapi ${MOSQUITTO_LIBRARY})
+target_link_libraries(mqttlistener pipelineapi ${MOSQUITTO_LIBRARY} nlohmann_json::nlohmann_json dl)
 
 # Specify the include directories for the library
 target_include_directories(mqttlistener PUBLIC
