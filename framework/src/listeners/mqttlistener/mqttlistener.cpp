@@ -13,9 +13,15 @@ shared_ptr<MQTTListener> MQTTListener::getInstance() {
   return make_shared<MQTTListener>();
 }
 
-void MQTTListener::init() {}
+void MQTTListener::init() {
+    mqtt =  MosquittoWrapper::getInstance(hostName, port, clientId, topic);
+    initComplete = mqtt->isInitComplete();
+}
 
-void MQTTListener::startListening() {}
+void MQTTListener::startListening() {
+    mqtt->startListening();
+    setIsListening(mqtt->isListening());
+}
 
 string MQTTListener::getHostName() {
     return hostName;

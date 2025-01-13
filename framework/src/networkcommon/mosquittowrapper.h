@@ -22,14 +22,17 @@ class MosquittoWrapper {
   ~MosquittoWrapper();
   bool isInitComplete();
   void sendData(string payloadString);
-
+  void startListening();
+  bool isListening();
+  
  private:
   string hostName;
   int port;
   string clientId;
   string topic;
   bool initComplete;
-  bool isConnected;
+  bool connected;
+  bool listening;
   struct mosquitto *mosquittoHandle;
   void init(string hostName, int port, string clientId, string topic);
   void initParams(std::string &hostName, int port, std::string &clientId,
@@ -37,6 +40,7 @@ class MosquittoWrapper {
   void initMosquittoLib();
   void initMosquittoConnection();
   void disconnectFromBroker();
+  void logMosquittoMessage(int mosquittoReturnCode, string sucessMessage, string errorMessage);
 };
 
 #endif  // MOSQUITTO_WRAPPER_H

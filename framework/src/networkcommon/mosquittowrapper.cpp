@@ -14,6 +14,10 @@ using namespace event_forge;
 
 std::shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
 
+void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
+	printf("New message with topic %s: %s\n", msg->topic, (char *) msg->payload);
+}
+
 std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
                                                                 int port,
                                                                 string clientId,
@@ -29,17 +33,36 @@ MosquittoWrapper::~MosquittoWrapper() {
   mosquitto_lib_cleanup();
 }
 
+void MosquittoWrapper::startListening() {
+  if(!listening && connected) {
+    mosquitto_message_callback_set(mosquittoHandle, on_message);
+    int success = mosquitto_loop_start(mosquittoHandle);
+    logMosquittoMessage(success,
+      "mosquitto loop strted", "failed starting mosquitto loop");
+    listening = (success == MOSQ_ERR_SUCCESS);
+  }
+}
+
+void MosquittoWrapper::logMosquittoMessage(int mosquittoReturnCode, string sucessMessage, string errorMessage) {
+    if(mosquittoReturnCode == MOSQ_ERR_SUCCESS) {
+      LOGGER.info(sucessMessage);
+    } else {
+      LOGGER.error(errorMessage + " - errorcode: " + string(mosquitto_strerror(mosquittoReturnCode)));
+    }
+}
+
 void MosquittoWrapper::disconnectFromBroker() {
-  if(isConnected) {
+  if(connected) {
     LOGGER.info("Disconnecting from MQTT broker at " + hostName);
     mosquitto_disconnect(mosquittoHandle);
-    isConnected = false;
+    connected = false;
   }
 }
 
 void MosquittoWrapper::init(string hostName, int port, string clientId, string topic) {
   initComplete = true;
-  isConnected = false;
+  connected = false;
+  listening = false;
   initParams(hostName, port, clientId, topic);
   initMosquittoLib();
   initMosquittoConnection();
@@ -72,9 +95,13 @@ void MosquittoWrapper::initMosquittoConnection() {
       initComplete = false;
     } else {
       LOGGER.info("Connected to MQTT broker at hostName: '" + hostName + "'");
-      isConnected = true;
+      connected = true;
     }
   }
+}
+
+bool MosquittoWrapper::isListening() {
+  return listening;
 }
 
 void MosquittoWrapper::initParams(std::string &hostName, int port,
@@ -95,5 +122,5 @@ void MosquittoWrapper::initMosquittoLib() {
 }
 
 bool MosquittoWrapper::isInitComplete() {
-  return initComplete && isConnected;
+  return initComplete && connected;
 }

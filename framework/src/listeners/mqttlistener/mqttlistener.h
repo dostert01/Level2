@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "networklistener.h"
+#include "mosquittowrapper.h"
 
 using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
@@ -25,6 +26,7 @@ class MQTTListener : public NetworkListener {
         int port = 1234;
         string clientId = "hallo";
         string topic = "test/topic";
+        std::shared_ptr<MosquittoWrapper> mqtt;
 };
 
 #endif //#define MQTT_LISTENER_H
