@@ -105,7 +105,7 @@ TEST(MQTTListener, IsListeningAfterCallingStartListening) {
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
         listener->init();
-        listener->startListening();
+        listener->startListening(nullptr);
         EXPECT_TRUE(listeners[0]->isListening());
     }
 }

@@ -44,7 +44,7 @@ MosquittoWrapper::~MosquittoWrapper() {
   mosquitto_lib_cleanup();
 }
 
-void MosquittoWrapper::startListening() {
+void MosquittoWrapper::startListening(shared_ptr<FillerPipe> fillerPipe) {
   if(!listening && connected) {
     mosquitto_message_callback_set(mosquittoHandle, on_message);
     subscribeToAllTopics();

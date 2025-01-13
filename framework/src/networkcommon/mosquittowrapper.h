@@ -11,6 +11,8 @@
 #include <vector>
 #include <shared_mutex>
 
+#include "pipelinefifo.h"
+
 using namespace std;
 
 class MosquittoWrapper {
@@ -28,7 +30,7 @@ class MosquittoWrapper {
   ~MosquittoWrapper();
   bool isInitComplete();
   void sendData(string payloadString);
-  void startListening();
+  void startListening(shared_ptr<FillerPipe> fillerPipe);
   bool isListening();
 
  private:

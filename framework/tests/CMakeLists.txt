@@ -67,6 +67,10 @@ add_executable(test_pipeline_payload_matching
     test_pipeline_payload_matching.cpp
     $<TARGET_OBJECTS:pipeline>)
 
+add_executable(test_pipelinefifo
+    test_pipelinefifo.cpp
+    $<TARGET_OBJECTS:fillerpipe>)
+
 add_executable(test_dbinterface
     test_dbinterface.cpp
     $<TARGET_OBJECTS:dbinterface>)
@@ -113,6 +117,9 @@ set_tests_properties(test_pipeline PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST
 
 add_test(NAME test_pipeline_payload_matching COMMAND test_pipeline_payload_matching)
 set_tests_properties(test_pipeline_payload_matching PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_pipelinefifo COMMAND test_pipelinefifo)
+set_tests_properties(test_pipelinefifo PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_dbinterface COMMAND test_dbinterface)
 set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

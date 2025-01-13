@@ -3,7 +3,7 @@
 #include <fstream>
 #include <dlfcn.h>
 
-#include "../logger/logger.h"
+#include "logger.h"
 #include "pipeline.h"
 
 namespace event_forge {

@@ -21,8 +21,8 @@ void MQTTListener::init() {
     initComplete = mqtt->isInitComplete();
 }
 
-void MQTTListener::startListening() {
-    mqtt->startListening();
+void MQTTListener::startListening(shared_ptr<FillerPipe> fillerPipe) {
+    mqtt->startListening(fillerPipe);
     setIsListening(mqtt->isListening());
 }
 

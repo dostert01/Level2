@@ -1,6 +1,7 @@
 #ifndef NETWORK_LISTENER_H
 #define NETWORK_LISTENER_H
 
+#include "fillerpipe.h"
 
 class NetworkListener {
     public:
@@ -9,7 +10,7 @@ class NetworkListener {
         bool isListening() { return listening;}
         bool isIniComplete() {return initComplete;}
         virtual void init() = 0;
-        virtual void startListening() = 0;
+        virtual void startListening(shared_ptr<FillerPipe> fillerPipe) = 0;
     protected:
         void setIsListening(bool value) { listening = value; }
         bool initComplete = false;

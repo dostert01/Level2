@@ -29,5 +29,6 @@ target_include_directories(mosquittowrapper PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PIPELINE_API_INCLUDE_DIR}
     ${LOGGER_INCLUDE_DIR}
+    ${PIPELINE_INCLUDE_DIR}
 )
 target_compile_definitions(mosquittowrapper PRIVATE BUILDING_DLL)

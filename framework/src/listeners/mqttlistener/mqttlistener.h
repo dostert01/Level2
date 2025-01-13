@@ -25,7 +25,7 @@ class MQTTListener : public NetworkListener {
         MQTTListener(json jsonObject);
         static shared_ptr<MQTTListener> getInstance();
         void init();
-        void startListening();
+        void startListening(shared_ptr<FillerPipe> fillerPipe);
         string getHostName();
         int getPort();
         string getClientId();
