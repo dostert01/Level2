@@ -23,14 +23,19 @@ std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
                                                                 string clientId,
                                                                 string topic) {
   std::shared_ptr<MosquittoWrapper> instance = std::make_shared<MosquittoWrapper>();
-  instance->init(hostName, port, clientId, topic);
+  vector<string> topics;
+  topics.push_back(topic);
+  instance->init(hostName, port, clientId, topics);
   return instance;
 }
 
 std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
                                                                 int port,
-                                                                string clientId) {
-  return getInstance(hostName, port, clientId);
+                                                                string clientId,
+                                                                vector<string> topics) {
+  std::shared_ptr<MosquittoWrapper> instance = std::make_shared<MosquittoWrapper>();
+  instance->init(hostName, port, clientId, topics);
+  return instance;
 }
 
 MosquittoWrapper::~MosquittoWrapper() {
@@ -65,18 +70,18 @@ void MosquittoWrapper::disconnectFromBroker() {
   }
 }
 
-void MosquittoWrapper::init(string hostName, int port, string clientId, string topic) {
+void MosquittoWrapper::init(string hostName, int port, string clientId, vector<string>& topics) {
   initComplete = true;
   connected = false;
   listening = false;
-  initParams(hostName, port, clientId, topic);
+  initParams(hostName, port, clientId, topics);
   initMosquittoLib();
   initMosquittoConnection();
 }
 
 void MosquittoWrapper::sendData(string payloadString) {
   int returnCode = mosquitto_publish(
-      mosquittoHandle, NULL, topic.c_str(),
+      mosquittoHandle, NULL, topics[0].c_str(),
       strlen(payloadString.c_str()) + 1, payloadString.c_str(), 0, false);
   if (returnCode == MOSQ_ERR_SUCCESS) {
     LOGGER.info("Message sent successful");
@@ -110,12 +115,12 @@ bool MosquittoWrapper::isListening() {
   return listening;
 }
 
-void MosquittoWrapper::initParams(std::string &hostName, int port,
-                                  std::string &clientId, std::string &topic) {
+void MosquittoWrapper::initParams(string &hostName, int port,
+                                  string &clientId, vector<string> topics) {
   this->hostName = hostName;
   this->port = port;
   this->clientId = clientId;
-  this->topic = topic;
+  this->topics = topics;
 }
 
 void MosquittoWrapper::initMosquittoLib() {

@@ -64,6 +64,15 @@ TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
     EXPECT_EQ("test/topic04", listeners[1]->getTopic(1).value());
 }
 
+TEST(MQTTListener, CanREturnTopicNamesAsVectorOfStrings) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    vector<string> names = listeners[0]->getTopicNames();
+    EXPECT_EQ("test/topic01", names[0]);
+    EXPECT_EQ("test/topic02", names[1]);
+}
+
 TEST(MQTTListener, initFailsIfConnectionParamsAreNotSet) {
     shared_ptr<NetworkListener> listener = MQTTListener::getInstance();
     listener->init();

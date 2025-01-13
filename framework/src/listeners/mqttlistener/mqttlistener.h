@@ -2,6 +2,7 @@
 #define MQTT_LISTENER_H
 
 #include <memory>
+#include <vector>
 #include <nlohmann/json.hpp>
 
 #include "networklistener.h"
@@ -29,6 +30,7 @@ class MQTTListener : public NetworkListener {
         int getPort();
         string getClientId();
         optional<string> getTopic(int index);
+        vector<string> getTopicNames();
     private:
         string hostName = "none";
         int port = 1234;

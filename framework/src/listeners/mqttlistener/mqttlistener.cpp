@@ -16,7 +16,8 @@ shared_ptr<MQTTListener> MQTTListener::getInstance() {
 }
 
 void MQTTListener::init() {
-    mqtt =  MosquittoWrapper::getInstance(hostName, port, clientId);
+    MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
+    mqtt = MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
     initComplete = mqtt->isInitComplete();
 }
 
@@ -43,6 +44,14 @@ optional<string> MQTTListener::getTopic(int index) {
     } else {
         return nullopt;
     }
+}
+
+vector<string> MQTTListener::getTopicNames() {
+    vector<string> returnValue;
+    for(auto topic : topics) {
+        returnValue.push_back(topic.get()->getName());
+    }
+    return returnValue;
 }
 
 // ----------------------------------------------------------------------------
