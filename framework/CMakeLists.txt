@@ -24,6 +24,8 @@ set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(MQTT_CONNECTOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/connectors/mqttconnector)
 set(LISTENERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/listeners)
 set(MQTT_LISTENER_DIR ${LISTENERS_DIR}/mqttlistener)
+set(NETWORK_COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/networkcommon)
+
 
 # add subdirs
 add_subdirectory(src)

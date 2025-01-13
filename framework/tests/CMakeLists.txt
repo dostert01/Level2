@@ -7,6 +7,7 @@ cmake_print_variables(SQLite3_LIBRARIES)
 cmake_print_variables(SQLite3_VERSION)
 
 cmake_print_variables(MOSQUITTO_LIBRARY)
+cmake_print_variables(NETWORK_COMMON_INCLUDE_DIR)
 
 # Include the necessary directories
 include_directories(
@@ -24,6 +25,7 @@ include_directories(
     ${MQTT_LISTENER_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${LISTENERS_DIR}
+    ${NETWORK_COMMON_INCLUDE_DIR}
 )
 
 link_directories(
@@ -79,6 +81,7 @@ if(MOSQUITTO_FOUND)
     )
     target_link_libraries(test_mqttconnector
         ${MOSQUITTO_LIBRARY}
+        mosquittowrapper
     )
 
     add_executable(test_mqttlistener
@@ -89,6 +92,7 @@ if(MOSQUITTO_FOUND)
     )
     target_link_libraries(test_mqttlistener
         ${MOSQUITTO_LIBRARY}
+        mosquittowrapper
     )
 else()
     message("INFO: Building without support for MQTT")

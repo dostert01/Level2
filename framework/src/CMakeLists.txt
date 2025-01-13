@@ -24,6 +24,7 @@ add_subdirectory(dbinterface)
 add_subdirectory(applicationcontext)
 add_subdirectory(connectors)
 add_subdirectory(listeners)
+add_subdirectory(networkcommon)
 
 # Hinzufügen der ausführbaren Datei
 add_executable(eventForge main.cpp)
