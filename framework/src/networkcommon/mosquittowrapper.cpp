@@ -47,10 +47,23 @@ MosquittoWrapper::~MosquittoWrapper() {
 void MosquittoWrapper::startListening() {
   if(!listening && connected) {
     mosquitto_message_callback_set(mosquittoHandle, on_message);
-    int success = mosquitto_loop_start(mosquittoHandle);
-    logMosquittoMessage(success,
-      "mosquitto loop strted", "failed starting mosquitto loop");
-    listening = (success == MOSQ_ERR_SUCCESS);
+    subscribeToAllTopics();
+    startMosquittoLoop();
+  }
+}
+
+void MosquittoWrapper::startMosquittoLoop() {
+  int success = mosquitto_loop_start(mosquittoHandle);
+  logMosquittoMessage(success, "mosquitto loop started",
+                      "failed starting mosquitto loop");
+  listening = (success == MOSQ_ERR_SUCCESS);
+}
+
+void MosquittoWrapper::subscribeToAllTopics() {
+  for (string topic : topics) {
+    int success = mosquitto_subscribe(mosquittoHandle, NULL, topic.c_str(), 0);
+    logMosquittoMessage(success, "subscribed to topic '" + topic + "'",
+                        "failed to subscribed to topic '" + topic + "'");
   }
 }
 
@@ -92,12 +105,11 @@ void MosquittoWrapper::sendData(string payloadString) {
 }
 
 void MosquittoWrapper::initMosquittoConnection() {
-  mosquittoHandle = mosquitto_new(clientId.c_str(), false, NULL);
-  if (mosquittoHandle == NULL) {
-    LOGGER.error("Failed to get the mosquitto handle: " +
-                 std::string(strerror(errno)));
-    initComplete = false;
-  }
+  createMosquittoHandle();
+  openMosquittoConnection();
+}
+
+void MosquittoWrapper::openMosquittoConnection() {
   if (initComplete) {
     if (mosquitto_connect(mosquittoHandle, hostName.c_str(), port, 60) !=
         MOSQ_ERR_SUCCESS) {
@@ -108,6 +120,15 @@ void MosquittoWrapper::initMosquittoConnection() {
       LOGGER.info("Connected to MQTT broker at hostName: '" + hostName + "'");
       connected = true;
     }
+  }
+}
+
+void MosquittoWrapper::createMosquittoHandle() {
+  mosquittoHandle = mosquitto_new(clientId.c_str(), false, NULL);
+  if (mosquittoHandle == NULL) {
+    LOGGER.error("Failed to get the mosquitto handle: " +
+                 std::string(strerror(errno)));
+    initComplete = false;
   }
 }
 
@@ -127,7 +148,7 @@ void MosquittoWrapper::initMosquittoLib() {
   std::unique_lock<std::shared_mutex> lock(mqttConnectorInitMutex);
   if (initComplete && (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)) {
     LOGGER.error(
-        "Failed to init mosquitto library. mqttconnecor will be disabled!");
+        "Failed to init mosquitto library. mqtt will be disabled!");
     initComplete = false;
   }
 }

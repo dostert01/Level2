@@ -44,7 +44,11 @@ class MosquittoWrapper {
   void initParams(string &hostName, int port, string &clientId, vector<string> topics);
   void initMosquittoLib();
   void initMosquittoConnection();
+  void openMosquittoConnection();
+  void createMosquittoHandle();
   void disconnectFromBroker();
+  void startMosquittoLoop();
+  void subscribeToAllTopics();
   void logMosquittoMessage(int mosquittoReturnCode, string sucessMessage, string errorMessage);
 };
 
