@@ -60,8 +60,8 @@ TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     EXPECT_EQ(2, listeners.size());
-    EXPECT_EQ("test/mqttconnector01", listeners[0]->getTopic());
-    EXPECT_EQ("test/mqttconnector02", listeners[1]->getTopic());
+    EXPECT_EQ("test/topic01", listeners[0]->getTopic(0).value());
+    EXPECT_EQ("test/topic04", listeners[1]->getTopic(1).value());
 }
 
 TEST(MQTTListener, initFailsIfConnectionParamsAreNotSet) {

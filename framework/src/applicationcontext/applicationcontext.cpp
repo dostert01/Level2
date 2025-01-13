@@ -73,9 +73,13 @@ vector<string> ApplicationContext::splitString(string toSplit, string separator)
 }
 
   optional<json> ApplicationContext::findRecursiveInJsonTree(string path) {
+    return findRecursiveInJsonTree(jsonAppConfigData, path);
+  }
+
+  optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, string path) {
     LOGGER.debug("searching for json objects with path: '" + path + "'");
     vector<string> pathElements = splitString(path, "/");
-    json currentJson = jsonAppConfigData;
+    json currentJson = objectAsJson;
     for (auto pathElement : pathElements) {
       if (currentJson.contains(pathElement)) {
         currentJson = currentJson[pathElement];

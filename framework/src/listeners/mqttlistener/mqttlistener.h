@@ -10,6 +10,14 @@
 using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
 
+class MQTTTopic {
+  public:
+    MQTTTopic(json jsonObject);
+    string getName();
+  private:
+    string name;
+};
+
 class MQTTListener : public NetworkListener {
     public:
         MQTTListener() = default;
@@ -20,12 +28,12 @@ class MQTTListener : public NetworkListener {
         string getHostName();
         int getPort();
         string getClientId();
-        string getTopic();
+        optional<string> getTopic(int index);
     private:
         string hostName = "none";
         int port = 1234;
         string clientId = "hallo";
-        string topic = "test/topic";
+        vector<shared_ptr<MQTTTopic>> topics;
         std::shared_ptr<MosquittoWrapper> mqtt;
 };
 

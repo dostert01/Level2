@@ -27,11 +27,12 @@ class ApplicationContext {
   void loadApplicationConfig(const std::string &configFilePath);
   vector<string> splitString(string toSplit, string separator);
   optional<json> findRecursiveInJsonTree(string path);
+  optional<json> findRecursiveInJsonTree(json objectAsJson, string path);
 
   template <typename T, typename... Args>
-  vector<shared_ptr<T>> createObjectsFromAppConfigJson(string path, Args &&...args) {
+  vector<shared_ptr<T>> createObjectsFromJson(json objectAsJson, string path, Args &&...args) {
     vector<shared_ptr<T>> returnValue;
-    optional<json> toBeCreatedFrom = findRecursiveInJsonTree(path);
+    optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
     if (toBeCreatedFrom.has_value()) {
       for (auto &jsonObject : toBeCreatedFrom.value()) {
         LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
@@ -45,6 +46,11 @@ class ApplicationContext {
       }
     }
     return std::move(returnValue);
+  };
+
+  template <typename T, typename... Args>
+  vector<shared_ptr<T>> createObjectsFromAppConfigJson(string path, Args &&...args) {
+    return std::move(createObjectsFromJson<T>(jsonAppConfigData, path, std::forward<Args>(args)...));
   };
 
  private:

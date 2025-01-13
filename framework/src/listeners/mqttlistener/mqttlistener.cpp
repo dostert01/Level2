@@ -1,12 +1,14 @@
 #include "mqttlistener.h"
+#include "applicationcontext.h"
 
 using namespace std;
+using namespace event_forge;
 
 MQTTListener::MQTTListener(json jsonObject) {
   hostName = jsonObject["hostName"];
   port = jsonObject["port"];
   clientId = jsonObject["clientId"];
-  topic = jsonObject["topic"];
+  topics = APP_CONTEXT.createObjectsFromJson<MQTTTopic>(jsonObject, "topics");
 };
 
 shared_ptr<MQTTListener> MQTTListener::getInstance() {
@@ -14,7 +16,7 @@ shared_ptr<MQTTListener> MQTTListener::getInstance() {
 }
 
 void MQTTListener::init() {
-    mqtt =  MosquittoWrapper::getInstance(hostName, port, clientId, topic);
+    mqtt =  MosquittoWrapper::getInstance(hostName, port, clientId);
     initComplete = mqtt->isInitComplete();
 }
 
@@ -35,6 +37,19 @@ string MQTTListener::getClientId() {
     return clientId;
 }
 
-string MQTTListener::getTopic() {
-    return topic;
+optional<string> MQTTListener::getTopic(int index) {
+    if((index > -1) && (index < topics.size())) {
+        return topics[index].get()->getName();
+    } else {
+        return nullopt;
+    }
+}
+
+// ----------------------------------------------------------------------------
+MQTTTopic::MQTTTopic(json jsonObject) {
+  name = jsonObject["name"];
+}
+
+string MQTTTopic::getName() {
+  return name;
 }

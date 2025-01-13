@@ -15,16 +15,20 @@ using namespace std;
 class MosquittoWrapper {
  public:
   static std::shared_mutex mqttConnectorInitMutex;
-  static shared_ptr<MosquittoWrapper> getInstance(string hostName, int port,
+  static shared_ptr<MosquittoWrapper> getInstance(string hostName,
+                                                  int port,
                                                   string clientId,
                                                   string topic);
+  static shared_ptr<MosquittoWrapper> getInstance(string hostName,
+                                                  int port,
+                                                  string clientId);
   MosquittoWrapper() = default;
   ~MosquittoWrapper();
   bool isInitComplete();
   void sendData(string payloadString);
   void startListening();
   bool isListening();
-  
+
  private:
   string hostName;
   int port;

@@ -20,7 +20,9 @@ add_compile_options(-fPIC)
 add_library(mosquittowrapper STATIC
     mosquittowrapper.cpp
 )
-target_link_libraries(mosquittowrapper ${MOSQUITTO_LIBRARY})
+target_link_libraries(mosquittowrapper
+    ${MOSQUITTO_LIBRARY}
+)
 
 # Specify the include directories for the library
 target_include_directories(mosquittowrapper PUBLIC

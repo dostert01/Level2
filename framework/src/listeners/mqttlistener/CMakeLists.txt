@@ -21,6 +21,7 @@ add_library(mqttlistener SHARED
 target_link_libraries(mqttlistener
     pipelineapi 
     mosquittowrapper
+    applicationcontext
     ${MOSQUITTO_LIBRARY}
     nlohmann_json::nlohmann_json dl)
 

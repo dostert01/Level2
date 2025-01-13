@@ -5,13 +5,27 @@
                 "hostName": "127.0.0.1",
                 "port": 1883,
                 "clientId": "mqttconnectorClient01",
-                "topic": "test/mqttconnector01"
+                "topics": [
+                    {
+                        "name": "test/topic01"
+                    },
+                    {
+                        "name": "test/topic02"
+                    }
+                ]
             },
             {
                 "hostName": "127.0.0.1",
                 "port": 1883,
-                "clientId": "mqttconnectorClient01",
-                "topic": "test/mqttconnector02"
+                "clientId": "mqttconnectorClient02",
+                "topics": [
+                    {
+                        "name": "test/topic03"
+                    },
+                    {
+                        "name": "test/topic04"
+                    }
+                ]
             }
         ],
         "HTTPListeners": [

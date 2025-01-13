@@ -27,6 +27,12 @@ std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
   return instance;
 }
 
+std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
+                                                                int port,
+                                                                string clientId) {
+  return getInstance(hostName, port, clientId);
+}
+
 MosquittoWrapper::~MosquittoWrapper() {
   disconnectFromBroker();
   mosquitto_destroy(mosquittoHandle);
