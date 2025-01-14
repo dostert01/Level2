@@ -17,7 +17,7 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 # Specify the library
 add_library(mosquittowrapper SHARED
     mosquittowrapper.cpp
-    $<TARGET_OBJECTS:fillerpipe>
+    $<TARGET_OBJECTS:pipelinefifo>
 )
 target_link_libraries(mosquittowrapper
     ${MOSQUITTO_LIBRARY}

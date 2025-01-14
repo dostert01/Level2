@@ -10,7 +10,7 @@ class NetworkListener {
         virtual ~NetworkListener() = default;
         bool isListening() { return listening;}
         bool isIniComplete() {return initComplete;}
-        virtual void init(shared_ptr<FillerPipe> fillerPipe);
+        virtual void init(shared_ptr<PipelineFiFo> fillerPipe);
         virtual void startListening() = 0;
         virtual optional<shared_ptr<PipelineProcessingData>> getLastMessage();
     protected:

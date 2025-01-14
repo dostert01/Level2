@@ -69,7 +69,7 @@ add_executable(test_pipeline_payload_matching
 
 add_executable(test_pipelinefifo
     test_pipelinefifo.cpp
-    $<TARGET_OBJECTS:fillerpipe>)
+    $<TARGET_OBJECTS:pipelinefifo>)
 
 add_executable(test_dbinterface
     test_dbinterface.cpp

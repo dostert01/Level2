@@ -16,17 +16,18 @@ add_subdirectory(api)
 add_library(pipeline SHARED
     pipeline.cpp
     pipelineprocessor.cpp
-    matchable.cpp)
+    matchable.cpp
+)
 
-add_library(fillerpipe SHARED
+add_library(pipelinefifo SHARED
     pipelinefifo.cpp
-    fillerpipe.cpp)
+)
 
 target_include_directories(pipeline PRIVATE api)
-target_include_directories(fillerpipe PRIVATE api)
+target_include_directories(pipelinefifo PRIVATE api)
 
 target_link_libraries(pipeline PRIVATE logger nlohmann_json::nlohmann_json dl)
-target_link_libraries(fillerpipe PRIVATE logger)
+target_link_libraries(pipelinefifo PRIVATE logger)
 
 # Specify the include directories for the library
 target_include_directories(pipeline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

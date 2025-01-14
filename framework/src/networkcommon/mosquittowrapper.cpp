@@ -20,7 +20,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
   if(mqtt != NULL && mqtt->getPipelineFifo() != nullopt) {
     LOGGER.debug("New MQTT message received for topic '" + string(msg->topic) + "'. "
       "Message payload: " + string((char*)msg->payload));
-   mqtt->getPipelineFifo().value()->addData(
+   mqtt->getPipelineFifo().value()->enqueue(
     PAYLOAD_NAME_MQTT_RECEIVED_DATA,
     PAYLOAD_CONTENT_TYPE_TEXT_PLAIN,
     string((char*)msg->payload));
@@ -122,8 +122,8 @@ optional<shared_ptr<PipelineFiFo>> MosquittoWrapper::getPipelineFifo() {
   }
 }
 
-void MosquittoWrapper::startListening(shared_ptr<FillerPipe> fifo) {
-  setPipelineFifo(dynamic_pointer_cast<PipelineFiFo>(fifo));
+void MosquittoWrapper::startListening(shared_ptr<PipelineFiFo> fifo) {
+  setPipelineFifo(fifo);
   if(!listening && connected) {
     mosquitto_message_callback_set(mosquittoHandle, on_message);
     subscribeToAllTopics();

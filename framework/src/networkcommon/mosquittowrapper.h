@@ -31,7 +31,7 @@ class MosquittoWrapper {
   void init(string hostName, int port, string clientId, string topic);
   bool isInitComplete();
   void sendData(string payloadString);
-  void startListening(shared_ptr<FillerPipe> fifo);
+  void startListening(shared_ptr<PipelineFiFo> fifo);
   bool isListening();
   optional<shared_ptr<PipelineFiFo>> getPipelineFifo();
 

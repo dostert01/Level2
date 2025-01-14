@@ -23,7 +23,8 @@ optional<shared_ptr<PipelineProcessingData>> PipelineFiFo::dequeue() {
     }
 }
 
-void PipelineFiFo::add2Fifo(shared_ptr<PipelineProcessingData> data) {
+void PipelineFiFo::enqueue(string payloadName, string mimetype, string payload) {
+    shared_ptr<PipelineProcessingData> data = make_shared<PipelineProcessingData>();
+    data->addPayloadData(payloadName, mimetype, payload);
     enqueue(data);
 }
-

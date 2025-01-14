@@ -11,16 +11,10 @@ TEST(PipeLineFifo, canGetAnInstance) {
     EXPECT_TRUE(p != nullptr);
 }
 
-TEST(PipeLineFifo, isOfClassFillerPipe) {
-    shared_ptr<FillerPipe> fifo = PipelineFiFo::getInstance();
-    PipelineFiFo *p = dynamic_cast<PipelineFiFo*>(fifo.get());
-    EXPECT_TRUE(p != nullptr);
-}
-
 TEST(PipeLineFifo, canQueueAndDequeueSomeData) {
-    shared_ptr<FillerPipe> fifo = PipelineFiFo::getInstance();
-    fifo->addData("testData", "text/plain", "hello world 01");
-    fifo->addData("testData", "text/plain", "hello world 02");
+    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+    fifo->enqueue("testData", "text/plain", "hello world 01");
+    fifo->enqueue("testData", "text/plain", "hello world 02");
 
     shared_ptr<PipelineFiFo> p = dynamic_pointer_cast<PipelineFiFo>(fifo);
 

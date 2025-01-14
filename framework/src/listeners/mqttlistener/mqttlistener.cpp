@@ -15,7 +15,7 @@ shared_ptr<MQTTListener> MQTTListener::getInstance() {
   return make_shared<MQTTListener>();
 }
 
-void MQTTListener::init(shared_ptr<FillerPipe> fifo) {
+void MQTTListener::init(shared_ptr<PipelineFiFo> fifo) {
     NetworkListener::init(fifo);
     MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
     mqtt = MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());

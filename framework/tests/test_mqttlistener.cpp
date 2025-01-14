@@ -122,7 +122,7 @@ TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
-    shared_ptr<FillerPipe> fifo = PipelineFiFo::getInstance();
+    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
     for(auto listener : listeners) {
         listener->init(fifo);
         listener->startListening();

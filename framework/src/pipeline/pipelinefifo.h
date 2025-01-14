@@ -7,20 +7,19 @@
 #include <optional>
 #include <shared_mutex>
 
-#include "fillerpipe.h"
+#include "apistructs.h"
 
 using namespace std;
 
 
-class PipelineFiFo : public FillerPipe {
+class PipelineFiFo {
     public:
         PipelineFiFo() = default;
         static shared_ptr<PipelineFiFo> getInstance();
         optional<shared_ptr<PipelineProcessingData>> dequeue();
-    protected:
-        void add2Fifo(shared_ptr<PipelineProcessingData> data);;
-    private:
+        void enqueue(string payloadName, string mimetype, string payload);
         void enqueue(shared_ptr<PipelineProcessingData> data);
+    private:        
         std::shared_mutex mutex;
         queue<shared_ptr<PipelineProcessingData>> processingDataFiFo;
 };

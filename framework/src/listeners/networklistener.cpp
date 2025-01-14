@@ -1,7 +1,7 @@
 #include"networklistener.h"
 
-void NetworkListener::init(shared_ptr<FillerPipe> fifo) {
-    pipelineFifo = dynamic_pointer_cast<PipelineFiFo>(fifo);
+void NetworkListener::init(shared_ptr<PipelineFiFo> fifo) {
+    pipelineFifo = fifo;
 }
 
 optional<shared_ptr<PipelineProcessingData>> NetworkListener::getLastMessage() {
