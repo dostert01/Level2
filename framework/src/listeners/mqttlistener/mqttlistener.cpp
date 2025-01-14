@@ -15,14 +15,15 @@ shared_ptr<MQTTListener> MQTTListener::getInstance() {
   return make_shared<MQTTListener>();
 }
 
-void MQTTListener::init() {
+void MQTTListener::init(shared_ptr<FillerPipe> fifo) {
+    NetworkListener::init(fifo);
     MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
     mqtt = MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
     initComplete = mqtt->isInitComplete();
 }
 
-void MQTTListener::startListening(shared_ptr<FillerPipe> fillerPipe) {
-    mqtt->startListening(fillerPipe);
+void MQTTListener::startListening() {
+    mqtt->startListening(pipelineFifo);
     setIsListening(mqtt->isListening());
 }
 

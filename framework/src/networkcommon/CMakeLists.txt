@@ -14,11 +14,10 @@ cmake_print_variables(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 cmake_print_variables(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 
-add_compile_options(-fPIC)
-
 # Specify the library
-add_library(mosquittowrapper STATIC
+add_library(mosquittowrapper SHARED
     mosquittowrapper.cpp
+    $<TARGET_OBJECTS:fillerpipe>
 )
 target_link_libraries(mosquittowrapper
     ${MOSQUITTO_LIBRARY}

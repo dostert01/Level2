@@ -7,16 +7,13 @@
 
 #include "apistructs.h"
 
-namespace event_forge {
-
-class FillerPipe {  
-    public:
-        FillerPipe() = default;
-        virtual ~FillerPipe() = default;
-        virtual void fillIntoPipeline4AsynchronousProcessing(shared_ptr<PipelineProcessingData> data) = 0;
-        virtual optional<shared_ptr<PipelineProcessingData>> fillIntoPipeline4SynchronousProcessing(shared_ptr<PipelineProcessingData> data) = 0;
+class FillerPipe {
+ public:
+  FillerPipe() = default;
+  virtual ~FillerPipe() = default;
+  virtual void addData(string payloadName, string mimetype, string payload);
+protected:
+  virtual void add2Fifo(shared_ptr<PipelineProcessingData> data) = 0;
 };
 
-} // namespace event_forge
-
-#endif //#define FILLER_PIPE_H
+#endif  // #define FILLER_PIPE_H

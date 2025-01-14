@@ -9,13 +9,26 @@
 
 #include "logger.h"
 #include "mosquittowrapper.h"
+#include "payloadnames.h"
 
 using namespace event_forge;
 
 std::shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
-	printf("New message with topic %s: %s\n", msg->topic, (char *) msg->payload);
+  MosquittoWrapper *mqtt = (MosquittoWrapper*)obj;
+  if(mqtt != NULL && mqtt->getPipelineFifo() != nullopt) {
+    LOGGER.debug("New MQTT message received for topic '" + string(msg->topic) + "'. "
+      "Message payload: " + string((char*)msg->payload));
+   mqtt->getPipelineFifo().value()->addData(
+    PAYLOAD_NAME_MQTT_RECEIVED_DATA,
+    PAYLOAD_CONTENT_TYPE_TEXT_PLAIN,
+    string((char*)msg->payload));
+  } else {
+    LOGGER.warn("New MQTT message received for topic '" + string(msg->topic) + "'. "
+      "However, the message can not be forwarded because no valid instance of "
+      "MosquittoWrapper is available. The message will be dropped!");
+  }
 }
 
 std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
@@ -44,7 +57,73 @@ MosquittoWrapper::~MosquittoWrapper() {
   mosquitto_lib_cleanup();
 }
 
-void MosquittoWrapper::startListening(shared_ptr<FillerPipe> fillerPipe) {
+void MosquittoWrapper::init(string hostName, int port, string clientId, string topic) {
+  vector<string> justOneTopic;
+  justOneTopic.push_back(topic);
+  init(hostName, port, clientId, justOneTopic);
+}
+
+void MosquittoWrapper::init(string hostName, int port, string clientId, vector<string>& topics) {
+  initComplete = true;
+  connected = false;
+  listening = false;
+  initParams(hostName, port, clientId, topics);
+  initMosquittoLib();
+  initMosquittoConnection();
+}
+
+void MosquittoWrapper::initMosquittoLib() {
+  std::unique_lock<std::shared_mutex> lock(mqttConnectorInitMutex);
+  if (initComplete && (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)) {
+    LOGGER.error(
+        "Failed to init mosquitto library. mqtt will be disabled!");
+    initComplete = false;
+  }
+}
+
+void MosquittoWrapper::initMosquittoConnection() {
+  createMosquittoHandle();
+  openMosquittoConnection();
+}
+
+void MosquittoWrapper::createMosquittoHandle() {
+  mosquittoHandle = mosquitto_new(clientId.c_str(), false, this);
+  if (mosquittoHandle == NULL) {
+    LOGGER.error("Failed to get the mosquitto handle: " +
+                 std::string(strerror(errno)));
+    initComplete = false;
+  }
+}
+
+void MosquittoWrapper::openMosquittoConnection() {
+  if (initComplete) {
+    if (mosquitto_connect(mosquittoHandle, hostName.c_str(), port, 60) !=
+        MOSQ_ERR_SUCCESS) {
+      LOGGER.error("Failed to connect to the broker at hostName: '" + hostName +
+                   "' : " + std::string(strerror(errno)));
+      initComplete = false;
+    } else {
+      LOGGER.info("Connected to MQTT broker at hostName: '" + hostName + "'");
+      connected = true;
+    }
+  }
+}
+
+void MosquittoWrapper::setPipelineFifo(shared_ptr<PipelineFiFo> fifo) {
+  pipelineFifo = fifo;
+}
+
+optional<shared_ptr<PipelineFiFo>> MosquittoWrapper::getPipelineFifo() {
+  if(pipelineFifo == nullptr) {
+    LOGGER.warn("this instance of MosquittoWrapper does not have an instance of PipelineFiFo attached. No data can be forwarded to a processing pipeline!");
+    return nullopt;
+  } else {
+    return pipelineFifo;
+  }
+}
+
+void MosquittoWrapper::startListening(shared_ptr<FillerPipe> fifo) {
+  setPipelineFifo(dynamic_pointer_cast<PipelineFiFo>(fifo));
   if(!listening && connected) {
     mosquitto_message_callback_set(mosquittoHandle, on_message);
     subscribeToAllTopics();
@@ -67,9 +146,9 @@ void MosquittoWrapper::subscribeToAllTopics() {
   }
 }
 
-void MosquittoWrapper::logMosquittoMessage(int mosquittoReturnCode, string sucessMessage, string errorMessage) {
+void MosquittoWrapper::logMosquittoMessage(int mosquittoReturnCode, string successMessage, string errorMessage) {
     if(mosquittoReturnCode == MOSQ_ERR_SUCCESS) {
-      LOGGER.info(sucessMessage);
+      LOGGER.info(successMessage);
     } else {
       LOGGER.error(errorMessage + " - errorcode: " + string(mosquitto_strerror(mosquittoReturnCode)));
     }
@@ -81,15 +160,6 @@ void MosquittoWrapper::disconnectFromBroker() {
     mosquitto_disconnect(mosquittoHandle);
     connected = false;
   }
-}
-
-void MosquittoWrapper::init(string hostName, int port, string clientId, vector<string>& topics) {
-  initComplete = true;
-  connected = false;
-  listening = false;
-  initParams(hostName, port, clientId, topics);
-  initMosquittoLib();
-  initMosquittoConnection();
 }
 
 void MosquittoWrapper::sendData(string payloadString) {
@@ -104,34 +174,6 @@ void MosquittoWrapper::sendData(string payloadString) {
   }
 }
 
-void MosquittoWrapper::initMosquittoConnection() {
-  createMosquittoHandle();
-  openMosquittoConnection();
-}
-
-void MosquittoWrapper::openMosquittoConnection() {
-  if (initComplete) {
-    if (mosquitto_connect(mosquittoHandle, hostName.c_str(), port, 60) !=
-        MOSQ_ERR_SUCCESS) {
-      LOGGER.error("Failed to connect to the broker at hostName: '" + hostName +
-                   "' : " + std::string(strerror(errno)));
-      initComplete = false;
-    } else {
-      LOGGER.info("Connected to MQTT broker at hostName: '" + hostName + "'");
-      connected = true;
-    }
-  }
-}
-
-void MosquittoWrapper::createMosquittoHandle() {
-  mosquittoHandle = mosquitto_new(clientId.c_str(), false, NULL);
-  if (mosquittoHandle == NULL) {
-    LOGGER.error("Failed to get the mosquitto handle: " +
-                 std::string(strerror(errno)));
-    initComplete = false;
-  }
-}
-
 bool MosquittoWrapper::isListening() {
   return listening;
 }
@@ -142,15 +184,6 @@ void MosquittoWrapper::initParams(string &hostName, int port,
   this->port = port;
   this->clientId = clientId;
   this->topics = topics;
-}
-
-void MosquittoWrapper::initMosquittoLib() {
-  std::unique_lock<std::shared_mutex> lock(mqttConnectorInitMutex);
-  if (initComplete && (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)) {
-    LOGGER.error(
-        "Failed to init mosquitto library. mqtt will be disabled!");
-    initComplete = false;
-  }
 }
 
 bool MosquittoWrapper::isInitComplete() {

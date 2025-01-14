@@ -28,10 +28,12 @@ class MosquittoWrapper {
                                                   vector<string> topics);
   MosquittoWrapper() = default;
   ~MosquittoWrapper();
+  void init(string hostName, int port, string clientId, string topic);
   bool isInitComplete();
   void sendData(string payloadString);
-  void startListening(shared_ptr<FillerPipe> fillerPipe);
+  void startListening(shared_ptr<FillerPipe> fifo);
   bool isListening();
+  optional<shared_ptr<PipelineFiFo>> getPipelineFifo();
 
  private:
   string hostName;
@@ -41,9 +43,11 @@ class MosquittoWrapper {
   bool initComplete;
   bool connected;
   bool listening;
+  shared_ptr<PipelineFiFo> pipelineFifo;
   struct mosquitto *mosquittoHandle;
   void init(string hostName, int port, string clientId, vector<string>& topics);
   void initParams(string &hostName, int port, string &clientId, vector<string> topics);
+  void setPipelineFifo(shared_ptr<PipelineFiFo> fifo);
   void initMosquittoLib();
   void initMosquittoConnection();
   void openMosquittoConnection();
@@ -51,7 +55,7 @@ class MosquittoWrapper {
   void disconnectFromBroker();
   void startMosquittoLoop();
   void subscribeToAllTopics();
-  void logMosquittoMessage(int mosquittoReturnCode, string sucessMessage, string errorMessage);
+  void logMosquittoMessage(int mosquittoReturnCode, string successMessage, string errorMessage);
 };
 
 #endif  // MOSQUITTO_WRAPPER_H

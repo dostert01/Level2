@@ -1,7 +1,7 @@
 #include "pipelinefifo.h"
 #include "logger.h"
 
-namespace event_forge {
+using namespace event_forge;
 
 shared_ptr<PipelineFiFo> PipelineFiFo::getInstance() {
     return make_shared<PipelineFiFo>();
@@ -23,14 +23,7 @@ optional<shared_ptr<PipelineProcessingData>> PipelineFiFo::dequeue() {
     }
 }
 
-void PipelineFiFo::fillIntoPipeline4AsynchronousProcessing(shared_ptr<PipelineProcessingData> data) {
+void PipelineFiFo::add2Fifo(shared_ptr<PipelineProcessingData> data) {
     enqueue(data);
 }
 
-optional<shared_ptr<PipelineProcessingData>> PipelineFiFo::fillIntoPipeline4SynchronousProcessing(shared_ptr<PipelineProcessingData> data) {
-    LOGGER.warn("Synchronous processing is not supported by class PipelineFiFo. Payload will be dropped.");
-    LOGGER.warn("Please use a FillerPipe derived class, that supports synchronous processing!");
-    return nullopt;
-}
-
-} //namespace event_forge

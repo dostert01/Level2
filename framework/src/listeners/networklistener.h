@@ -1,7 +1,8 @@
 #ifndef NETWORK_LISTENER_H
 #define NETWORK_LISTENER_H
-
-#include "fillerpipe.h"
+#include <memory>
+#include "pipelinefifo.h"
+#include "pipeline.h"
 
 class NetworkListener {
     public:
@@ -9,11 +10,13 @@ class NetworkListener {
         virtual ~NetworkListener() = default;
         bool isListening() { return listening;}
         bool isIniComplete() {return initComplete;}
-        virtual void init() = 0;
-        virtual void startListening(shared_ptr<FillerPipe> fillerPipe) = 0;
+        virtual void init(shared_ptr<FillerPipe> fillerPipe);
+        virtual void startListening() = 0;
+        virtual optional<shared_ptr<PipelineProcessingData>> getLastMessage();
     protected:
         void setIsListening(bool value) { listening = value; }
         bool initComplete = false;
+        shared_ptr<PipelineFiFo> pipelineFifo;
     private:
         bool listening = false;
 };

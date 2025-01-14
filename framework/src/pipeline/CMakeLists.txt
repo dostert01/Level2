@@ -18,8 +18,9 @@ add_library(pipeline SHARED
     pipelineprocessor.cpp
     matchable.cpp)
 
-add_library(fillerpipe STATIC
-    pipelinefifo.cpp)
+add_library(fillerpipe SHARED
+    pipelinefifo.cpp
+    fillerpipe.cpp)
 
 target_include_directories(pipeline PRIVATE api)
 target_include_directories(fillerpipe PRIVATE api)

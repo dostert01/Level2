@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
+#include <thread>
 #include "logger.h"
 #include "pipeline.h"
 #include "applicationcontext.h"
-
+#include "payloadnames.h"
 #include "mqttlistener.h"
 
 using namespace std;
@@ -75,7 +76,7 @@ TEST(MQTTListener, CanREturnTopicNamesAsVectorOfStrings) {
 
 TEST(MQTTListener, initFailsIfConnectionParamsAreNotSet) {
     shared_ptr<NetworkListener> listener = MQTTListener::getInstance();
-    listener->init();
+    listener->init(nullptr);
     EXPECT_FALSE(listener->isIniComplete());
 }
 
@@ -84,7 +85,7 @@ TEST(MQTTListener, CanInitFromApplicationConext) {
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
-        listener->init();
+        listener->init(nullptr);
         EXPECT_TRUE(listener->isIniComplete());
     }
 }
@@ -94,7 +95,7 @@ TEST(MQTTListener, IsNotListeningRightAfterInit) {
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
-        listener->init();
+        listener->init(nullptr);
         EXPECT_FALSE(listeners[0]->isListening());
     }
 }
@@ -104,8 +105,43 @@ TEST(MQTTListener, IsListeningAfterCallingStartListening) {
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
-        listener->init();
-        listener->startListening(nullptr);
+        listener->init(nullptr);
+        listener->startListening();
         EXPECT_TRUE(listeners[0]->isListening());
     }
+}
+
+void sendMessage() {
+    LOGGER.info("hello from the sending thread");
+    MosquittoWrapper mqtt;
+    mqtt.init("127.0.0.1", 1883, "testSender", "test/topic02");
+    mqtt.sendData("Hello from the test");
+}
+
+TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    shared_ptr<FillerPipe> fifo = PipelineFiFo::getInstance();
+    for(auto listener : listeners) {
+        listener->init(fifo);
+        listener->startListening();
+        EXPECT_TRUE(listeners[0]->isListening());
+    }
+    LOGGER.info("stating thread");
+    thread t(sendMessage);
+    t.join();
+    LOGGER.info("thread joined");
+    optional<shared_ptr<PipelineProcessingData>> data  = listeners[0]->getLastMessage();
+    int i = 0;
+    while(data == nullopt && ++i < 100) {
+        data  = listeners[0]->getLastMessage();
+        usleep(100000);
+    }
+    EXPECT_EQ(1, data.value()->getCountOfPayloads());
+
+    std::optional<std::shared_ptr<ProcessingPayload>> payload =
+        data.value()->getPayload(PAYLOAD_NAME_MQTT_RECEIVED_DATA);
+    EXPECT_EQ("Hello from the test", payload.value()->payloadAsString());
+
 }

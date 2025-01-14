@@ -17,6 +17,7 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 # Specify the library
 add_library(mqttlistener SHARED
     mqttlistener.cpp
+    ../networklistener.cpp
 )
 target_link_libraries(mqttlistener
     pipelineapi 
