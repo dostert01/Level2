@@ -1,6 +1,6 @@
-#include "apistructs.h"
 #include <iostream>
-
+#include "apistructs.h"
+#include "payloadnames.h"
 /*
     BinaryProcessingData
 */
@@ -55,17 +55,7 @@ void ProcessingPayload::setPayload(std::shared_ptr<BinaryProcessingData> payload
 /*
     PipelineProcessingData
 */
-PipelineProcessingData::~PipelineProcessingData() {
-    /*
-    std::multimap<std::string, std::shared_ptr<ProcessingPayload>>::iterator it;
-    for(it = namedPayloadData.begin(); it != namedPayloadData.end(); ++it) {
-        if(it->second != NULL) {
-            std::cout << "deleting payload of name: " << it->first << std::endl;
-            delete it->second;
-        }
-    }
-    */
-}
+PipelineProcessingData::~PipelineProcessingData() {}
 
 void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::string data) {
     std::shared_ptr<ProcessingPayload> payload = std::make_shared<ProcessingPayload>(mimetype, data);

@@ -22,7 +22,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
       "Message payload: " + string((char*)msg->payload));
    mqtt->getPipelineFifo().value()->enqueue(
     PAYLOAD_NAME_MQTT_RECEIVED_DATA,
-    PAYLOAD_CONTENT_TYPE_TEXT_PLAIN,
+    PAYLOAD_MIMETYPE_TEXT_PLAIN,
     string((char*)msg->payload));
   } else {
     LOGGER.warn("New MQTT message received for topic '" + string(msg->topic) + "'. "

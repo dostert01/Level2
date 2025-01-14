@@ -68,9 +68,6 @@ class ProcessingPayload {
         std::shared_ptr<BinaryProcessingData> payloadAsBinaryData();
 };
 
-#define PAYLOAD_NAME_PROCESSING_ERROR "___processingError___"
-#define PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM "application/octet-stream"
-
 class PipelineProcessingData : public Matchable {
     private:
         std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
