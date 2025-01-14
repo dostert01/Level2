@@ -17,17 +17,34 @@ std::shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
   MosquittoWrapper *mqtt = (MosquittoWrapper*)obj;
+
   if(mqtt != NULL && mqtt->getPipelineFifo() != nullopt) {
+
     LOGGER.debug("New MQTT message received for topic '" + string(msg->topic) + "'. "
       "Message payload: " + string((char*)msg->payload));
-   mqtt->getPipelineFifo().value()->enqueue(
-    PAYLOAD_NAME_MQTT_RECEIVED_DATA,
-    PAYLOAD_MIMETYPE_TEXT_PLAIN,
-    string((char*)msg->payload));
+
+    map<string, string> matchingPatterns;
+    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_DATA_ORIGIN] =
+      string(msg->topic);
+    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_BY_LISTENER] =
+      PAYLOAD_MATCHIN_PATTERN_VALUE_MQTT_LISTENER;
+    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_VIA_PROTOCOL] =
+      PAYLOAD_MATCHIN_PATTERN_VALUE_PROTOCOL_MQTT;
+    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_FROM_HOST] =
+      mqtt->getHostName();
+
+    mqtt->getPipelineFifo().value()->enqueue(
+      PAYLOAD_NAME_MQTT_RECEIVED_DATA,
+      PAYLOAD_MIMETYPE_TEXT_PLAIN,
+      string((char*)msg->payload),
+      matchingPatterns);
+
   } else {
+
     LOGGER.warn("New MQTT message received for topic '" + string(msg->topic) + "'. "
       "However, the message can not be forwarded because no valid instance of "
       "MosquittoWrapper is available. The message will be dropped!");
+
   }
 }
 
@@ -111,6 +128,10 @@ void MosquittoWrapper::openMosquittoConnection() {
 
 void MosquittoWrapper::setPipelineFifo(shared_ptr<PipelineFiFo> fifo) {
   pipelineFifo = fifo;
+}
+
+string MosquittoWrapper::getHostName() {
+  return hostName;
 }
 
 optional<shared_ptr<PipelineFiFo>> MosquittoWrapper::getPipelineFifo() {

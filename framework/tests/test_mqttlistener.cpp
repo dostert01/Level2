@@ -145,3 +145,34 @@ TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
     EXPECT_EQ("Hello from the test", payload.value()->payloadAsString());
 
 }
+
+TEST(MQTTListener, PayloadHasSpecificMatchingPattern) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
+    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+    for(auto listener : listeners) {
+        listener->init(fifo);
+        listener->startListening();
+        EXPECT_TRUE(listeners[0]->isListening());
+    }
+    LOGGER.info("stating thread");
+    thread t(sendMessage);
+    t.join();
+    LOGGER.info("thread joined");
+    optional<shared_ptr<PipelineProcessingData>> data  = listeners[0]->getLastMessage();
+    int i = 0;
+    while(data == nullopt && ++i < 100) {
+        data  = listeners[0]->getLastMessage();
+        usleep(100000);
+    }
+    std::shared_ptr<PipelineProcessingData> processingData = data.value();
+    EXPECT_EQ("test/topic02",
+        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_DATA_ORIGIN).value_or(""));
+    EXPECT_EQ(PAYLOAD_MATCHIN_PATTERN_VALUE_MQTT_LISTENER,
+        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_BY_LISTENER).value_or(""));
+    EXPECT_EQ(PAYLOAD_MATCHIN_PATTERN_VALUE_PROTOCOL_MQTT,
+        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_VIA_PROTOCOL).value_or(""));
+    EXPECT_EQ("127.0.0.1",
+        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_FROM_HOST).value_or(""));
+}

@@ -21,6 +21,7 @@ add_library(pipeline SHARED
 
 add_library(pipelinefifo SHARED
     pipelinefifo.cpp
+    matchable.cpp
 )
 
 target_include_directories(pipeline PRIVATE api)

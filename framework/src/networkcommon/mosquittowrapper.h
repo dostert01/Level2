@@ -33,6 +33,7 @@ class MosquittoWrapper {
   void sendData(string payloadString);
   void startListening(shared_ptr<PipelineFiFo> fifo);
   bool isListening();
+  string getHostName();
   optional<shared_ptr<PipelineFiFo>> getPipelineFifo();
 
  private:
