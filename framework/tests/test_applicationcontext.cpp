@@ -139,13 +139,11 @@ class MockListener {
             hostName = jsonObject["hostName"];
             port = jsonObject["port"];
             clientId = jsonObject["clientId"];
-            topic = jsonObject["topic"];
         };
     public:
         string hostName = "none";
         int port = 1234;
         string clientId = "hallo";
-        string topic = "test/topic";
 };
 
 TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
