@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
+using namespace std;
+
 TEST(firstTest, Display) {
     testing::internal::CaptureStdout();
-    std::cout << "Hello from a Test" << std::endl;
-    std::string output = testing::internal::GetCapturedStdout();
+    cout << "Hello from a Test" << endl;
+    string output = testing::internal::GetCapturedStdout();
     EXPECT_EQ(output, "Hello from a Test\n");
 }
 

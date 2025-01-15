@@ -17,8 +17,8 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 
 namespace test_applicationcontext {
-    std::string workingDir;
-    std::string testFilesDir;
+    string workingDir;
+    string testFilesDir;
 
     void configureLogger() {
         LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
@@ -76,20 +76,20 @@ TEST(ApplicationContext, CanReadTheCurrentWorkingDirectory) {
 TEST(ApplicationContext, LogsFailureIfParsingJsonFails) {
     testing::internal::CaptureStdout();
     APP_CONTEXT.loadApplicationConfig("");
-    std::string output = testing::internal::GetCapturedStdout();
-    std::cout << "output: " << output << std::endl;
-    std::regex regex("parse error at line 1, column 1: attempting to parse an empty input");
-    EXPECT_TRUE(std::regex_search(output, regex));
+    string output = testing::internal::GetCapturedStdout();
+    cout << "output: " << output << endl;
+    regex regex("parse error at line 1, column 1: attempting to parse an empty input");
+    EXPECT_TRUE(regex_search(output, regex));
 }
 
 TEST(ApplicationContext, CanLoadAppConfigFromJsonFile) {
     configureTest();
     testing::internal::CaptureStdout();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    std::string output = testing::internal::GetCapturedStdout();
-    std::cout << "output: " << output << std::endl;
-    std::regex regex("parse error at line 1, column 1: attempting to parse an empty input");
-    EXPECT_FALSE(std::regex_search(output, regex));
+    string output = testing::internal::GetCapturedStdout();
+    cout << "output: " << output << endl;
+    regex regex("parse error at line 1, column 1: attempting to parse an empty input");
+    EXPECT_FALSE(regex_search(output, regex));
 }
 
 TEST(ApplicationContext, canSplitStrings01) {

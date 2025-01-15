@@ -25,10 +25,10 @@ class PipelineFiFo {
 
 
  private:
-  std::shared_mutex mutex;
+  shared_mutex mutex;
   queue<shared_ptr<PipelineProcessingData>> processingDataFiFo;
-  void addMatchingPatterns(std::map<std::string, std::string> &matchingPatterns,
-                           std::shared_ptr<PipelineProcessingData> &data);
+  void addMatchingPatterns(map<string, string> &matchingPatterns,
+                           shared_ptr<PipelineProcessingData> &data);
 };
 
 #endif  // #ifndef PIPELINE_FIFO_H

@@ -52,7 +52,7 @@ static int rowReaderCallback(void *instanceOfRecordSet, int argc, char **argv, c
 
 shared_ptr<RecordSet> DatabaseSQLite::executeQuery(string sql) {
     char *errorMessage = NULL;
-    shared_ptr<RecordSet> result = make_shared<RecordSet>();
+    auto result = make_shared<RecordSet>();
     if(sqlite3_exec(dbConnection, sql.c_str(), rowReaderCallback, result.get(), &errorMessage) == SQLITE_OK) {
         LOGGER.info("executed SQL '" + sql + "'");
     } else {
@@ -94,7 +94,7 @@ RecordSet::RecordSet() {
 }
 
 shared_ptr<Row> RecordSet::addNewRow() {
-    shared_ptr<Row> newRow = make_shared<Row>();
+    auto newRow = make_shared<Row>();
     rows->push_back(newRow);
     return newRow;
 }

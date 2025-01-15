@@ -14,18 +14,18 @@ namespace event_forge {
 #define JSON_PROPERTY_LIBRARY_NAME "libraryName"
 #define JSON_PROPERTY_NAMED_ARGUMENTS "namedArguments"
 
-std::shared_ptr<Pipeline> Pipeline::getInstance() {
-    std::shared_ptr<Pipeline> instance = std::make_shared<Pipeline>();
+shared_ptr<Pipeline> Pipeline::getInstance() {
+    shared_ptr<Pipeline> instance = make_shared<Pipeline>();
     return instance;
 }
 
-std::optional<std::shared_ptr<Pipeline>> Pipeline::getInstance(const std::string configFilePath) {
-    std::shared_ptr<Pipeline> instance = getInstance();
+optional<shared_ptr<Pipeline>> Pipeline::getInstance(const string configFilePath) {
+    auto instance = getInstance();
     try {
         instance.get()->loadPipelineConfig(configFilePath);
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         LOGGER.error("Failed loading pipeline configuration from " + configFilePath + " : " + e.what());
-        return std::nullopt;
+        return nullopt;
     }
     return instance;
 }
@@ -35,7 +35,7 @@ uint Pipeline::getCountOfPipelineSteps() {
 }
 
 void Pipeline::execute() {
-    shared_ptr<PipelineProcessingData> emptyProcessingData = make_shared<PipelineProcessingData>();
+    auto emptyProcessingData = make_shared<PipelineProcessingData>();
     execute(emptyProcessingData);
 }
 
@@ -56,7 +56,7 @@ void Pipeline::tagProcessingData(shared_ptr<PipelineProcessingData> processData)
     processData->setLastProcessedPipelineName(getPipelineName());
 }
 
-std::optional<std::shared_ptr<PipelineStep>> Pipeline::getStepByName(const std::string& stepName) {
+optional<shared_ptr<PipelineStep>> Pipeline::getStepByName(const string& stepName) {
     for(const auto& currentStep : pipelineSteps) {
         if(currentStep.get()->getStepName() == stepName){
             return currentStep;
@@ -65,22 +65,22 @@ std::optional<std::shared_ptr<PipelineStep>> Pipeline::getStepByName(const std::
     return nullptr;
 }
 
-std::string Pipeline::getPipelineName() {
+string Pipeline::getPipelineName() {
     return pipelineName;
 }
 
-void Pipeline::setPipelineName(const std::string& pipelineName) {
+void Pipeline::setPipelineName(const string& pipelineName) {
     this->pipelineName = pipelineName;
 }
 
-void Pipeline::loadPipelineConfig(const std::string& configFilePath) {
+void Pipeline::loadPipelineConfig(const string& configFilePath) {
     try {
-        std::ifstream jsonFile(configFilePath);
+        ifstream jsonFile(configFilePath);
         json jsonData = json::parse(jsonFile);
         jsonFile.close();
         loadPipelineMetaData(jsonData);
         loadPipelineSteps(jsonData);
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         throw;
     }
 }
@@ -96,13 +96,13 @@ void Pipeline::loadPipelineMetaData(const json& jsonData) {
 void Pipeline::loadPipelineSteps(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_PIPELINE_STEPS) && jsonData[JSON_PROPERTY_PIPELINE_STEPS].is_array()) {
         for (const auto& step : jsonData[JSON_PROPERTY_PIPELINE_STEPS]) {
-            std::shared_ptr<PipelineStep> currentStep = std::make_shared<PipelineStep>();
+            shared_ptr<PipelineStep> currentStep = make_shared<PipelineStep>();
             currentStep.get()->setStepName(step.value(JSON_PROPERTY_STEP_NAME, UNDEFINED_JSON_DATA));
             currentStep.get()->setLibraryName(step.value(JSON_PROPERTY_LIBRARY_NAME, UNDEFINED_JSON_DATA));
             currentStep.get()->loadNamedArguments(step);
             try {
                 currentStep.get()->loadLib();
-            } catch (const std::exception& e) {
+            } catch (const exception& e) {
                 throw;
             }
             if(currentStep.get()->isInitComplete()) {
@@ -132,25 +132,25 @@ PipelineStep::~PipelineStep() {
 void PipelineStep::loadNamedArguments(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_NAMED_ARGUMENTS) && jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].is_object()) {
         for (const auto& item : jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].items()) {
-            initData.namedArguments.insert({item.key(), (item.value().get<std::string>())});
+            initData.namedArguments.insert({item.key(), (item.value().get<string>())});
         }
     }
 }
 
-void PipelineStep::setStepName(const std::string stepName) {
+void PipelineStep::setStepName(const string stepName) {
     this->stepName = stepName;
 }
 
-std::string PipelineStep::getStepName() {
+string PipelineStep::getStepName() {
     return stepName;
 }
 
-void PipelineStep::setLibraryName(const std::string libraryName) {
+void PipelineStep::setLibraryName(const string libraryName) {
     this->libraryName = libraryName;
 }
 
 void PipelineStep::loadLib() {
-    std::string libraryFileName = "lib" + libraryName + ".so";
+    string libraryFileName = "lib" + libraryName + ".so";
     LOGGER.info("Loading shared object into pipeline: " + libraryFileName);
     hLib = dlopen(libraryFileName.c_str(), RTLD_LAZY);
     char* error = dlerror();
@@ -197,7 +197,7 @@ void PipelineStep::runFinishFunction() {
 }
 
 //-------------------------------------------------------------------
-PipelineException::PipelineException(const std::string& message) : std::exception() {
+PipelineException::PipelineException(const string& message) : exception() {
     this->message = message;
 }
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 
+using namespace std;
 namespace event_forge {
 
 #define LOG_PREFIX_TRACE "TRACE"
@@ -30,11 +31,11 @@ enum class LogLevel {
 class LogLevelStringMapper {
  public:
   LogLevelStringMapper();
-  std::optional<LogLevel> string2LogLevel(const std::string &levelString) const;
-  std::optional<std::string> logLevel2String(const LogLevel &logLevel) const ;
+  optional<LogLevel> string2LogLevel(const string &levelString) const;
+  optional<string> logLevel2String(const LogLevel &logLevel) const ;
 
  private:
-  std::map<LogLevel, std::string> logLevels;
+  map<LogLevel, string> logLevels;
 };
 
 }  // namespace event_forge

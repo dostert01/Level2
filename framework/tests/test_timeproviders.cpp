@@ -6,6 +6,7 @@
 #include "timeproviders.h"
 
 using namespace event_forge;
+using namespace std;
 
 TEST(TimeProvider, DefaultTimeProviderIsInstanceOfTimeProvider) {
     DefaultTimeProvider provider;
@@ -14,8 +15,8 @@ TEST(TimeProvider, DefaultTimeProviderIsInstanceOfTimeProvider) {
 
 TEST(TimeProvider, DefaultTimeProviderReturnsATimeStamp) {
     DefaultTimeProvider provider;
-    std::string timeStamp = provider.getTimeStampOfNow();
-    std::cout << "timeStamp: " << timeStamp << std::endl;
-    std::regex regex("^20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}");
-    EXPECT_TRUE(std::regex_search(timeStamp, regex));
+    string timeStamp = provider.getTimeStampOfNow();
+    cout << "timeStamp: " << timeStamp << endl;
+    regex regex("^20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}");
+    EXPECT_TRUE(regex_search(timeStamp, regex));
 }

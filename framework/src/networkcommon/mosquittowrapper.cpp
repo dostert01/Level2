@@ -13,7 +13,7 @@
 
 using namespace event_forge;
 
-std::shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
+shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
   MosquittoWrapper *mqtt = (MosquittoWrapper*)obj;
@@ -48,22 +48,22 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
   }
 }
 
-std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
+shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
                                                                 int port,
                                                                 string clientId,
                                                                 string topic) {
-  std::shared_ptr<MosquittoWrapper> instance = std::make_shared<MosquittoWrapper>();
+  shared_ptr<MosquittoWrapper> instance = make_shared<MosquittoWrapper>();
   vector<string> topics;
   topics.push_back(topic);
   instance->init(hostName, port, clientId, topics);
   return instance;
 }
 
-std::shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
+shared_ptr<MosquittoWrapper> MosquittoWrapper::getInstance(string hostName,
                                                                 int port,
                                                                 string clientId,
                                                                 vector<string> topics) {
-  std::shared_ptr<MosquittoWrapper> instance = std::make_shared<MosquittoWrapper>();
+  shared_ptr<MosquittoWrapper> instance = make_shared<MosquittoWrapper>();
   instance->init(hostName, port, clientId, topics);
   return instance;
 }
@@ -90,7 +90,7 @@ void MosquittoWrapper::init(string hostName, int port, string clientId, vector<s
 }
 
 void MosquittoWrapper::initMosquittoLib() {
-  std::unique_lock<std::shared_mutex> lock(mqttConnectorInitMutex);
+  unique_lock<shared_mutex> lock(mqttConnectorInitMutex);
   if (initComplete && (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)) {
     LOGGER.error(
         "Failed to init mosquitto library. mqtt will be disabled!");
@@ -107,7 +107,7 @@ void MosquittoWrapper::createMosquittoHandle() {
   mosquittoHandle = mosquitto_new(clientId.c_str(), false, this);
   if (mosquittoHandle == NULL) {
     LOGGER.error("Failed to get the mosquitto handle: " +
-                 std::string(strerror(errno)));
+                 string(strerror(errno)));
     initComplete = false;
   }
 }
@@ -117,7 +117,7 @@ void MosquittoWrapper::openMosquittoConnection() {
     if (mosquitto_connect(mosquittoHandle, hostName.c_str(), port, 60) !=
         MOSQ_ERR_SUCCESS) {
       LOGGER.error("Failed to connect to the broker at hostName: '" + hostName +
-                   "' : " + std::string(strerror(errno)));
+                   "' : " + string(strerror(errno)));
       initComplete = false;
     } else {
       LOGGER.info("Connected to MQTT broker at hostName: '" + hostName + "'");

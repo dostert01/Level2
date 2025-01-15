@@ -14,7 +14,7 @@ void PipelineFiFo::enqueue(shared_ptr<PipelineProcessingData> data) {
 
 void PipelineFiFo::enqueue(shared_ptr<PipelineProcessingData> data, map<string, string> &matchingPatterns) {
   addMatchingPatterns(matchingPatterns, data);
-  std::unique_lock<std::shared_mutex> lock(mutex);
+  unique_lock<shared_mutex> lock(mutex);
   processingDataFiFo.push(data);
 }
 
@@ -30,15 +30,15 @@ void PipelineFiFo::enqueue(string payloadName, string mimetype, string payload, 
 }
 
 void PipelineFiFo::addMatchingPatterns(
-    std::map<std::string, std::string> &matchingPatterns,
-    std::shared_ptr<PipelineProcessingData> &data) {
+    map<string, string> &matchingPatterns,
+    shared_ptr<PipelineProcessingData> &data) {
   for (const auto &[key, value] : matchingPatterns) {
     data->addMatchingPattern(key, value);
   }
 }
 
 optional<shared_ptr<PipelineProcessingData>> PipelineFiFo::dequeue() {
-  std::unique_lock<std::shared_mutex> lock(mutex);
+  unique_lock<shared_mutex> lock(mutex);
   if (!processingDataFiFo.empty()) {
     optional<shared_ptr<PipelineProcessingData>> returnValue =
         processingDataFiFo.front();

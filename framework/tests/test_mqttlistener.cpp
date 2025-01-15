@@ -51,7 +51,7 @@ TEST(MQTTListener, IsInstanceOfNetworkListener) {
 }
 
 TEST(MQTTListener, CanBeStoredAsNetworkListener) {
-    shared_ptr<NetworkListener> listener = MQTTListener::getInstance();
+    auto listener = MQTTListener::getInstance();
     MQTTListener* l = dynamic_cast<MQTTListener*>(listener.get());
     EXPECT_TRUE(l != NULL);
 }
@@ -59,7 +59,7 @@ TEST(MQTTListener, CanBeStoredAsNetworkListener) {
 TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     EXPECT_EQ(2, listeners.size());
     EXPECT_EQ("test/topic01", listeners[0]->getTopic(0).value());
     EXPECT_EQ("test/topic04", listeners[1]->getTopic(1).value());
@@ -68,14 +68,14 @@ TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
 TEST(MQTTListener, CanREturnTopicNamesAsVectorOfStrings) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     vector<string> names = listeners[0]->getTopicNames();
     EXPECT_EQ("test/topic01", names[0]);
     EXPECT_EQ("test/topic02", names[1]);
 }
 
 TEST(MQTTListener, initFailsIfConnectionParamsAreNotSet) {
-    shared_ptr<NetworkListener> listener = MQTTListener::getInstance();
+    auto listener = MQTTListener::getInstance();
     listener->init(nullptr);
     EXPECT_FALSE(listener->isIniComplete());
 }
@@ -83,7 +83,7 @@ TEST(MQTTListener, initFailsIfConnectionParamsAreNotSet) {
 TEST(MQTTListener, CanInitFromApplicationConext) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
         listener->init(nullptr);
         EXPECT_TRUE(listener->isIniComplete());
@@ -93,7 +93,7 @@ TEST(MQTTListener, CanInitFromApplicationConext) {
 TEST(MQTTListener, IsNotListeningRightAfterInit) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
         listener->init(nullptr);
         EXPECT_FALSE(listeners[0]->isListening());
@@ -103,7 +103,7 @@ TEST(MQTTListener, IsNotListeningRightAfterInit) {
 TEST(MQTTListener, IsListeningAfterCallingStartListening) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
     for(auto listener : listeners) {
         listener->init(nullptr);
         listener->startListening();
@@ -121,8 +121,8 @@ void sendMessage() {
 TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
-    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto fifo = PipelineFiFo::getInstance();
     for(auto listener : listeners) {
         listener->init(fifo);
         listener->startListening();
@@ -132,7 +132,7 @@ TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
     thread t(sendMessage);
     t.join();
     LOGGER.info("thread joined");
-    optional<shared_ptr<PipelineProcessingData>> data  = listeners[0]->getLastMessage();
+    auto data = listeners[0]->getLastMessage();
     int i = 0;
     while(data == nullopt && ++i < 100) {
         data  = listeners[0]->getLastMessage();
@@ -140,8 +140,7 @@ TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
     }
     EXPECT_EQ(1, data.value()->getCountOfPayloads());
 
-    std::optional<std::shared_ptr<ProcessingPayload>> payload =
-        data.value()->getPayload(PAYLOAD_NAME_MQTT_RECEIVED_DATA);
+    auto payload = data.value()->getPayload(PAYLOAD_NAME_MQTT_RECEIVED_DATA);
     EXPECT_EQ("Hello from the test", payload.value()->payloadAsString());
 
 }
@@ -149,8 +148,8 @@ TEST(MQTTListener, WritesReceivedDataIntoTheQueue) {
 TEST(MQTTListener, PayloadHasSpecificMatchingPattern) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
-    vector<shared_ptr<MQTTListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
-    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");
+    auto fifo = PipelineFiFo::getInstance();
     for(auto listener : listeners) {
         listener->init(fifo);
         listener->startListening();

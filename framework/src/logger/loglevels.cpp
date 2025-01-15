@@ -12,21 +12,21 @@ LogLevelStringMapper::LogLevelStringMapper() {
                {LogLevel::LOG_LEVEL_TRACE, LOG_PREFIX_TRACE}};
 }
 
-std::optional<LogLevel> LogLevelStringMapper::string2LogLevel(
-    const std::string &levelString) const {
+optional<LogLevel> LogLevelStringMapper::string2LogLevel(
+    const string &levelString) const {
   for (const auto &[levelAsEnum, levelAsString] : logLevels) {
     if (levelAsString == levelString) {
       return levelAsEnum;
     }
   }
-  return std::nullopt;
+  return nullopt;
 }
 
-std::optional<std::string> LogLevelStringMapper::logLevel2String(const LogLevel &logLevel) const {
+optional<string> LogLevelStringMapper::logLevel2String(const LogLevel &logLevel) const {
     try {
         return logLevels.at(logLevel);
     } catch (...) {
-        return std::nullopt;
+        return nullopt;
     }
 }
 

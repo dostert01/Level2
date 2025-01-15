@@ -11,15 +11,16 @@
 #define ONE_SECOND 1000000
 
 using namespace event_forge;
+using namespace std;
 
 TEST(LoggingDestinations, DefaultIsStdOut) {
     Logger& logger = Logger::getInstance();
     testing::internal::CaptureStdout();
     logger.error("Hello Log");
-    std::string output = testing::internal::GetCapturedStdout();
-    std::cout << "output: " << output << std::endl;
-    std::regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
-    EXPECT_TRUE(std::regex_search(output, regex));
+    string output = testing::internal::GetCapturedStdout();
+    cout << "output: " << output << endl;
+    regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_TRUE(regex_search(output, regex));
 }
 
 TEST(LoggingDestinations, CanRemoveAllDestinations) {
@@ -44,10 +45,10 @@ TEST(LoggingDestinations, CanLogToStdErr) {
     EXPECT_EQ(2, logger.getCountOfLoggingDestinations());
     testing::internal::CaptureStderr();
     logger.error("Hello Log");
-    std::string output = testing::internal::GetCapturedStderr();
-    std::cout << "output: " << output << std::endl;
-    std::regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
-    EXPECT_TRUE(std::regex_search(output, regex));
+    string output = testing::internal::GetCapturedStderr();
+    cout << "output: " << output << endl;
+    regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_TRUE(regex_search(output, regex));
 }
 
 TEST(LoggingDestinations, CanReplaceLoggingDestinations) {
@@ -58,35 +59,35 @@ TEST(LoggingDestinations, CanReplaceLoggingDestinations) {
     EXPECT_EQ(1, logger.getCountOfLoggingDestinations());
 }
 
-std::string readFirstLineFromFile(const std::string fileName) {
-    std::ifstream inputFile(fileName);
-    std::string line;
-    std::getline(inputFile, line);
+string readFirstLineFromFile(const string fileName) {
+    ifstream inputFile(fileName);
+    string line;
+    getline(inputFile, line);
     return line;
 }
 
 TEST(LoggingDestinations, CanLogToAFile) {
-    std::string fileName = "./testFile.log";
+    string fileName = "./testFile.log";
     Logger& logger = Logger::getInstance();
     LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.setLoggingDestination(factory.createDestinationFile(fileName));
     logger.error("Hello Log");
-    std::string output = readFirstLineFromFile(fileName);    
-    std::regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
-    EXPECT_TRUE(std::regex_search(output, regex));
-    if(!std::filesystem::remove(fileName)) {
-        std::cerr << "Waring: failed to remove test log file at: " << fileName << std::endl;
+    string output = readFirstLineFromFile(fileName);    
+    regex regex("^\\[ERROR\\] \\[20([0-9]{2}-){2}[0-9]{2} ([0-9]{2}:){2}[0-9]{2}\\] Hello Log");
+    EXPECT_TRUE(regex_search(output, regex));
+    if(!filesystem::remove(fileName)) {
+        cerr << "Waring: failed to remove test log file at: " << fileName << endl;
     }
 }
 
-void readSyslog(std::vector<std::string>& syslogBuffered) {
-    std::ifstream syslogFile("/var/log/syslog");
+void readSyslog(vector<string>& syslogBuffered) {
+    ifstream syslogFile("/var/log/syslog");
     if(!syslogFile.is_open()){
         syslogFile.open("/var/log/messages");
     }
     if(syslogFile.is_open()){
-        std::string currentLine;
-        while(std::getline(syslogFile, currentLine)){
+        string currentLine;
+        while(getline(syslogFile, currentLine)){
             if(!currentLine.empty()){
                 syslogBuffered.push_back(currentLine);
             }
@@ -95,16 +96,16 @@ void readSyslog(std::vector<std::string>& syslogBuffered) {
     }
 }
 
-bool stringPresentInSyslog(const std::string logString) {
-    std::vector<std::string> syslog;
+bool stringPresentInSyslog(const string logString) {
+    vector<string> syslog;
     usleep(ONE_SECOND);
     readSyslog(syslog);
-    std::regex regex(logString);
+    regex regex(logString);
     bool found = false;
-    for(std::string currentLine : syslog){
-        found = std::regex_search(currentLine, regex);
+    for(string currentLine : syslog){
+        found = regex_search(currentLine, regex);
         if(found) {
-            std::cout << "line found in syslog: " << currentLine << std::endl;
+            cout << "line found in syslog: " << currentLine << endl;
             break;
         }
     }
@@ -112,12 +113,12 @@ bool stringPresentInSyslog(const std::string logString) {
 }
 
 TEST(LoggingDestinations, CanLogToSyslog) {
-    std::string fileName = "./testFile.log";
+    string fileName = "./testFile.log";
     Logger& logger = Logger::getInstance();
     LoggingDestinationFactory factory = LoggingDestinationFactory();
     logger.setLoggingDestination(factory.createDestinationSyslog("testapp"));
     DefaultTimeProvider timeProvider;
-    std::string logString = "Hello Log at " + timeProvider.getTimeStampOfNow();
+    string logString = "Hello Log at " + timeProvider.getTimeStampOfNow();
     logger.error(logString);
     EXPECT_TRUE(stringPresentInSyslog(logString));
 }

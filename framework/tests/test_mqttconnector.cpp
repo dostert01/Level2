@@ -9,8 +9,8 @@ using namespace event_forge;
 #define PIPELINE_CONFIG_TEST_FILE_06 "/pipelineConfig06.json"
 
 namespace test_mqttconnector {
-    std::string workingDir;
-    std::string testFilesDir;
+    string workingDir;
+    string testFilesDir;
 
     void configureLogger() {
         LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);

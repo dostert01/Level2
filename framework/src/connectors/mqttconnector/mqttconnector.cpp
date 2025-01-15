@@ -38,7 +38,7 @@ int pipeline_step_module_init(PipelineStepInitData& initData) {
 }
 
 void sendData(PipelineProcessingData& processData) {
-  optional<shared_ptr<ProcessingPayload>> payload = processData.getPayload(PAYLOAD_NAME_MQTT_SEND_TEXT_DATA);
+  auto payload = processData.getPayload(PAYLOAD_NAME_MQTT_SEND_TEXT_DATA);
   if(payload.has_value()) {
     LOGGER.info("sending text payload to MQTT broker.");
     mqtt->sendData(payload.value()->payloadAsString());

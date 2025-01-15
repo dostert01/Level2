@@ -6,6 +6,7 @@
 
 #include "loglevels.h"
 
+using namespace std;
 namespace event_forge {
 
 #define SQUARE_BRACKET_LEFT "["
@@ -15,8 +16,8 @@ namespace event_forge {
 class LoggingDestination {
  public:
   LoggingDestination() = default;
-  virtual void doLogging(const LogLevel& logLevel, const std::string& message,
-                         const std::string& timestamp) = 0;
+  virtual void doLogging(const LogLevel& logLevel, const string& message,
+                         const string& timestamp) = 0;
   virtual ~LoggingDestination();
 };
 
@@ -24,12 +25,12 @@ class LoggingDestination {
 class LoggingDestinationStdOut : public LoggingDestination {
  public:
   LoggingDestinationStdOut() = default;
-  void doLogging(const LogLevel& logLevel, const std::string& message,
-                 const std::string& timestamp) override;
+  void doLogging(const LogLevel& logLevel, const string& message,
+                 const string& timestamp) override;
  protected:
-  std::string prepareLoggingMessage(const LogLevel &logLevel,
-                                    const std::string &message,
-                                    const std::string &timestamp);
+  string prepareLoggingMessage(const LogLevel &logLevel,
+                                    const string &message,
+                                    const string &timestamp);
  private:
   LogLevelStringMapper loglevelMapper;
 };
@@ -37,39 +38,39 @@ class LoggingDestinationStdOut : public LoggingDestination {
 //-------------------------------------------------------------------
 class LoggingDestinationSyslog : public LoggingDestination {
  public:
-    LoggingDestinationSyslog(const std::string applicationName);
+    LoggingDestinationSyslog(const string applicationName);
     ~LoggingDestinationSyslog();
-    void doLogging(const LogLevel& logLevel, const std::string& message,
-                 const std::string& timestamp) override;
+    void doLogging(const LogLevel& logLevel, const string& message,
+                 const string& timestamp) override;
   private:
-    std::string syslogIdent;
+    string syslogIdent;
 };
 
 //-------------------------------------------------------------------
 class LoggingDestinationStdErr : public LoggingDestinationStdOut {
  public:
-  void doLogging(const LogLevel& logLevel, const std::string& message,
-                         const std::string& timestamp) override;
+  void doLogging(const LogLevel& logLevel, const string& message,
+                         const string& timestamp) override;
 };
 
 //-------------------------------------------------------------------
 class LoggingDestinationFile : public LoggingDestinationStdOut {
  public:
-  LoggingDestinationFile(const std::string fileName);
-    void doLogging(const LogLevel& logLevel, const std::string& message,
-                         const std::string& timestamp) override;
+  LoggingDestinationFile(const string fileName);
+    void doLogging(const LogLevel& logLevel, const string& message,
+                         const string& timestamp) override;
   private:
-    std::string logFileName;
+    string logFileName;
 };
 
 //-------------------------------------------------------------------
 class LoggingDestinationFactory {
  public:
   LoggingDestinationFactory() = default;
-  std::unique_ptr<LoggingDestination> createDestinationStdOut();
-  std::unique_ptr<LoggingDestination> createDestinationStdErr();
-  std::unique_ptr<LoggingDestination> createDestinationFile(const std::string fileName);
-  std::unique_ptr<LoggingDestination> createDestinationSyslog(const std::string applicationName);
+  unique_ptr<LoggingDestination> createDestinationStdOut();
+  unique_ptr<LoggingDestination> createDestinationStdErr();
+  unique_ptr<LoggingDestination> createDestinationFile(const string fileName);
+  unique_ptr<LoggingDestination> createDestinationSyslog(const string applicationName);
 };
 
 }  // namespace event_forge

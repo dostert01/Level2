@@ -21,12 +21,12 @@ PipeLineProcessor::~PipeLineProcessor() {
 }
 
 unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
-    unique_ptr<PipeLineProcessor> instance = make_unique<PipeLineProcessor>();
+    auto instance = make_unique<PipeLineProcessor>();
     return instance;
 }
 
 optional<unique_ptr<PipeLineProcessor>> PipeLineProcessor::getInstance(const string configFilePath) {
-    unique_ptr<PipeLineProcessor> instance = getInstance();
+    auto instance = getInstance();
     try {
         LOGGER.info("Loading pipeline processor configuration from file: " + configFilePath);
         instance.get()->loadProcessorConfig(configFilePath);
