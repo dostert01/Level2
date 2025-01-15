@@ -35,12 +35,12 @@ uint Pipeline::getCountOfPipelineSteps() {
 }
 
 void Pipeline::execute() {
-    PipelineProcessingData emptyProcessingData;
+    shared_ptr<PipelineProcessingData> emptyProcessingData = make_shared<PipelineProcessingData>();
     execute(emptyProcessingData);
 }
 
-void Pipeline::execute(PipelineProcessingData& processData) {
-    if((!hasMatchingPatterns() && !processData.hasMatchingPatterns()) || matchesAll(processData)) {
+void Pipeline::execute(shared_ptr<PipelineProcessingData> processData) {
+    if((!hasMatchingPatterns() && !processData->hasMatchingPatterns()) || matchesAll(processData)) {
         LOGGER.info("Start processing payload by pipeline '" + getPipelineName() + "'");
         tagProcessingData(processData);
         for(const auto& currentStep : pipelineSteps) {
@@ -51,9 +51,9 @@ void Pipeline::execute(PipelineProcessingData& processData) {
     }
 }
 
-void Pipeline::tagProcessingData(PipelineProcessingData& processData) {
-    processData.increaseProcessingCounter();
-    processData.setLastProcessedPipelineName(getPipelineName());
+void Pipeline::tagProcessingData(shared_ptr<PipelineProcessingData> processData) {
+    processData->increaseProcessingCounter();
+    processData->setLastProcessedPipelineName(getPipelineName());
 }
 
 std::optional<std::shared_ptr<PipelineStep>> Pipeline::getStepByName(const std::string& stepName) {
@@ -187,8 +187,8 @@ void PipelineStep::runInitFunction() {
     libInit(initData);
 }
 
-void PipelineStep::runProcessingFunction(const PipelineProcessingData& processingData) { 
-    libProcess(processingData);
+void PipelineStep::runProcessingFunction(shared_ptr<PipelineProcessingData> processingData) { 
+    libProcess(*processingData);
 }
 
 void PipelineStep::runFinishFunction() {

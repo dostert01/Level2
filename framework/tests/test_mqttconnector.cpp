@@ -53,8 +53,8 @@ void configureTest() {
 TEST(MQTTConnector, CanSend) {
     configureTest();
     optional<shared_ptr<Pipeline>> pipeline1 = Pipeline::getInstance(test_mqttconnector::testFilesDir + PIPELINE_CONFIG_TEST_FILE_06);
-    PipelineProcessingData processData;
-    processData.addPayloadData("MQTT_SEND_TEXT_DATA", "text/plain", "Hello via MQTT");
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
+    processData->addPayloadData("MQTT_SEND_TEXT_DATA", "text/plain", "Hello via MQTT");
     //thread t(test_mqttconnector::listenToIncomingMessages);
     pipeline1.value()->execute(processData);
     //t.join();

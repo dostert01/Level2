@@ -14,10 +14,13 @@ using namespace event_forge;
 #endif
 
 #define PROCESS_CONFIG_TEST_FILE_01 "/processConfig01.json"
+#define PROCESS_CONFIG_TEST_FILE_02 "/processConfig02.json"
+
+using namespace std;
 
 namespace test_pipeline_processor {
-    std::string workingDir;
-    std::string testFilesDir;
+    string workingDir;
+    string testFilesDir;
 
     void configureLogger() {
         LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
@@ -25,10 +28,10 @@ namespace test_pipeline_processor {
     }
 
     void configureTestVariables() {
-        workingDir = std::filesystem::current_path();
+        workingDir = filesystem::current_path();
         LOGGER.info("Running test in directory: " + workingDir);
-        if(std::getenv("TEST_FILES_DIR") != NULL) {
-            testFilesDir = std::getenv("TEST_FILES_DIR");
+        if(getenv("TEST_FILES_DIR") != NULL) {
+            testFilesDir = getenv("TEST_FILES_DIR");
             LOGGER.info("Testfiles expected to be present in directory: " + testFilesDir);
         } else {
             LOGGER.error("Environment variable TEST_FILES_DIR must be set to where the tests expect the testfiles to live!");
@@ -43,13 +46,13 @@ void configureTest() {
 
 TEST(PipeLineProcessor, ReturnsEmptyOptionalIfConfigFileNotPresent) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance("noFileHere");
+    auto processor = PipeLineProcessor::getInstance("noFileHere");
     EXPECT_FALSE(processor.has_value());
 }
 
 TEST(PipeLineProcessor, CanLoadConfigFromJson) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(processor.has_value());
     if(processor.has_value())
         EXPECT_EQ(3, processor.value()->getCountOfPipelines());
@@ -57,71 +60,71 @@ TEST(PipeLineProcessor, CanLoadConfigFromJson) {
 
 TEST(PipeLineProcessor, ProcessHasAName) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     EXPECT_EQ("my first testProcess", processor.value()->getProcessName());
 }
 
 TEST(PipeLineProcessor, CanGetPipelineByName) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     PipeLineProcessor* prc = processor.value().get();
-    std::optional<std::shared_ptr<Pipeline>> pipeline = prc->getPipelineByName("my first testPipeline");
+    auto pipeline = prc->getPipelineByName("my first testPipeline");
     EXPECT_TRUE(pipeline.has_value());
     EXPECT_EQ("my first testPipeline", pipeline.value().get()->getPipelineName());
 }
 
 TEST(PipeLineProcessor, PipelineHasMatchingPatterns) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
-    std::shared_ptr<Pipeline> pipeline = processor.value().get()->getPipelineByName("my first testPipeline").value();
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    shared_ptr<Pipeline> pipeline = processor.value().get()->getPipelineByName("my first testPipeline").value();
     EXPECT_EQ(5, pipeline.get()->getCountOfMatchingPatterns());
 }
 
 TEST(PipeLineProcessor, OneOfThreePipelinesProcessesTheMatchingPayload) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
-    processData.addMatchingPattern("key01", "value01");
-    processData.addMatchingPattern("key02", "value02");
-    processData.addMatchingPattern("key03", "value03");
-    processData.addMatchingPattern("key04", "value04");
-    processData.addMatchingPattern("key05", "value05");
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
+    processData->addMatchingPattern("key01", "value01");
+    processData->addMatchingPattern("key02", "value02");
+    processData->addMatchingPattern("key03", "value03");
+    processData->addMatchingPattern("key04", "value04");
+    processData->addMatchingPattern("key05", "value05");
     processor.value().get()->execute(processData);
-    EXPECT_EQ(1, processData.getProcessingCounter());
-    EXPECT_EQ("my first testPipeline", processData.getLastProcessedPipelineName());
+    EXPECT_EQ(1, processData->getProcessingCounter());
+    EXPECT_EQ("my first testPipeline", processData->getLastProcessedPipelineName());
 }
 
 TEST(PipeLineProcessor, NoneOfThreePipelinesProcessesTheMatchingPayload) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
-    processData.addMatchingPattern("thisPattern", "does not match any pipeline");
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
+    processData->addMatchingPattern("thisPattern", "does not match any pipeline");
     processor.value().get()->execute(processData);
-    EXPECT_EQ(0, processData.getProcessingCounter());
-    EXPECT_EQ("", processData.getLastProcessedPipelineName());
+    EXPECT_EQ(0, processData->getProcessingCounter());
+    EXPECT_EQ("", processData->getLastProcessedPipelineName());
 }
 
 TEST(PipeLineProcessor, TwoOfThreePipelinesProcessesThePayloadWithoutAnyMatchingPattern) {
     configureTest();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
     processor.value().get()->execute(processData);
-    EXPECT_EQ(2, processData.getProcessingCounter());
-    EXPECT_EQ("my pipeline with binaryData", processData.getLastProcessedPipelineName());
+    EXPECT_EQ(2, processData->getProcessingCounter());
+    EXPECT_EQ("my pipeline with binaryData", processData->getLastProcessedPipelineName());
 }
 
 TEST(PipeLineProcessor, CanStartTheProcessingLoop) {
     configureTest();
 
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
 
     shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
 
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     processor.value()->startProcessingLoop(fifo);
     EXPECT_TRUE(processor.value()->isProcessingLoopRunning());
     sleep(1);
@@ -133,16 +136,21 @@ TEST(PipeLineProcessor, CanStartTheProcessingLoop) {
 TEST(PipeLineProcessor, ProcessingLoopProcessesSomeData) {
     configureTest();
 
-    shared_ptr<PipelineProcessingData> processData = make_shared<PipelineProcessingData>();
+    auto processData = PipelineProcessingData::getInstance();
     processData->addPayloadData("question", "text/plain", "What is the answer?");
-    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
-    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    auto fifo = PipelineFiFo::getInstance();
+    auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_02);
     processor.value()->startProcessingLoop(fifo);
     sleep(1);
     fifo->enqueue(processData);
     sleep(1);
-    EXPECT_EQ(2, processData->getProcessingCounter());
+    EXPECT_EQ(1, processData->getProcessingCounter());
     EXPECT_EQ("my pipeline with binaryData", processData->getLastProcessedPipelineName());
+    auto payload = processData->getPayload("myBinaryPayloadData");
+    auto data = payload.value()->payloadAsBinaryData();
+    EXPECT_EQ("ProcessingError is the only BinaryDataPayload, that currently is supported. "
+        "firstArgument: first hello from arguments secondArgument: second hello from arguments",
+        dynamic_pointer_cast<ProcessingError>(data)->getErrorMessage());
     processor.value()->stopProcessingLoop();
     sleep(1);
 }

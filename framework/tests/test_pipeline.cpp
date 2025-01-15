@@ -115,13 +115,13 @@ TEST(Pipeline, CanUseProcessData) {
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
     pipeline.value()->execute(processData);
     std::optional<std::shared_ptr<ProcessingPayload>> payload;
-    payload = processData.getPayload("question");
+    payload = processData->getPayload("question");
     EXPECT_TRUE(payload.has_value());
-    payload = processData.getPayload("answer");
+    payload = processData->getPayload("answer");
     EXPECT_TRUE(payload.has_value());
     EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
     std::filesystem::remove(testfileName);
@@ -130,11 +130,11 @@ TEST(Pipeline, CanUseProcessData) {
 TEST(Pipeline, CanUseBinaryProcessData) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_04);
-    PipelineProcessingData processData;
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
     pipeline.value()->execute(processData);
-    EXPECT_EQ(1, processData.getCountOfPayloads());
+    EXPECT_EQ(1, processData->getCountOfPayloads());
     std::optional<std::shared_ptr<ProcessingPayload>> payload;
-    payload = processData.getPayload("myBinaryPayloadData");
+    payload = processData->getPayload("myBinaryPayloadData");
     EXPECT_TRUE(payload.has_value());
     EXPECT_EQ("first hello from arguments",
         ((SpecificBinaryProcessingData*)(payload.value()->payloadAsBinaryData().get()))->firstArgument);    
@@ -185,13 +185,13 @@ TEST(Pipeline, ProcessesDataOnlyIfPayloadPatternsMatchThePipelinePatterns) {
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
-    processData.addMatchingPattern("key01", "value01");
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
+    processData->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key01", "value01");
     pipeline.value()->execute(processData);
     std::optional<std::shared_ptr<ProcessingPayload>> payload;
-    payload = processData.getPayload("answer");
+    payload = processData->getPayload("answer");
     EXPECT_TRUE(payload.has_value());
     EXPECT_EQ(payload.value()->payloadAsString().compare("the answer is 42"), 0);
     std::filesystem::remove(testfileName);
@@ -202,13 +202,13 @@ TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_03);
     std::string testfileName = "./argumentsProcessor_output02.txt";
     std::filesystem::remove(testfileName);
-    PipelineProcessingData processData;
-    processData.addPayloadData("question", "text/plain", "What is the answer?");
-    processData.addMatchingPattern("key01", "value01");
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
+    processData->addMatchingPattern("key01", "value01");
     pipeline.value()->addMatchingPattern("key01", "value02");
     pipeline.value()->execute(processData);
     std::optional<std::shared_ptr<ProcessingPayload>> payload;
-    payload = processData.getPayload("answer");
+    payload = processData->getPayload("answer");
     EXPECT_FALSE(payload.has_value());
     std::filesystem::remove(testfileName);
 }
@@ -216,17 +216,17 @@ TEST(Pipeline, DoesNotProcessDataIfMatchingPatternsDiffer) {
 TEST(Pipeline, PipelineCanLogErrors) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
-    PipelineProcessingData processData;
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
     pipeline.value()->execute(processData);
-    EXPECT_TRUE(processData.hasError());
+    EXPECT_TRUE(processData->hasError());
 }
 
 TEST(Pipeline, CanGetAllErrors) {
     configureTest();
     std::optional<std::shared_ptr<Pipeline>> pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
-    PipelineProcessingData processData;
+    shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();;
     pipeline.value()->execute(processData);
-    std::vector<ProcessingError> allErrors = processData.getAllErrors();
+    std::vector<ProcessingError> allErrors = processData->getAllErrors();
     EXPECT_EQ(2, allErrors.size());
     EXPECT_EQ("first error", allErrors.at(0).getErrorCode());
     EXPECT_EQ("this is a test error", allErrors.at(0).getErrorMessage());

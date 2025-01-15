@@ -38,7 +38,7 @@ class PipelineStep {
         void setLibraryName(const std::string libraryName);
         bool isInitComplete();
         void runInitFunction();
-        void runProcessingFunction(const PipelineProcessingData& processingData);
+        void runProcessingFunction(shared_ptr<PipelineProcessingData> processingData);
         void runFinishFunction();
         void loadLib();
         void loadNamedArguments(const json& jsonData);
@@ -62,14 +62,14 @@ class Pipeline : public Matchable {
         void setPipelineName(const std::string& pipelineName);
         std::string getPipelineName();
         void execute();
-        void execute(PipelineProcessingData& processData);
+        void execute(shared_ptr<PipelineProcessingData> processData);
     private:
         std::string pipelineName;
         std::vector<std::shared_ptr<PipelineStep>> pipelineSteps;
         void loadPipelineConfig(const std::string& configFilePath);
         void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);
-        void tagProcessingData(PipelineProcessingData& processData);
+        void tagProcessingData(shared_ptr<PipelineProcessingData> processData);
 };
 
 }

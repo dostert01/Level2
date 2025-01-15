@@ -14,8 +14,8 @@ using namespace event_forge;
 
 struct PipelineStepInitData
 {
-    std::multimap<std::string, std::string> namedArguments;
-    std::optional<std::string> getNamedArgument(const std::string& argumentName);
+    multimap<string, string> namedArguments;
+    optional<string> getNamedArgument(const string& argumentName);
 };
 
 class SerializableDB {
@@ -42,51 +42,52 @@ class BinaryProcessingData {
 
 class ProcessingError : public BinaryProcessingData {
     public:
-        ProcessingError(std::string errorCode, std::string errorMessage);
+        ProcessingError(string errorCode, string errorMessage);
         ProcessingError(ProcessingError* other);
-        std::string getErrorCode();
-        std::string getErrorMessage();
+        string getErrorCode();
+        string getErrorMessage();
     private:
-        std::string errorCode;
-        std::string errorMessage;
+        string errorCode;
+        string errorMessage;
 };
 
 class ProcessingPayload {
     private:
-        std::string mimetype;
-        std::string stringPayloadData;
-        std::shared_ptr<BinaryProcessingData> binaryPayloadData;
+        string mimetype;
+        string stringPayloadData;
+        shared_ptr<BinaryProcessingData> binaryPayloadData;
     public:
         ProcessingPayload() = default;
-        ProcessingPayload(std::string mimetype, std::string payload);
-        ProcessingPayload(std::string mimetype, std::shared_ptr<BinaryProcessingData> payload);
+        ProcessingPayload(string mimetype, string payload);
+        ProcessingPayload(string mimetype, shared_ptr<BinaryProcessingData> payload);
         ~ProcessingPayload();
-        void setMimeType(std::string mimetype);
-        void setPayload(std::string payload);
-        void setPayload(std::shared_ptr<BinaryProcessingData> payload);
-        std::string payloadAsString();
-        std::shared_ptr<BinaryProcessingData> payloadAsBinaryData();
+        void setMimeType(string mimetype);
+        void setPayload(string payload);
+        void setPayload(shared_ptr<BinaryProcessingData> payload);
+        string payloadAsString();
+        shared_ptr<BinaryProcessingData> payloadAsBinaryData();
 };
 
 class PipelineProcessingData : public Matchable {
     private:
-        std::multimap<std::string, std::shared_ptr<ProcessingPayload>> namedPayloadData;
-        std::string lastProcessedPipelineName;
+        multimap<string, shared_ptr<ProcessingPayload>> namedPayloadData;
+        string lastProcessedPipelineName;
         uint processingCounter = 0;
     public:
         PipelineProcessingData() = default;
         ~PipelineProcessingData();
-        void addPayloadData(std::string payloadName, std::string mimetype, std::string data);
-        void addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data);
-        void addError(std::string errorCode, std::string errorMessage);
+        static shared_ptr<PipelineProcessingData> getInstance();
+        void addPayloadData(string payloadName, string mimetype, string data);
+        void addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data);
+        void addError(string errorCode, string errorMessage);
         bool hasError();
-        std::vector<ProcessingError> getAllErrors();
-        std::optional<std::shared_ptr<ProcessingPayload>> getPayload(std::string payloadName);
+        vector<ProcessingError> getAllErrors();
+        optional<shared_ptr<ProcessingPayload>> getPayload(string payloadName);
         uint getCountOfPayloads();
         uint getProcessingCounter();
         void increaseProcessingCounter();
-        void setLastProcessedPipelineName(std::string pipelineName);
-        std::string getLastProcessedPipelineName();
+        void setLastProcessedPipelineName(string pipelineName);
+        string getLastProcessedPipelineName();
 };
 
 #endif //#ifndef API_HELPERS_H

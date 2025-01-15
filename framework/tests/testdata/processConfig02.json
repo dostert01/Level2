@@ -1,0 +1,9 @@
+{
+    "processName" : "my first testProcess",
+    "pipelines" : [
+        {
+            "pipelineConfigFile":"pipelineConfig04.json",
+            "matchingPatterns" : []
+        }
+    ]
+}

@@ -4,22 +4,24 @@
 #include <map>
 #include <string>
 #include <optional>
+#include <memory>
 
+using namespace std;
 
 namespace event_forge {
 
 class Matchable {
     public:
         Matchable() = default;
-        void addMatchingPattern(std::string key, std::string value);
+        void addMatchingPattern(string key, string value);
         uint getCountOfMatchingPatterns();
-        std::optional<std::string> getMatchingPattern(std::string key);
-        void removeMatchingPattern(std::string key);
-        bool matchesAll(Matchable& other);
+        optional<string> getMatchingPattern(string key);
+        void removeMatchingPattern(string key);
+        bool matchesAll(shared_ptr<Matchable> other);
         bool hasMatchingPatterns();
     private:
-        std::map<std::string, std::string> matchingPatterns;
-        bool RegexMatch(std::string s1, std::string s2);
+        map<string, string> matchingPatterns;
+        bool RegexMatch(string s1, string s2);
         bool bothHaveMatchingPatterns(Matchable& other);
         bool bothHaveSameNumberOfMatchingPatterns(Matchable& other);
 };

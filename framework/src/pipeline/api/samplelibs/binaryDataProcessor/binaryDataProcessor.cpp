@@ -11,13 +11,6 @@ std::string secondArgument;
 void processTheProcessingData(PipelineProcessingData& processData);
 void processArgumentsFromJson();
 
-SpecificBinaryProcessingData::SpecificBinaryProcessingData() : BinaryProcessingData() {}
-
-SpecificBinaryProcessingData::~SpecificBinaryProcessingData() {
-  std::cout << "SpecificBinaryProcessingData in deletion has firstArgument: " << firstArgument << std::endl;
-  std::cout << "SpecificBinaryProcessingData in deletion has secondArgument: " << secondArgument << std::endl;
-}
-
 int pipeline_step_module_init(PipelineStepInitData& initData) {
 
     std::optional<std::string> s  = initData.getNamedArgument("first argument");
@@ -37,9 +30,10 @@ int pipeline_step_module_process(PipelineProcessingData& processData) {
 }
 
 void processTheProcessingData(PipelineProcessingData& processData) {
-  std::shared_ptr<BinaryProcessingData> binData(new SpecificBinaryProcessingData());
-  ((SpecificBinaryProcessingData*)(binData.get()))->firstArgument = firstArgument;
-  ((SpecificBinaryProcessingData*)(binData.get()))->secondArgument = secondArgument;
+  auto binData = make_shared<ProcessingError>("ProcessingError",
+    "ProcessingError is the only BinaryDataPayload, that currently is supported. "
+    "firstArgument: " + firstArgument + " " +
+    "secondArgument: " + secondArgument);
   processData.addPayloadData("myBinaryPayloadData", "", binData);
 }
 

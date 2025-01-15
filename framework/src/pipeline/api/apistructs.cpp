@@ -1,6 +1,9 @@
 #include <iostream>
 #include "apistructs.h"
 #include "payloadnames.h"
+
+using namespace std;
+
 /*
     BinaryProcessingData
 */
@@ -9,66 +12,70 @@ BinaryProcessingData::~BinaryProcessingData() {}
 /*
     PipelineStepInitData
 */
-std::optional<std::string> PipelineStepInitData::getNamedArgument(const std::string& argumentName) {
+optional<string> PipelineStepInitData::getNamedArgument(const string& argumentName) {
     auto search = namedArguments.find(argumentName);
     if(search != namedArguments.end()) {
         return search->second;
     }
-    return std::nullopt;
+    return nullopt;
 }
 
 /*
     ProcessingPayload
 */
-ProcessingPayload::ProcessingPayload(std::string mimetype, std::string payload) {
+ProcessingPayload::ProcessingPayload(string mimetype, string payload) {
     setMimeType(mimetype);
     setPayload(payload);
 }
 
-ProcessingPayload::ProcessingPayload(std::string mimetype, std::shared_ptr<BinaryProcessingData> payload){
+ProcessingPayload::ProcessingPayload(string mimetype, shared_ptr<BinaryProcessingData> payload){
     setMimeType(mimetype);
     setPayload(payload);
 }
 
 ProcessingPayload::~ProcessingPayload() {}
 
-std::string ProcessingPayload::payloadAsString() {
+string ProcessingPayload::payloadAsString() {
     return stringPayloadData;
 }
 
-std::shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
+shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
     return binaryPayloadData;
 }
 
-void ProcessingPayload::setMimeType(std::string mimetype) {
+void ProcessingPayload::setMimeType(string mimetype) {
     this->mimetype = mimetype;
 }
 
-void ProcessingPayload::setPayload(std::string payload) {
+void ProcessingPayload::setPayload(string payload) {
     this->stringPayloadData = payload;
 }
 
-void ProcessingPayload::setPayload(std::shared_ptr<BinaryProcessingData> payload) {
+void ProcessingPayload::setPayload(shared_ptr<BinaryProcessingData> payload) {
     this->binaryPayloadData = payload;
 }
 
 /*
     PipelineProcessingData
 */
+shared_ptr<PipelineProcessingData> PipelineProcessingData::getInstance() {
+    return make_shared<PipelineProcessingData>();
+}
+
 PipelineProcessingData::~PipelineProcessingData() {}
 
-void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::string data) {
-    std::shared_ptr<ProcessingPayload> payload = std::make_shared<ProcessingPayload>(mimetype, data);
-    namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
+void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, string data) {
+    auto payload = make_shared<ProcessingPayload>(mimetype, data);
+    namedPayloadData.insert(make_pair(payloadName, payload));
 }
 
-void PipelineProcessingData::addPayloadData(std::string payloadName, std::string mimetype, std::shared_ptr<BinaryProcessingData> data) {
-    std::shared_ptr<ProcessingPayload> payload = std::make_shared<ProcessingPayload>(mimetype, data);
-    namedPayloadData.insert(std::make_pair(payloadName, std::move(payload)));
+void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data) {
+    auto payload = make_shared<ProcessingPayload>(mimetype, data);
+    namedPayloadData.insert(make_pair(payloadName, payload));
 }
 
-void PipelineProcessingData::addError(std::string errorCode, std::string errorMessage) {
-    std::shared_ptr<BinaryProcessingData> error = std::make_shared<ProcessingError>(errorCode, errorMessage);
+void PipelineProcessingData::addError(string errorCode, string errorMessage) {
+    auto error = make_shared<ProcessingError>(errorCode, errorMessage);
     addPayloadData(PAYLOAD_NAME_PROCESSING_ERROR, PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM, error);
 }
 
@@ -76,8 +83,8 @@ bool PipelineProcessingData::hasError() {
     return namedPayloadData.contains(PAYLOAD_NAME_PROCESSING_ERROR);
 }
 
-std::vector<ProcessingError> PipelineProcessingData::getAllErrors() {
-    std::vector<ProcessingError> returnVector;
+vector<ProcessingError> PipelineProcessingData::getAllErrors() {
+    vector<ProcessingError> returnVector;
     if(hasError()) {
         auto allErrors = namedPayloadData.equal_range(PAYLOAD_NAME_PROCESSING_ERROR);
         for(auto iterator = allErrors.first; iterator != allErrors.second; ++iterator) {
@@ -88,12 +95,12 @@ std::vector<ProcessingError> PipelineProcessingData::getAllErrors() {
     return returnVector;
 }
 
-std::optional<std::shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(std::string payloadName) {
+optional<shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(string payloadName) {
     auto search = namedPayloadData.find(payloadName);
     if(search != namedPayloadData.end()) {
         return search->second;
     }
-    return std::nullopt;
+    return nullopt;
 }
 
 uint PipelineProcessingData::getCountOfPayloads() {
@@ -108,18 +115,18 @@ void PipelineProcessingData::increaseProcessingCounter() {
     processingCounter++;
 }
 
-void PipelineProcessingData::setLastProcessedPipelineName(std::string pipelineName) {
+void PipelineProcessingData::setLastProcessedPipelineName(string pipelineName) {
     lastProcessedPipelineName = pipelineName;
 }
 
-std::string PipelineProcessingData::getLastProcessedPipelineName() {
+string PipelineProcessingData::getLastProcessedPipelineName() {
     return lastProcessedPipelineName;
 }
 
 /*
     ProcessingError
 */
-ProcessingError::ProcessingError(std::string errorCode, std::string errorMessage) : BinaryProcessingData() {
+ProcessingError::ProcessingError(string errorCode, string errorMessage) : BinaryProcessingData() {
     this->errorCode = errorCode;
     this->errorMessage = errorMessage;
 }
@@ -129,10 +136,10 @@ ProcessingError::ProcessingError(ProcessingError* other) : BinaryProcessingData(
     errorMessage = other->getErrorMessage();
 }
 
-std::string ProcessingError::getErrorCode() {
+string ProcessingError::getErrorCode() {
     return errorCode;
 }
 
-std::string ProcessingError::getErrorMessage() {
+string ProcessingError::getErrorMessage() {
     return errorMessage;
 }
