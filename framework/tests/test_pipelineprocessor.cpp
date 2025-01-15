@@ -112,3 +112,37 @@ TEST(PipeLineProcessor, TwoOfThreePipelinesProcessesThePayloadWithoutAnyMatching
     EXPECT_EQ(2, processData.getProcessingCounter());
     EXPECT_EQ("my pipeline with binaryData", processData.getLastProcessedPipelineName());
 }
+
+TEST(PipeLineProcessor, CanStartTheProcessingLoop) {
+    configureTest();
+
+    PipelineProcessingData processData;
+    processData.addPayloadData("question", "text/plain", "What is the answer?");
+
+    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    processor.value()->startProcessingLoop(fifo);
+    EXPECT_TRUE(processor.value()->isProcessingLoopRunning());
+    sleep(1);
+    processor.value()->stopProcessingLoop();
+    EXPECT_FALSE(processor.value()->isProcessingLoopRunning());
+
+}
+
+TEST(PipeLineProcessor, ProcessingLoopProcessesSomeData) {
+    configureTest();
+
+    shared_ptr<PipelineProcessingData> processData = make_shared<PipelineProcessingData>();
+    processData->addPayloadData("question", "text/plain", "What is the answer?");
+    shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();
+    std::optional<std::unique_ptr<PipeLineProcessor>> processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
+    processor.value()->startProcessingLoop(fifo);
+    sleep(1);
+    fifo->enqueue(processData);
+    sleep(1);
+    EXPECT_EQ(2, processData->getProcessingCounter());
+    EXPECT_EQ("my pipeline with binaryData", processData->getLastProcessedPipelineName());
+    processor.value()->stopProcessingLoop();
+    sleep(1);
+}

@@ -49,7 +49,8 @@ add_executable(test_eventForge
     test_logger.cpp
     test_timeproviders.cpp
     test_loggingdestinations.cpp
-    $<TARGET_OBJECTS:pipeline>)
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
 
 add_executable(test_applicationcontext
     test_applicationcontext.cpp
@@ -57,19 +58,23 @@ add_executable(test_applicationcontext
 
 add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
-    $<TARGET_OBJECTS:pipeline>)
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
 
 add_executable(test_pipeline
     test_pipeline.cpp
-    $<TARGET_OBJECTS:pipeline>)
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
 
 add_executable(test_pipeline_payload_matching
     test_pipeline_payload_matching.cpp
-    $<TARGET_OBJECTS:pipeline>)
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
 
 add_executable(test_pipelinefifo
     test_pipelinefifo.cpp
-    $<TARGET_OBJECTS:pipelinefifo>)
+    $<TARGET_OBJECTS:pipelinefifo>
+    $<TARGET_OBJECTS:pipeline>)
 
 add_executable(test_dbinterface
     test_dbinterface.cpp

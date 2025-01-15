@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 #include "pipelineprocessor.h"
 #include "../logger/logger.h"
@@ -11,10 +12,12 @@ namespace event_forge {
 #define JSON_PROPERTY_PROCESS_NAME "processName"
 #define JSON_PROPERTY_MATCHING_PATTERNS_ARRAY "matchingPatterns"
 
+#define HALF_A_SECOND 500000
 #define DIR_SEPARATOR "/"
 
 PipeLineProcessor::~PipeLineProcessor() {
     LOGGER.info("Unloading the PipeLineProcessor");
+    stopProcessingLoop();
 }
 
 std::unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
@@ -124,9 +127,49 @@ std::string PipeLineProcessor::getProcessName() {
 }
 
 void PipeLineProcessor::execute(PipelineProcessingData& payload) {
+    std::unique_lock<std::shared_mutex> lock(pipelineExecutionMutex);
     for(const auto& currentPipeline : pipelines) {
         currentPipeline.get()->execute(payload);
     }
 }
+
+void PipeLineProcessor::processingLoop(shared_ptr<PipelineFiFo> fifo) {
+    LOGGER.debug("processing loop started");
+    int sleepTime = HALF_A_SECOND;
+    while(keepThreadRunning) {
+        optional<shared_ptr<PipelineProcessingData>> data =
+            fifo->dequeue();
+        if(data.has_value()) {
+            sleepTime = 1;
+            //execute(*data.value());
+        } else {
+            if(sleepTime < HALF_A_SECOND) {
+                sleepTime *= 2;
+            }
+        }
+        usleep(sleepTime);
+    }
+    LOGGER.debug("processing loop ending");
+}
+
+void PipeLineProcessor::startProcessingLoop(shared_ptr<PipelineFiFo> fifo) {
+    LOGGER.debug("starting the processing loop");
+    keepThreadRunning = true;
+    processingLoopThread = std::thread(
+        &PipeLineProcessor::processingLoop, this, fifo);
+}
+
+bool PipeLineProcessor::isProcessingLoopRunning() {
+    return processingLoopThread.joinable();
+}
+
+void PipeLineProcessor::stopProcessingLoop() {
+    keepThreadRunning = false;
+    if(processingLoopThread.joinable()) {
+        LOGGER.debug("stopping the processing loop");
+        processingLoopThread.join();
+    }
+}
+
 
 }

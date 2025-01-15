@@ -21,6 +21,8 @@ class PipelineFiFo {
                map<string, string> &matchingPatterns);
   void enqueue(shared_ptr<PipelineProcessingData> data,
                map<string, string> &matchingPatterns);
+  void enqueue(shared_ptr<PipelineProcessingData> data);
+
 
  private:
   std::shared_mutex mutex;
