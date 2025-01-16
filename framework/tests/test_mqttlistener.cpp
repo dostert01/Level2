@@ -167,11 +167,11 @@ TEST(MQTTListener, PayloadHasSpecificMatchingPattern) {
     }
     std::shared_ptr<PipelineProcessingData> processingData = data.value();
     EXPECT_EQ("test/topic02",
-        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_DATA_ORIGIN).value_or(""));
-    EXPECT_EQ(PAYLOAD_MATCHIN_PATTERN_VALUE_MQTT_LISTENER,
-        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_BY_LISTENER).value_or(""));
-    EXPECT_EQ(PAYLOAD_MATCHIN_PATTERN_VALUE_PROTOCOL_MQTT,
-        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_VIA_PROTOCOL).value_or(""));
+        processingData->getMatchingPattern(PAYLOAD_MATCHING_PATTERN_DATA_ORIGIN).value_or(""));
+    EXPECT_EQ(PAYLOAD_MATCHING_PATTERN_VALUE_MQTT_LISTENER,
+        processingData->getMatchingPattern(PAYLOAD_MATCHING_PATTERN_RECEIVED_BY_LISTENER).value_or(""));
+    EXPECT_EQ(PAYLOAD_MATCHING_PATTERN_VALUE_PROTOCOL_MQTT,
+        processingData->getMatchingPattern(PAYLOAD_MATCHING_PATTERN_RECEIVED_VIA_PROTOCOL).value_or(""));
     EXPECT_EQ("127.0.0.1",
-        processingData->getMatchingPattern(PAYLOAD_MATCHIN_PATTERN_RECEIVED_FROM_HOST).value_or(""));
+        processingData->getMatchingPattern(PAYLOAD_MATCHING_PATTERN_RECEIVED_FROM_HOST).value_or(""));
 }

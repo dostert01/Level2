@@ -24,13 +24,13 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
       "Message payload: " + string((char*)msg->payload));
 
     map<string, string> matchingPatterns;
-    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_DATA_ORIGIN] =
+    matchingPatterns[PAYLOAD_MATCHING_PATTERN_DATA_ORIGIN] =
       string(msg->topic);
-    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_BY_LISTENER] =
-      PAYLOAD_MATCHIN_PATTERN_VALUE_MQTT_LISTENER;
-    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_VIA_PROTOCOL] =
-      PAYLOAD_MATCHIN_PATTERN_VALUE_PROTOCOL_MQTT;
-    matchingPatterns[PAYLOAD_MATCHIN_PATTERN_RECEIVED_FROM_HOST] =
+    matchingPatterns[PAYLOAD_MATCHING_PATTERN_RECEIVED_BY_LISTENER] =
+      PAYLOAD_MATCHING_PATTERN_VALUE_MQTT_LISTENER;
+    matchingPatterns[PAYLOAD_MATCHING_PATTERN_RECEIVED_VIA_PROTOCOL] =
+      PAYLOAD_MATCHING_PATTERN_VALUE_PROTOCOL_MQTT;
+    matchingPatterns[PAYLOAD_MATCHING_PATTERN_RECEIVED_FROM_HOST] =
       mqtt->getHostName();
 
     mqtt->getPipelineFifo().value()->enqueue(

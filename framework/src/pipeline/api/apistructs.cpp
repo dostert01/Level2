@@ -1,4 +1,5 @@
 #include <iostream>
+#include <atomic>
 #include "apistructs.h"
 #include "payloadnames.h"
 
@@ -58,11 +59,48 @@ void ProcessingPayload::setPayload(shared_ptr<BinaryProcessingData> payload) {
 /*
     PipelineProcessingData
 */
+
+atomic_int PipelineProcessingData::counter{0};
+
+PipelineProcessingData::PipelineProcessingData() {
+    setDefaultProperties();
+}
+
 shared_ptr<PipelineProcessingData> PipelineProcessingData::getInstance() {
     return make_shared<PipelineProcessingData>();
 }
 
 PipelineProcessingData::~PipelineProcessingData() {}
+
+void PipelineProcessingData::setDefaultProperties() {
+    
+    addMatchingPattern(PAYLOAD_MATCHING_PATTERN_TRANSACTION_ID, getTimeStampOfNow("%Y%m%d%H%M%S") +
+        "_" + getFormattedCounter());
+    addMatchingPattern(PAYLOAD_MATCHING_PATTERN_DATE_CREATED, getTimeStampOfNow("%Y%m%d"));
+    addMatchingPattern(PAYLOAD_MATCHING_PATTERN_TIME_CREATED, getTimeStampOfNow("%H%M%S"));
+}
+
+string PipelineProcessingData::getFormattedCounter() {
+    char buffer[1024];
+    int localCounter = counter.fetch_add(1);
+    if(localCounter > PIPELINE_PROCESSING_DATA_COUNTER_MAX) {
+        counter.store(0);
+    }
+    sprintf(buffer, "%09d", localCounter);
+    return string(buffer);
+}
+
+string PipelineProcessingData::getTimeStampOfNow(const string& pattern) {
+  time_t timeBuffer;
+  struct tm *localTime;
+  char buffer[64];
+
+  time(&timeBuffer);
+  localTime = localtime(&timeBuffer);
+  strftime(buffer, sizeof(buffer), pattern.c_str(), localTime);
+  string str(buffer);
+  return str;
+}
 
 void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, string data) {
     auto payload = make_shared<ProcessingPayload>(mimetype, data);

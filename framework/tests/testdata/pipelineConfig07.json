@@ -5,7 +5,7 @@
             "stepName":"store data to target directory",
             "libraryName":"fileconnector",
             "namedArguments" : {
-                "hostName":"127.0.0.1"
+                "targetDirectory":"fileconnectorTest/outDir"
             }
         }
     ]

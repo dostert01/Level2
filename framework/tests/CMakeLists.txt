@@ -56,7 +56,12 @@ add_executable(test_applicationcontext
     test_applicationcontext.cpp
     $<TARGET_OBJECTS:applicationcontext>)
 
-add_executable(test_pipelineprocessor
+add_executable(test_apistructs
+    test_apistructs.cpp
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
+
+    add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
@@ -118,6 +123,9 @@ set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TE
 
 add_test(NAME test_applicationcontext COMMAND test_applicationcontext)
 set_tests_properties(test_applicationcontext PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_apistructs COMMAND test_apistructs)
+set_tests_properties(test_apistructs PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_pipelineprocessor COMMAND test_pipelineprocessor)
 set_tests_properties(test_pipelineprocessor PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

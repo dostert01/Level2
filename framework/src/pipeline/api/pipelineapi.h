@@ -2,6 +2,7 @@
 #define SECOND_TAKE_PIPELINE_API_H
 
 #include "apistructs.h"
+#include "payloadnames.h"
 
 /** declare as extern "C" or not **/
 #ifdef BEGIN_DECL

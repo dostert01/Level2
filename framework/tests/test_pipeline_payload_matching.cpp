@@ -92,3 +92,25 @@ TEST(PipeLinePayloadMating, DoesNotMatchIfBothHaveNoMatchingPatterns) {
     auto m2 = make_shared<Matchable>();
     EXPECT_FALSE(m1.matchesAll(m2));
 }
+
+TEST(PipeLinePayloadMating, MatchesIfAnyOfTheOtherCanBeMatchedToAllOfMine) {
+    Matchable m1;
+    auto m2 = make_shared<Matchable>();
+    m1.addMatchingPattern("key01", "value01");
+    m1.addMatchingPattern("key02", "value02");
+    m2->addMatchingPattern("key01", "value01");
+    m2->addMatchingPattern("key02", "value02");
+    m2->addMatchingPattern("key03", "value03");
+    m2->addMatchingPattern("key04", "value04");
+    EXPECT_TRUE(m1.matchesAllOfMineToAnyOfTheOther(m2));
+}
+
+TEST(PipeLinePayloadMating, MatchesIfTheFirstOneHasNoMatchingPatterns) {
+    Matchable m1;
+    auto m2 = make_shared<Matchable>();
+    m2->addMatchingPattern("key01", "value01");
+    m2->addMatchingPattern("key02", "value02");
+    m2->addMatchingPattern("key03", "value03");
+    m2->addMatchingPattern("key04", "value04");
+    EXPECT_TRUE(m1.matchesAllOfMineToAnyOfTheOther(m2));
+}

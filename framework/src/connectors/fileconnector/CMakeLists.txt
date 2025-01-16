@@ -16,11 +16,16 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 
 # Specify the library
 add_library(fileconnector SHARED
-fileconnector.cpp
+    fileconnector.cpp
+    filewriter.cpp
 )
 
 target_link_libraries(fileconnector
     pipelineapi
+    nlohmann_json::nlohmann_json
+    dl
+    applicationcontext
+    pipeline
 )
 
 # Specify the include directories for the library
@@ -28,5 +33,6 @@ target_include_directories(fileconnector PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PIPELINE_API_INCLUDE_DIR}
     ${LOGGER_INCLUDE_DIR}
+    ${APPLICATION_CONTEXT_INCLUDE_DIR}
 )
 target_compile_definitions(fileconnector PRIVATE BUILDING_DLL)

@@ -8,6 +8,7 @@
 
 #include "pipelineapi.h"
 #include "matchable.h"
+#include "payloadnames.h"
 
 using json = nlohmann::json;
 using namespace std;

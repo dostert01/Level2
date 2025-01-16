@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <atomic>
+#include <limits.h>
 
 #include "../matchable.h"
 #include "../../dbinterface/dbinterface.h"
@@ -68,13 +70,11 @@ class ProcessingPayload {
         shared_ptr<BinaryProcessingData> payloadAsBinaryData();
 };
 
+#define PIPELINE_PROCESSING_DATA_COUNTER_MAX (INT_MAX / 2)
+
 class PipelineProcessingData : public Matchable {
-    private:
-        multimap<string, shared_ptr<ProcessingPayload>> namedPayloadData;
-        string lastProcessedPipelineName;
-        uint processingCounter = 0;
     public:
-        PipelineProcessingData() = default;
+        PipelineProcessingData();
         ~PipelineProcessingData();
         static shared_ptr<PipelineProcessingData> getInstance();
         void addPayloadData(string payloadName, string mimetype, string data);
@@ -88,6 +88,14 @@ class PipelineProcessingData : public Matchable {
         void increaseProcessingCounter();
         void setLastProcessedPipelineName(string pipelineName);
         string getLastProcessedPipelineName();
+    private:
+        static atomic_int counter;
+        multimap<string, shared_ptr<ProcessingPayload>> namedPayloadData;
+        string lastProcessedPipelineName;
+        uint processingCounter = 0;
+        void setDefaultProperties();
+        string getTimeStampOfNow(const string& pattern);
+        string getFormattedCounter();
 };
 
 #endif //#ifndef API_HELPERS_H

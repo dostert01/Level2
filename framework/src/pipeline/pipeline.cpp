@@ -40,7 +40,7 @@ void Pipeline::execute() {
 }
 
 void Pipeline::execute(shared_ptr<PipelineProcessingData> processData) {
-    if((!hasMatchingPatterns() && !processData->hasMatchingPatterns()) || matchesAll(processData)) {
+    if((!hasMatchingPatterns() && !processData->hasMatchingPatterns()) || matchesAllOfMineToAnyOfTheOther(processData)) {
         LOGGER.info("Start processing payload by pipeline '" + getPipelineName() + "'");
         tagProcessingData(processData);
         for(const auto& currentStep : pipelineSteps) {

@@ -26,15 +26,26 @@ void Matchable::removeMatchingPattern(string key) {
     matchingPatterns.erase(key);
 }
 
+int Matchable::getCoutOfMatches(shared_ptr<Matchable> other) {
+    int matchCount = 0;
+    for(const auto& [key, value] : matchingPatterns) {
+        optional<string> foundMatchingPattern = other->getMatchingPattern(key);
+        if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
+            matchCount++;
+        }
+    }
+    return matchCount;
+}
+
+bool Matchable::matchesAllOfMineToAnyOfTheOther(shared_ptr<Matchable> other) {
+    return (getCountOfMatchingPatterns() == 0) ||
+        (getCountOfMatchingPatterns() == getCoutOfMatches(other));
+}
+
 bool Matchable::matchesAll(shared_ptr<Matchable> other) {
     int matchCount = 0;
     if(bothHaveMatchingPatterns(*other) && bothHaveSameNumberOfMatchingPatterns(*other)) {
-        for(const auto& [key, value] : matchingPatterns) {
-            optional<string> foundMatchingPattern = other->getMatchingPattern(key);
-            if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
-                matchCount++;
-            }
-        }
+        matchCount = getCoutOfMatches(other);
     } else {
         LOGGER.info("Patterns do not match because of different counts");
     }

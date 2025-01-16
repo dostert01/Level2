@@ -18,12 +18,14 @@ class Matchable {
         optional<string> getMatchingPattern(string key);
         void removeMatchingPattern(string key);
         bool matchesAll(shared_ptr<Matchable> other);
+        bool matchesAllOfMineToAnyOfTheOther(shared_ptr<Matchable> other);
         bool hasMatchingPatterns();
     private:
         map<string, string> matchingPatterns;
         bool RegexMatch(string s1, string s2);
         bool bothHaveMatchingPatterns(Matchable& other);
         bool bothHaveSameNumberOfMatchingPatterns(Matchable& other);
+        int getCoutOfMatches(shared_ptr<Matchable> other);
 };
 
 }
