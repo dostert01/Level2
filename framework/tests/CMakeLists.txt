@@ -82,6 +82,11 @@ add_executable(test_dbinterface
 target_link_libraries(test_dbinterface
     ${SQLite3_LIBRARIES})
 
+add_executable(test_fileconnector
+    test_fileconnector.cpp
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>)
+
 if(MOSQUITTO_FOUND)
     add_executable(test_mqttconnector
         test_mqttconnector.cpp
@@ -128,6 +133,9 @@ set_tests_properties(test_pipelinefifo PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${
 
 add_test(NAME test_dbinterface COMMAND test_dbinterface)
 set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_fileconnector COMMAND test_fileconnector)
+set_tests_properties(test_fileconnector PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 if(MOSQUITTO_FOUND)
     add_test(NAME test_mqttconnector COMMAND test_mqttconnector)
