@@ -24,12 +24,14 @@ optional<string> PipelineStepInitData::getNamedArgument(const string& argumentNa
 /*
     ProcessingPayload
 */
-ProcessingPayload::ProcessingPayload(string mimetype, string payload) {
+ProcessingPayload::ProcessingPayload(string payloadName, string mimetype, string payload) {
+    setPayloadName(payloadName);
     setMimeType(mimetype);
     setPayload(payload);
 }
 
-ProcessingPayload::ProcessingPayload(string mimetype, shared_ptr<BinaryProcessingData> payload){
+ProcessingPayload::ProcessingPayload(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> payload){
+    setPayloadName(payloadName);
     setMimeType(mimetype);
     setPayload(payload);
 }
@@ -42,6 +44,14 @@ string ProcessingPayload::payloadAsString() {
 
 shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
     return binaryPayloadData;
+}
+
+string ProcessingPayload::getPayloadName() {
+    return payloadName;
+}
+
+void ProcessingPayload::setPayloadName(string payloadName) {
+    this->payloadName = payloadName;
 }
 
 void ProcessingPayload::setMimeType(string mimetype) {
@@ -103,49 +113,57 @@ string PipelineProcessingData::getTimeStampOfNow(const string& pattern) {
 }
 
 void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, string data) {
-    auto payload = make_shared<ProcessingPayload>(mimetype, data);
-    namedPayloadData.insert(make_pair(payloadName, payload));
+    payloadDataCollection.emplace_back(make_shared<ProcessingPayload>(payloadName, mimetype, data));
 }
 
 void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data) {
-    auto payload = make_shared<ProcessingPayload>(mimetype, data);
-    namedPayloadData.insert(make_pair(payloadName, payload));
+    payloadDataCollection.emplace_back(make_shared<ProcessingPayload>(payloadName, mimetype, data));
 }
 
 void PipelineProcessingData::addError(string errorCode, string errorMessage) {
     auto error = make_shared<ProcessingError>(errorCode, errorMessage);
-    addPayloadData(PAYLOAD_NAME_PROCESSING_ERROR, PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM, error);
+    errors.emplace_back(make_shared<ProcessingPayload>(PAYLOAD_NAME_PROCESSING_ERROR, PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM, error));
 }
 
 bool PipelineProcessingData::hasError() {
-    return namedPayloadData.contains(PAYLOAD_NAME_PROCESSING_ERROR);
+    return (!errors.empty());
 }
 
-vector<ProcessingError> PipelineProcessingData::getAllErrors() {
-    vector<ProcessingError> returnVector;
-    if(hasError()) {
-        auto allErrors = namedPayloadData.equal_range(PAYLOAD_NAME_PROCESSING_ERROR);
-        for(auto iterator = allErrors.first; iterator != allErrors.second; ++iterator) {
-            ProcessingError* error = (ProcessingError*)(iterator->second.get()->payloadAsBinaryData().get());
-            returnVector.emplace_back(error);
+vector<shared_ptr<ProcessingError>> PipelineProcessingData::getAllErrors() {
+    vector<shared_ptr<ProcessingError>> returnVector;
+    for(auto payload : errors) {
+        if(payload->getPayloadName().compare(PAYLOAD_NAME_PROCESSING_ERROR) == 0) {
+            shared_ptr<ProcessingError> error = dynamic_pointer_cast<ProcessingError>(payload->payloadAsBinaryData());
+            if(error)
+                returnVector.push_back(error);
         }
     }
     return returnVector;
 }
 
 optional<shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(string payloadName) {
-    auto search = namedPayloadData.find(payloadName);
-    if(search != namedPayloadData.end()) {
-        return search->second;
+    optional<shared_ptr<ProcessingPayload>> returnValue = nullopt;
+    for(auto payload : payloadDataCollection) {
+        if(payload->getPayloadName().compare(payloadName) == 0) {
+            returnValue = payload;
+        }
     }
-    return nullopt;
+    return returnValue;
 }
 
-uint PipelineProcessingData::getCountOfPayloads() {
-    return namedPayloadData.size();
+optional<shared_ptr<ProcessingPayload>> PipelineProcessingData::getLastPayload() {
+    optional<shared_ptr<ProcessingPayload>> returnValue = nullopt;
+    if(!payloadDataCollection.empty()) {
+        returnValue = payloadDataCollection.back();
+    }
+    return returnValue;
 }
 
-uint PipelineProcessingData::getProcessingCounter() {
+int PipelineProcessingData::getCountOfPayloads() {
+    return payloadDataCollection.size();
+}
+
+int PipelineProcessingData::getProcessingCounter() {
     return processingCounter;
 }
 

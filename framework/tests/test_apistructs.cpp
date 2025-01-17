@@ -72,3 +72,8 @@ TEST(ApiStructs, CreationOfTransactionIdsIsThreadSafe) {
     EXPECT_TRUE(regexMatch(data,
         PAYLOAD_MATCHING_PATTERN_TRANSACTION_ID, "^[0-9]{14}_000100001"));
 }
+
+TEST(ProcessingPayload, hasPayloadName) {
+    ProcessingPayload payload("name of payload", "mime/type", "I'm the payload");
+    EXPECT_EQ("name of payload", payload.getPayloadName());
+}

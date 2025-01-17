@@ -228,10 +228,10 @@ TEST(Pipeline, CanGetAllErrors) {
     auto pipeline = Pipeline::getInstance(test_pipeline::testFilesDir + PIPELINE_CONFIG_TEST_FILE_05);
     auto processData = PipelineProcessingData::getInstance();;
     pipeline.value()->execute(processData);
-    vector<ProcessingError> allErrors = processData->getAllErrors();
+    vector<shared_ptr<ProcessingError>> allErrors = processData->getAllErrors();
     EXPECT_EQ(2, allErrors.size());
-    EXPECT_EQ("first error", allErrors.at(0).getErrorCode());
-    EXPECT_EQ("this is a test error", allErrors.at(0).getErrorMessage());
-    EXPECT_EQ("second error", allErrors.at(1).getErrorCode());
-    EXPECT_EQ("this is yet another test error", allErrors.at(1).getErrorMessage());
+    EXPECT_EQ("first error", allErrors.at(0)->getErrorCode());
+    EXPECT_EQ("this is a test error", allErrors.at(0)->getErrorMessage());
+    EXPECT_EQ("second error", allErrors.at(1)->getErrorCode());
+    EXPECT_EQ("this is yet another test error", allErrors.at(1)->getErrorMessage());
 }

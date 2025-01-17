@@ -55,14 +55,17 @@ class ProcessingError : public BinaryProcessingData {
 
 class ProcessingPayload {
     private:
+        string payloadName;
         string mimetype;
         string stringPayloadData;
         shared_ptr<BinaryProcessingData> binaryPayloadData;
     public:
         ProcessingPayload() = default;
-        ProcessingPayload(string mimetype, string payload);
-        ProcessingPayload(string mimetype, shared_ptr<BinaryProcessingData> payload);
+        ProcessingPayload(string payloadName, string mimetype, string payload);
+        ProcessingPayload(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> payload);
         ~ProcessingPayload();
+        void setPayloadName(string payloadName);
+        string getPayloadName();
         void setMimeType(string mimetype);
         void setPayload(string payload);
         void setPayload(shared_ptr<BinaryProcessingData> payload);
@@ -81,18 +84,20 @@ class PipelineProcessingData : public Matchable {
         void addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data);
         void addError(string errorCode, string errorMessage);
         bool hasError();
-        vector<ProcessingError> getAllErrors();
+        vector<shared_ptr<ProcessingError>> getAllErrors();
         optional<shared_ptr<ProcessingPayload>> getPayload(string payloadName);
-        uint getCountOfPayloads();
-        uint getProcessingCounter();
+        optional<shared_ptr<ProcessingPayload>> getLastPayload();
+        int getCountOfPayloads();
+        int getProcessingCounter();
         void increaseProcessingCounter();
         void setLastProcessedPipelineName(string pipelineName);
         string getLastProcessedPipelineName();
     private:
         static atomic_int counter;
-        multimap<string, shared_ptr<ProcessingPayload>> namedPayloadData;
+        vector<shared_ptr<ProcessingPayload>> payloadDataCollection;
+        vector<shared_ptr<ProcessingPayload>> errors;
         string lastProcessedPipelineName;
-        uint processingCounter = 0;
+        int processingCounter = 0;
         void setDefaultProperties();
         string getTimeStampOfNow(const string& pattern);
         string getFormattedCounter();
