@@ -86,6 +86,7 @@ void FileListener::monitoringLoop() {
         char buffer[1024];
         int bytesRead = read(inotifyFd, buffer, sizeof(buffer));
         if(bytesRead > 0) {
+            sleepTime = 1;
             inotify_event *event;
             for(char *p = buffer; p < buffer + bytesRead;) {
                 event = (inotify_event*)p;
@@ -99,6 +100,8 @@ void FileListener::monitoringLoop() {
             usleep(HALF_A_SECOND);
         }
         usleep(sleepTime);
+        if(sleepTime < HALF_A_SECOND)
+          sleepTime *= 2;
     }
     LOGGER.debug("about to exit monitoring loop");
 }
