@@ -65,7 +65,7 @@ TEST(MQTTListener, ListenerCanBeCreatedThroughAppContext) {
     EXPECT_EQ("test/topic04", listeners[1]->getTopic(1).value());
 }
 
-TEST(MQTTListener, CanREturnTopicNamesAsVectorOfStrings) {
+TEST(MQTTListener, CanReturnTopicNamesAsVectorOfStrings) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_mqttlistener::testFilesDir + APP_CONFIG_TEST_FILE_01);
     auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MQTTListener>("Listeners/MQTTListeners");

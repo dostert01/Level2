@@ -24,7 +24,7 @@ optional<string> PipelineStepInitData::getNamedArgument(const string& argumentNa
 /*
     ProcessingPayload
 */
-ProcessingPayload::ProcessingPayload(string payloadName, string mimetype, string payload) {
+ProcessingPayload::ProcessingPayload(string payloadName, string mimetype, const string& payload) {
     setPayloadName(payloadName);
     setMimeType(mimetype);
     setPayload(payload);
@@ -58,7 +58,7 @@ void ProcessingPayload::setMimeType(string mimetype) {
     this->mimetype = mimetype;
 }
 
-void ProcessingPayload::setPayload(string payload) {
+void ProcessingPayload::setPayload(const string& payload) {
     this->stringPayloadData = payload;
 }
 
@@ -112,7 +112,7 @@ string PipelineProcessingData::getTimeStampOfNow(const string& pattern) {
   return str;
 }
 
-void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, string data) {
+void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, const string& data) {
     payloadDataCollection.emplace_back(make_shared<ProcessingPayload>(payloadName, mimetype, data));
 }
 

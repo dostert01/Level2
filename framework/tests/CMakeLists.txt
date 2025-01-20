@@ -23,6 +23,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/_deps/json-src/include/
     ${MQTT_CONNECTOR_DIR}
     ${MQTT_LISTENER_DIR}
+    ${FILE_LISTENER_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${LISTENERS_DIR}
     ${NETWORK_COMMON_INCLUDE_DIR}
@@ -92,6 +93,13 @@ add_executable(test_fileconnector
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
 
+add_executable(test_filelistener
+    test_filelistener.cpp
+    $<TARGET_OBJECTS:filelistener>
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>
+    $<TARGET_OBJECTS:applicationcontext>)
+
 if(MOSQUITTO_FOUND)
     add_executable(test_mqttconnector
         test_mqttconnector.cpp
@@ -144,6 +152,9 @@ set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${T
 
 add_test(NAME test_fileconnector COMMAND test_fileconnector)
 set_tests_properties(test_fileconnector PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_filelistener COMMAND test_filelistener)
+set_tests_properties(test_filelistener PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 if(MOSQUITTO_FOUND)
     add_test(NAME test_mqttconnector COMMAND test_mqttconnector)

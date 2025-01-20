@@ -15,24 +15,24 @@ cmake_print_variables(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 
 # Specify the library
-add_library(mqttlistener SHARED
-    mqttlistener.cpp
+add_library(filelistener SHARED
+    filelistener.cpp
     ../networklistener.cpp
 )
 
-target_link_libraries(mqttlistener
+target_link_libraries(filelistener
+    pipeline
     pipelineapi 
-    mosquittowrapper
     applicationcontext
-    ${MOSQUITTO_LIBRARY}
     nlohmann_json::nlohmann_json dl
 )
 
 # Specify the include directories for the library
-target_include_directories(mqttlistener PUBLIC
+target_include_directories(filelistener PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PIPELINE_API_INCLUDE_DIR}
     ${LOGGER_INCLUDE_DIR}
     ${LISTENERS_DIR}
 )
-target_compile_definitions(mqttlistener PRIVATE BUILDING_DLL)
+
+target_compile_definitions(filelistener PRIVATE BUILDING_DLL)

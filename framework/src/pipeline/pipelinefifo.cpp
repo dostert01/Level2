@@ -18,12 +18,12 @@ void PipelineFiFo::enqueue(shared_ptr<PipelineProcessingData> data, map<string, 
   processingDataFiFo.push(data);
 }
 
-void PipelineFiFo::enqueue(string payloadName, string mimetype, string payload) {
+void PipelineFiFo::enqueue(string payloadName, string mimetype, const string& payload) {
     map<string, string> emptyMatchingPatterns;
     enqueue(payloadName, mimetype, payload, emptyMatchingPatterns);
 }
 
-void PipelineFiFo::enqueue(string payloadName, string mimetype, string payload, map<string, string> &matchingPatterns) {
+void PipelineFiFo::enqueue(string payloadName, string mimetype, const string& payload, map<string, string> &matchingPatterns) {
     shared_ptr<PipelineProcessingData> data = make_shared<PipelineProcessingData>();
     data->addPayloadData(payloadName, mimetype, payload);
     enqueue(data, matchingPatterns);
@@ -47,4 +47,9 @@ optional<shared_ptr<PipelineProcessingData>> PipelineFiFo::dequeue() {
   } else {
     return nullopt;
   }
+}
+
+int PipelineFiFo::getCountOfElementsInFifo() {
+  unique_lock<shared_mutex> lock(mutex);
+  return processingDataFiFo.size();
 }

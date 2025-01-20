@@ -61,13 +61,13 @@ class ProcessingPayload {
         shared_ptr<BinaryProcessingData> binaryPayloadData;
     public:
         ProcessingPayload() = default;
-        ProcessingPayload(string payloadName, string mimetype, string payload);
+        ProcessingPayload(string payloadName, string mimetype, const string& payload);
         ProcessingPayload(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> payload);
         ~ProcessingPayload();
         void setPayloadName(string payloadName);
         string getPayloadName();
         void setMimeType(string mimetype);
-        void setPayload(string payload);
+        void setPayload(const string& payload);
         void setPayload(shared_ptr<BinaryProcessingData> payload);
         string payloadAsString();
         shared_ptr<BinaryProcessingData> payloadAsBinaryData();
@@ -80,7 +80,7 @@ class PipelineProcessingData : public Matchable {
         PipelineProcessingData();
         ~PipelineProcessingData();
         static shared_ptr<PipelineProcessingData> getInstance();
-        void addPayloadData(string payloadName, string mimetype, string data);
+        void addPayloadData(string payloadName, string mimetype, const string& data);
         void addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data);
         void addError(string errorCode, string errorMessage);
         bool hasError();

@@ -1,0 +1,12 @@
+{
+    "Listeners": {
+        "FileListeners": [
+            {
+                "directory2Monitor": "/filelistenerTest.tmp/this/directory/must/not/be/creatable"
+            },
+            {
+                "directory2Monitor": "/filelistenerTest.tmp/this/directory/must/not/be/creatable"
+            }
+        ]
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "Listeners": {
+        "FileListeners": [
+            {
+                "directory2Monitor": "filelistenerTest.tmp/newFiles01"
+            },
+            {
+                "directory2Monitor": "filelistenerTest.tmp/newFiles02"
+            }
+        ]
+    }
+}

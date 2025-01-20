@@ -86,7 +86,7 @@ vector<string> ApplicationContext::splitString(string toSplit, string separator)
       } else {
         LOGGER.error(
             "json string '" + currentJson.dump() +
-            "' does not contain the required object or array names: '" +
+            "' does not contain the required object or array named: '" +
             pathElement + "'");
         return nullopt;
       }
