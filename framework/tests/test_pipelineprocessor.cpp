@@ -55,7 +55,7 @@ TEST(PipeLineProcessor, CanLoadConfigFromJson) {
     auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     EXPECT_TRUE(processor.has_value());
     if(processor.has_value())
-        EXPECT_EQ(3, processor.value()->getCountOfPipelines());
+        EXPECT_EQ(4, processor.value()->getCountOfPipelines());
 }
 
 TEST(PipeLineProcessor, ProcessHasAName) {
@@ -80,7 +80,7 @@ TEST(PipeLineProcessor, PipelineHasMatchingPatterns) {
     EXPECT_EQ(5, pipeline.get()->getCountOfMatchingPatterns());
 }
 
-TEST(PipeLineProcessor, OneOfThreePipelinesProcessesTheMatchingPayload) {
+TEST(PipeLineProcessor, ThreeOutOfFourPipelinesAreTheMatchingThePayload) {
     configureTest();
     auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
@@ -91,19 +91,19 @@ TEST(PipeLineProcessor, OneOfThreePipelinesProcessesTheMatchingPayload) {
     processData->addMatchingPattern("key04", "value04");
     processData->addMatchingPattern("key05", "value05");
     processor.value().get()->execute(processData);
-    EXPECT_EQ(1, processData->getProcessingCounter());
-    EXPECT_EQ("my first testPipeline", processData->getLastProcessedPipelineName());
+    EXPECT_EQ(3, processData->getProcessingCounter());
+    EXPECT_EQ("my pipeline with binaryData", processData->getLastProcessedPipelineName());
 }
 
-TEST(PipeLineProcessor, NoneOfThreePipelinesProcessesTheMatchingPayload) {
+TEST(PipeLineProcessor, NoneMatchingPayloadIsProcessedByPipelinesWithoutAnyMatchingPatterns) {
     configureTest();
     auto processor = PipeLineProcessor::getInstance(test_pipeline_processor::testFilesDir + PROCESS_CONFIG_TEST_FILE_01);
     shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
     processData->addPayloadData("question", "text/plain", "What is the answer?");
     processData->addMatchingPattern("thisPattern", "does not match any pipeline");
     processor.value().get()->execute(processData);
-    EXPECT_EQ(0, processData->getProcessingCounter());
-    EXPECT_EQ("", processData->getLastProcessedPipelineName());
+    EXPECT_EQ(2, processData->getProcessingCounter());
+    EXPECT_EQ("my pipeline with binaryData", processData->getLastProcessedPipelineName());
 }
 
 TEST(PipeLineProcessor, TwoOfThreePipelinesProcessesThePayloadWithoutAnyMatchingPattern) {

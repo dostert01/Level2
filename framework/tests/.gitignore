@@ -2,3 +2,5 @@ test_mqttlistener
 test_pipelinefifo
 test_fileconnector
 test_apistructs
+test_common
+test_filelistener

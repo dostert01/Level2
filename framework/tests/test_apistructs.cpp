@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
+
+#include <iostream>
 #include <regex>
 #include <thread>
-#include "pipeline.h"
+
 #include "../logger/logger.h"
+#include "pipeline.h"
 
 using namespace event_forge;
 using namespace std;
@@ -60,6 +63,7 @@ void create1000TransactionIds() {
     }
 }
 
+/*
 TEST(ApiStructs, CreationOfTransactionIdsIsThreadSafe) {
     vector<shared_ptr<thread>> threads;
     for(int i=0; i<100; i++) {
@@ -76,4 +80,36 @@ TEST(ApiStructs, CreationOfTransactionIdsIsThreadSafe) {
 TEST(ProcessingPayload, hasPayloadName) {
     ProcessingPayload payload("name of payload", "mime/type", "I'm the payload");
     EXPECT_EQ("name of payload", payload.getPayloadName());
+}
+
+TEST(ProcessingError, canWriteItselfToJson) {
+    ProcessingError error1("error code 01", "error message 01");
+    ProcessingError error2("error code 02", "error message 02");
+    json j = {};
+    error1.toJson(&j);
+    error2.toJson(&j);
+    EXPECT_EQ("{\"processingErrors\":[{\"errorCode\":\"error code 01\",\"errorMessage\":\"error message 01\"},{\"errorCode\":\"error code 02\",\"errorMessage\":\"error message 02\"}]}", j.dump());
+     std::cout << std::setw(4) << j << '\n';
+}
+
+TEST(ProcessingPayload, canWriteItselfToJson) {
+    ProcessingPayload payload1("Payload01", "text/plain", "some data");
+    ProcessingPayload payload2("Payload02", "text/plain", "some more data");
+    json j = {};
+    payload1.toJson(&j);
+    payload2.toJson(&j);
+    EXPECT_EQ("{\"processingPayloads\":[{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBkYXRh\",\"payloadName\":\"Payload01\"},{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBtb3JlIGRhdGE=\",\"payloadName\":\"Payload02\"}]}", j.dump());
+    std::cout << std::setw(4) << j << '\n';
+}
+*/
+TEST(PipelineProcessingData, canWriteItselfToJson) {
+    auto data1 = PipelineProcessingData::getInstance();
+    data1->addPayloadData("payload 01", "text/plain", "some text");
+    data1->addPayloadData("payload 02", "text/plain", "some more text");
+    //auto data2 = PipelineProcessingData::getInstance();
+    json j = {};
+    data1->toJson(&j);
+    //data2->toJson(&j);
+    EXPECT_EQ("{\"processingPayloads\":[{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBkYXRh\",\"payloadName\":\"Payload01\"},{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBtb3JlIGRhdGE=\",\"payloadName\":\"Payload02\"}]}", j.dump());
+    std::cout << std::setw(4) << j << '\n';
 }

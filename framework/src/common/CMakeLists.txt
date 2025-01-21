@@ -19,8 +19,13 @@ add_library(mosquittowrapper SHARED
     mosquittowrapper.cpp
     $<TARGET_OBJECTS:pipelinefifo>
 )
+
 target_link_libraries(mosquittowrapper
     ${MOSQUITTO_LIBRARY}
+)
+
+add_library(common SHARED
+    base64.cpp
 )
 
 # Specify the include directories for the library
@@ -31,3 +36,4 @@ target_include_directories(mosquittowrapper PUBLIC
     ${PIPELINE_INCLUDE_DIR}
 )
 target_compile_definitions(mosquittowrapper PRIVATE BUILDING_DLL)
+target_compile_definitions(common PRIVATE BUILDING_DLL)

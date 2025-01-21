@@ -11,5 +11,17 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(./samplelibs)
 
-add_library(pipelineapi SHARED apistructs.cpp)
+add_library(pipelineapi SHARED
+    apistructs.cpp
+    $<TARGET_OBJECTS:common>
+)
+
+target_include_directories(pipelineapi PUBLIC
+    ${COMMON_INCLUDE_DIR}
+)
+
+target_link_libraries(pipelineapi PRIVATE 
+    nlohmann_json::nlohmann_json
+    dl
+)
 

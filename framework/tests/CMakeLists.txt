@@ -7,7 +7,7 @@ cmake_print_variables(SQLite3_LIBRARIES)
 cmake_print_variables(SQLite3_VERSION)
 
 cmake_print_variables(MOSQUITTO_LIBRARY)
-cmake_print_variables(NETWORK_COMMON_INCLUDE_DIR)
+cmake_print_variables(COMMON_INCLUDE_DIR)
 
 # Include the necessary directories
 include_directories(
@@ -26,7 +26,7 @@ include_directories(
     ${FILE_LISTENER_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${LISTENERS_DIR}
-    ${NETWORK_COMMON_INCLUDE_DIR}
+    ${COMMON_INCLUDE_DIR}
 )
 
 link_directories(
@@ -52,6 +52,10 @@ add_executable(test_eventForge
     test_loggingdestinations.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+
+add_executable(test_common
+    test_common.cpp
+    $<TARGET_OBJECTS:common>)
 
 add_executable(test_applicationcontext
     test_applicationcontext.cpp
@@ -131,6 +135,9 @@ set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TE
 
 add_test(NAME test_applicationcontext COMMAND test_applicationcontext)
 set_tests_properties(test_applicationcontext PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_common COMMAND test_common)
+set_tests_properties(test_common PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_apistructs COMMAND test_apistructs)
 set_tests_properties(test_apistructs PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

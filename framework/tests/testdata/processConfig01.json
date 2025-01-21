@@ -16,7 +16,17 @@
         },
         {
             "pipelineConfigFile":"pipelineConfig04.json"
+        },
+        {
+            "pipelineConfigFile":"pipelineConfig04.json",
+            "matchingPatterns" : [
+                {"key01": "value07"},
+                {"key02": "value08"},
+                {"key03": "value09"},
+                {"key04": "value10", "key05": "value11"}
+            ]
         }
+
 
     ]
 }

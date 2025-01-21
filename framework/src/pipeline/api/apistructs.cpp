@@ -2,6 +2,12 @@
 #include <atomic>
 #include "apistructs.h"
 #include "payloadnames.h"
+#include "common.h"
+
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+#define JSON (*(json*)(jsonData))
 
 using namespace std;
 
@@ -42,6 +48,10 @@ string ProcessingPayload::payloadAsString() {
     return stringPayloadData;
 }
 
+string ProcessingPayload::payloadAsBase64String() {
+    return event_forge::Base64Encoder::encodeNoNewLines(payloadAsString());
+}
+
 shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
     return binaryPayloadData;
 }
@@ -64,6 +74,22 @@ void ProcessingPayload::setPayload(const string& payload) {
 
 void ProcessingPayload::setPayload(shared_ptr<BinaryProcessingData> payload) {
     this->binaryPayloadData = payload;
+}
+
+void ProcessingPayload::toJson(void* jsonData) {
+    std::cout << "ProcessingPayload::toJson" << std::endl;
+    auto j = JSON.find("processingPayloads");
+    std::cout << "ProcessingPayload::toJson 01" << std::endl;
+    if(j == JSON.end()) {
+        std::cout << "ProcessingPayload::toJson 02" << std::endl;
+        JSON.emplace_back(json::object_t::value_type("processingPayloads", {{"hallo", 1}}));
+        std::cout << "ProcessingPayload::toJson 02a" << std::endl;
+        j = JSON.find("processingPayloads");
+    }
+    std::cout << "ProcessingPayload::toJson 03" << std::endl;
+    j.value().push_back(
+        {{"payloadName", payloadName}, {"mimetype", mimetype}, {"payload", payloadAsBase64String()}});
+    std::cout << "ProcessingPayload::toJson 04" << std::endl;
 }
 
 /*
@@ -179,6 +205,27 @@ string PipelineProcessingData::getLastProcessedPipelineName() {
     return lastProcessedPipelineName;
 }
 
+void PipelineProcessingData::toJson(void* jsonData) {
+    std::cout << "PipelineProcessingData::toJson" << std::endl;
+    auto j = JSON.find("PipelineProcessingDatas");
+    if(j == JSON.end()) {
+        JSON.push_back(json::object_t::value_type("PipelineProcessingDatas", {}));
+        j = JSON.find("PipelineProcessingDatas");
+    }
+    j.value().push_back(
+        {
+            {"lastProcessedPipelineName", lastProcessedPipelineName},
+            {"processingCounter", processingCounter},
+            {"bla", "fasel"}
+        });
+    //JSON.push_back(json::object_t::value_type("ProcessingPayloads", {}));
+    //    j = JSON.find("ProcessingPayloads");
+    for(auto currentProcessingPayload : payloadDataCollection) {
+        currentProcessingPayload->toJson(&j);
+    }
+
+}
+
 /*
     ProcessingError
 */
@@ -198,4 +245,15 @@ string ProcessingError::getErrorCode() {
 
 string ProcessingError::getErrorMessage() {
     return errorMessage;
+}
+
+void ProcessingError::toJson(void* jsonData) {
+    std::cout << "ProcessingError::toJson" << std::endl;
+    auto j = JSON.find("processingErrors");
+    if(j == JSON.end()) {
+        JSON.push_back(json::object_t::value_type("processingErrors", {}));
+        j = JSON.find("processingErrors");
+    }
+    j.value().push_back(
+        {{"errorMessage", errorMessage}, {"errorCode", errorCode}});
 }

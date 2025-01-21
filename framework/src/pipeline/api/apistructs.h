@@ -9,6 +9,7 @@
 #include <limits.h>
 
 #include "../matchable.h"
+#include "common.h"
 #include "../../dbinterface/dbinterface.h"
 
 using namespace std;
@@ -20,40 +21,25 @@ struct PipelineStepInitData
     optional<string> getNamedArgument(const string& argumentName);
 };
 
-class SerializableDB {
-    public:
-        SerializableDB() = default;
-        virtual ~SerializableDB() = default;
-        virtual bool writeToDataBase(shared_ptr<Database> db) = 0;
-        virtual bool initFromDataBase(shared_ptr<Database> db) = 0;
-};
-
-class SerializableJson {
-    public:
-        SerializableJson() = default;
-        virtual ~SerializableJson() = default;
-        virtual string toJson() = 0;
-        virtual void initFromJson(string jsonString) = 0;
-};
-
 class BinaryProcessingData {
     public:
         BinaryProcessingData() = default;
         virtual ~BinaryProcessingData();
 };
 
-class ProcessingError : public BinaryProcessingData {
+class ProcessingError : public BinaryProcessingData, public SerializableJson {
     public:
         ProcessingError(string errorCode, string errorMessage);
         ProcessingError(ProcessingError* other);
         string getErrorCode();
         string getErrorMessage();
+        void toJson(void* jsonData) override;
     private:
         string errorCode;
         string errorMessage;
 };
 
-class ProcessingPayload {
+class ProcessingPayload : public SerializableJson {
     private:
         string payloadName;
         string mimetype;
@@ -70,12 +56,14 @@ class ProcessingPayload {
         void setPayload(const string& payload);
         void setPayload(shared_ptr<BinaryProcessingData> payload);
         string payloadAsString();
+        string payloadAsBase64String();
         shared_ptr<BinaryProcessingData> payloadAsBinaryData();
+        void toJson(void* jsonData) override;
 };
 
 #define PIPELINE_PROCESSING_DATA_COUNTER_MAX (INT_MAX / 2)
 
-class PipelineProcessingData : public Matchable {
+class PipelineProcessingData : public Matchable, public SerializableJson {
     public:
         PipelineProcessingData();
         ~PipelineProcessingData();
@@ -92,6 +80,7 @@ class PipelineProcessingData : public Matchable {
         void increaseProcessingCounter();
         void setLastProcessedPipelineName(string pipelineName);
         string getLastProcessedPipelineName();
+        void toJson(void* jsonData) override;
     private:
         static atomic_int counter;
         vector<shared_ptr<ProcessingPayload>> payloadDataCollection;
