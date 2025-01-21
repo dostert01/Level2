@@ -20,8 +20,8 @@
 #endif
 
 BEGIN_DECL
-int pipeline_step_module_init(PipelineStepInitData& initData);
-int pipeline_step_module_process(PipelineProcessingData& processData);
+int pipeline_step_module_init(event_forge::PipelineStepInitData& initData);
+int pipeline_step_module_process(event_forge::PipelineProcessingData& processData);
 int pipeline_step_module_finish();
 END_DECL
 

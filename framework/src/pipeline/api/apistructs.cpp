@@ -11,6 +11,7 @@ using json = nlohmann::json;
 
 using namespace std;
 
+namespace event_forge {
 /*
     BinaryProcessingData
 */
@@ -68,6 +69,10 @@ void ProcessingPayload::setMimeType(string mimetype) {
     this->mimetype = mimetype;
 }
 
+string ProcessingPayload::getMimeType() {
+    return mimetype;
+}
+
 void ProcessingPayload::setPayload(const string& payload) {
     this->stringPayloadData = payload;
 }
@@ -76,20 +81,26 @@ void ProcessingPayload::setPayload(shared_ptr<BinaryProcessingData> payload) {
     this->binaryPayloadData = payload;
 }
 
-void ProcessingPayload::toJson(void* jsonData) {
-    std::cout << "ProcessingPayload::toJson" << std::endl;
-    auto j = JSON.find("processingPayloads");
-    std::cout << "ProcessingPayload::toJson 01" << std::endl;
-    if(j == JSON.end()) {
-        std::cout << "ProcessingPayload::toJson 02" << std::endl;
-        JSON.emplace_back(json::object_t::value_type("processingPayloads", {{"hallo", 1}}));
-        std::cout << "ProcessingPayload::toJson 02a" << std::endl;
-        j = JSON.find("processingPayloads");
+void to_json(nlohmann::json& j, const ProcessingPayload* p) {
+
+    j = nlohmann::json{{"payloadName", p->payloadName}, {"mimetype", p->mimetype}, {"payload", p->stringPayloadData}};
+
+    json parametersObject = json::object();
+    for(const auto& [key, value] : ((PipelineProcessingData*)p)->getMatchingPatterns()) {
+        parametersObject[key] = value;
     }
-    std::cout << "ProcessingPayload::toJson 03" << std::endl;
-    j.value().push_back(
-        {{"payloadName", payloadName}, {"mimetype", mimetype}, {"payload", payloadAsBase64String()}});
-    std::cout << "ProcessingPayload::toJson 04" << std::endl;
+    j["parameters"] = parametersObject;
+}
+
+void from_json(const nlohmann::json& j, ProcessingPayload& p) {
+    j.at("payloadName").get_to(p.payloadName);
+    j.at("mimetype").get_to(p.mimetype);
+    j.at("payload").get_to(p.stringPayloadData);
+}
+
+void ProcessingPayload::toJson(void* jsonData) {
+    json j = this;
+    JSON.push_back(j);
 }
 
 /*
@@ -140,10 +151,12 @@ string PipelineProcessingData::getTimeStampOfNow(const string& pattern) {
 
 void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, const string& data) {
     payloadDataCollection.emplace_back(make_shared<ProcessingPayload>(payloadName, mimetype, data));
+    payloadDataCollection.back()->setMatchingPatterns(*this);
 }
 
 void PipelineProcessingData::addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data) {
     payloadDataCollection.emplace_back(make_shared<ProcessingPayload>(payloadName, mimetype, data));
+    payloadDataCollection.back()->setMatchingPatterns(*this);
 }
 
 void PipelineProcessingData::addError(string errorCode, string errorMessage) {
@@ -165,6 +178,10 @@ vector<shared_ptr<ProcessingError>> PipelineProcessingData::getAllErrors() {
         }
     }
     return returnVector;
+}
+
+vector<shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayloads() {
+    return payloadDataCollection;
 }
 
 optional<shared_ptr<ProcessingPayload>> PipelineProcessingData::getPayload(string payloadName) {
@@ -205,6 +222,41 @@ string PipelineProcessingData::getLastProcessedPipelineName() {
     return lastProcessedPipelineName;
 }
 
+void to_json(nlohmann::json& j, const PipelineProcessingData* p) {
+
+    j = nlohmann::json{{"lastProcessedPipelineName", p->lastProcessedPipelineName}, {"processingCounter", p->processingCounter}};
+
+    json processingPayloadArray = json::array();
+    for(auto payload : ((PipelineProcessingData*)p)->getPayloads()) {
+        payload->toJson(&processingPayloadArray);
+    }
+    j["processingPayloads"] = processingPayloadArray;
+
+    json parametersObject = json::object();
+    for(const auto& [key, value] : ((PipelineProcessingData*)p)->getMatchingPatterns()) {
+        parametersObject[key] = value;
+    }
+    j["parameters"] = parametersObject;
+
+    json processingErrorsArray = json::array();
+    for(auto error : ((PipelineProcessingData*)p)->getAllErrors()) {
+        error->toJson(&processingErrorsArray);
+    }
+    j["processingErrors"] = processingErrorsArray;
+
+}
+
+void from_json(const nlohmann::json& j, PipelineProcessingData& p) {
+    j.at("lastProcessedPipelineName").get_to(p.lastProcessedPipelineName);
+    j.at("processingCounter").get_to(p.processingCounter);
+}
+
+void PipelineProcessingData::toJson(void* jsonData) {
+    json j = this;
+    JSON.push_back(j);
+}
+
+/*
 void PipelineProcessingData::toJson(void* jsonData) {
     std::cout << "PipelineProcessingData::toJson" << std::endl;
     auto j = JSON.find("PipelineProcessingDatas");
@@ -225,7 +277,7 @@ void PipelineProcessingData::toJson(void* jsonData) {
     }
 
 }
-
+*/
 /*
     ProcessingError
 */
@@ -247,13 +299,22 @@ string ProcessingError::getErrorMessage() {
     return errorMessage;
 }
 
-void ProcessingError::toJson(void* jsonData) {
-    std::cout << "ProcessingError::toJson" << std::endl;
-    auto j = JSON.find("processingErrors");
-    if(j == JSON.end()) {
-        JSON.push_back(json::object_t::value_type("processingErrors", {}));
-        j = JSON.find("processingErrors");
-    }
-    j.value().push_back(
-        {{"errorMessage", errorMessage}, {"errorCode", errorCode}});
+void to_json(nlohmann::json& j, const ProcessingError* p) {
+    j = nlohmann::json{{"errorMessage", p->errorMessage}, {"errorCode", p->errorCode}};
 }
+
+void from_json(const nlohmann::json& j, ProcessingError& p) {
+    j.at("errorMessage").get_to(p.errorMessage);
+    j.at("errorCode").get_to(p.errorCode);
+}
+
+void ProcessingError::toJson(void* jsonData) {
+    json j = this;
+    JSON.push_back(j);
+}
+
+
+
+
+
+} //namespace event_forge

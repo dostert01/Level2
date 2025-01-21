@@ -14,7 +14,7 @@
 #define PATH_SEPARATOR "/"
 
 using namespace std;
-using namespace event_forge;
+namespace event_forge {
 
 FileListener::FileListener(json jsonObject) {
   directory2Monitor = jsonObject["directory2Monitor"];
@@ -168,3 +168,4 @@ void FileListener::stopINotify() {
         close(inotifyFd);
     }
 }
+} // namespace event_forge

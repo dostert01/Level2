@@ -3,13 +3,14 @@
 #include <iostream>
 #include <regex>
 #include <thread>
+#include <nlohmann/json.hpp>
 
 #include "../logger/logger.h"
 #include "pipeline.h"
 
 using namespace event_forge;
 using namespace std;
-
+using json = nlohmann::json;
 
 namespace test_apistructs {
     string workingDir;
@@ -63,7 +64,7 @@ void create1000TransactionIds() {
     }
 }
 
-/*
+
 TEST(ApiStructs, CreationOfTransactionIdsIsThreadSafe) {
     vector<shared_ptr<thread>> threads;
     for(int i=0; i<100; i++) {
@@ -88,9 +89,18 @@ TEST(ProcessingError, canWriteItselfToJson) {
     json j = {};
     error1.toJson(&j);
     error2.toJson(&j);
-    EXPECT_EQ("{\"processingErrors\":[{\"errorCode\":\"error code 01\",\"errorMessage\":\"error message 01\"},{\"errorCode\":\"error code 02\",\"errorMessage\":\"error message 02\"}]}", j.dump());
+    EXPECT_EQ("[{\"errorCode\":\"error code 01\",\"errorMessage\":\"error message 01\"},{\"errorCode\":\"error code 02\",\"errorMessage\":\"error message 02\"}]", j.dump());
      std::cout << std::setw(4) << j << '\n';
 }
+
+TEST(ProcessingError, canWriteItselfToJson02) {
+    ProcessingError data1 = ProcessingError("code", "message");
+    json j;
+    data1.toJson(&j);    
+    EXPECT_EQ("[{\"errorCode\":\"code\",\"errorMessage\":\"message\"}]", j.dump());
+    std::cout << std::setw(4) << j << '\n';
+}
+
 
 TEST(ProcessingPayload, canWriteItselfToJson) {
     ProcessingPayload payload1("Payload01", "text/plain", "some data");
@@ -98,18 +108,23 @@ TEST(ProcessingPayload, canWriteItselfToJson) {
     json j = {};
     payload1.toJson(&j);
     payload2.toJson(&j);
-    EXPECT_EQ("{\"processingPayloads\":[{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBkYXRh\",\"payloadName\":\"Payload01\"},{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBtb3JlIGRhdGE=\",\"payloadName\":\"Payload02\"}]}", j.dump());
+    EXPECT_EQ("[{\"mimetype\":\"text/plain\",\"payload\":\"some data\",\"payloadName\":\"Payload01\"},{\"mimetype\":\"text/plain\",\"payload\":\"some more data\",\"payloadName\":\"Payload02\"}]", j.dump());
     std::cout << std::setw(4) << j << '\n';
 }
-*/
+
+
 TEST(PipelineProcessingData, canWriteItselfToJson) {
     auto data1 = PipelineProcessingData::getInstance();
     data1->addPayloadData("payload 01", "text/plain", "some text");
     data1->addPayloadData("payload 02", "text/plain", "some more text");
-    //auto data2 = PipelineProcessingData::getInstance();
+    data1->addError("errorcode 0815", "just an ordinary error");
+    data1->addError("42", "unfortunately, we have forgotten the question");
+    data1->addError("0", "no error here ;-P");
     json j = {};
     data1->toJson(&j);
-    //data2->toJson(&j);
-    EXPECT_EQ("{\"processingPayloads\":[{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBkYXRh\",\"payloadName\":\"Payload01\"},{\"mimetype\":\"text/plain\",\"payload\":\"c29tZSBtb3JlIGRhdGE=\",\"payloadName\":\"Payload02\"}]}", j.dump());
+    EXPECT_EQ("[{\"lastProcessedPipelineName\":\"\",\"processingCounter\":0}]", j.dump());
     std::cout << std::setw(4) << j << '\n';
 }
+
+
+

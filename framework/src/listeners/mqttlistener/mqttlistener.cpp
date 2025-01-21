@@ -2,7 +2,7 @@
 #include "applicationcontext.h"
 
 using namespace std;
-using namespace event_forge;
+namespace event_forge {
 
 MQTTListener::MQTTListener(json jsonObject) {
   hostName = jsonObject["hostName"];
@@ -63,3 +63,4 @@ MQTTTopic::MQTTTopic(json jsonObject) {
 string MQTTTopic::getName() {
   return name;
 }
+} // namespace event_forge

@@ -11,6 +11,8 @@
 using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
 
+namespace event_forge {
+
 class MQTTTopic {
   public:
     MQTTTopic(json jsonObject);
@@ -39,4 +41,5 @@ class MQTTListener : public NetworkListener {
         std::shared_ptr<MosquittoWrapper> mqtt;
 };
 
+} // namespace event_forge
 #endif //#define MQTT_LISTENER_H

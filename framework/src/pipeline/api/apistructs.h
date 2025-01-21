@@ -13,7 +13,8 @@
 #include "../../dbinterface/dbinterface.h"
 
 using namespace std;
-using namespace event_forge;
+
+namespace event_forge {
 
 struct PipelineStepInitData
 {
@@ -34,18 +35,18 @@ class ProcessingError : public BinaryProcessingData, public SerializableJson {
         string getErrorCode();
         string getErrorMessage();
         void toJson(void* jsonData) override;
-    private:
+    //private:
         string errorCode;
         string errorMessage;
 };
 
-class ProcessingPayload : public SerializableJson {
+class ProcessingPayload : public Matchable, public SerializableJson {
     private:
+        shared_ptr<BinaryProcessingData> binaryPayloadData;
+    public:
         string payloadName;
         string mimetype;
         string stringPayloadData;
-        shared_ptr<BinaryProcessingData> binaryPayloadData;
-    public:
         ProcessingPayload() = default;
         ProcessingPayload(string payloadName, string mimetype, const string& payload);
         ProcessingPayload(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> payload);
@@ -53,6 +54,7 @@ class ProcessingPayload : public SerializableJson {
         void setPayloadName(string payloadName);
         string getPayloadName();
         void setMimeType(string mimetype);
+        string getMimeType();
         void setPayload(const string& payload);
         void setPayload(shared_ptr<BinaryProcessingData> payload);
         string payloadAsString();
@@ -67,12 +69,15 @@ class PipelineProcessingData : public Matchable, public SerializableJson {
     public:
         PipelineProcessingData();
         ~PipelineProcessingData();
+        string lastProcessedPipelineName;
+        int processingCounter = 0;
         static shared_ptr<PipelineProcessingData> getInstance();
         void addPayloadData(string payloadName, string mimetype, const string& data);
         void addPayloadData(string payloadName, string mimetype, shared_ptr<BinaryProcessingData> data);
         void addError(string errorCode, string errorMessage);
         bool hasError();
         vector<shared_ptr<ProcessingError>> getAllErrors();
+        vector<shared_ptr<ProcessingPayload>> getPayloads();
         optional<shared_ptr<ProcessingPayload>> getPayload(string payloadName);
         optional<shared_ptr<ProcessingPayload>> getLastPayload();
         int getCountOfPayloads();
@@ -85,11 +90,10 @@ class PipelineProcessingData : public Matchable, public SerializableJson {
         static atomic_int counter;
         vector<shared_ptr<ProcessingPayload>> payloadDataCollection;
         vector<shared_ptr<ProcessingPayload>> errors;
-        string lastProcessedPipelineName;
-        int processingCounter = 0;
         void setDefaultProperties();
         string getTimeStampOfNow(const string& pattern);
         string getFormattedCounter();
 };
 
+}
 #endif //#ifndef API_HELPERS_H

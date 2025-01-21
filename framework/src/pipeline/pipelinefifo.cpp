@@ -3,6 +3,8 @@
 
 using namespace event_forge;
 
+namespace event_forge {
+
 shared_ptr<PipelineFiFo> PipelineFiFo::getInstance() {
     return make_shared<PipelineFiFo>();
 }
@@ -53,3 +55,4 @@ int PipelineFiFo::getCountOfElementsInFifo() {
   unique_lock<shared_mutex> lock(mutex);
   return processingDataFiFo.size();
 }
+} // namespace event_forge

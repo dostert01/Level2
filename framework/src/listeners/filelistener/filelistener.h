@@ -12,6 +12,7 @@
 using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
 
+namespace event_forge {
 class FileListener : public NetworkListener {
     public:
       FileListener() = default;
@@ -38,5 +39,5 @@ class FileListener : public NetworkListener {
       void processFile(string fileName);
       void addContentAsNewPayload(const string& content, string fileName);
 };
-
+} // namespace event_forge
 #endif //#define FILE_LISTENER_H

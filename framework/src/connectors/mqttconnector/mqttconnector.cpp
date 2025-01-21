@@ -10,6 +10,8 @@
 #include "mqttconnector.h"
 #include "logger.h"
 
+namespace event_forge {
+
 std::shared_ptr<MosquittoWrapper> mqtt;
 
 string getNamedArgument(PipelineStepInitData& initData, string paramName) {
@@ -61,3 +63,4 @@ int pipeline_step_module_finish() {
   return 0;
 }
 
+} // namespace event_forge

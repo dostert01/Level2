@@ -114,3 +114,19 @@ TEST(PipeLinePayloadMating, MatchesIfTheFirstOneHasNoMatchingPatterns) {
     m2->addMatchingPattern("key04", "value04");
     EXPECT_TRUE(m1.matchesAllOfMineToAnyOfTheOther(m2));
 }
+
+TEST(PipeLinePayloadMating, canCopyContent) {
+    Matchable m1;
+    Matchable m2;
+    
+    m1.addMatchingPattern("key05", "value05");
+
+    m2.addMatchingPattern("key01", "value01");
+    m2.addMatchingPattern("key02", "value02");
+    m2.addMatchingPattern("key03", "value03");
+    m2.addMatchingPattern("key04", "value04");
+
+    m1 = m2;
+    EXPECT_TRUE(m1.matchesAll(m2));
+    EXPECT_EQ(m1.getCountOfMatchingPatterns(), m2.getCountOfMatchingPatterns());
+}

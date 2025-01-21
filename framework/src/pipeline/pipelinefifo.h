@@ -11,6 +11,7 @@
 
 using namespace std;
 
+namespace event_forge {
 class PipelineFiFo {
  public:
   PipelineFiFo() = default;
@@ -31,4 +32,5 @@ class PipelineFiFo {
                            shared_ptr<PipelineProcessingData> &data);
 };
 
+} //namespace event_forge
 #endif  // #ifndef PIPELINE_FIFO_H

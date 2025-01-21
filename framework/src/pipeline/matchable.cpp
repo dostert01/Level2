@@ -6,6 +6,12 @@
 
 namespace event_forge {
 
+Matchable& Matchable::operator=(const Matchable& other) {
+    matchingPatterns.clear();
+    matchingPatterns = ((Matchable)other).getMatchingPatterns();
+    return *this;
+}
+
 void Matchable::addMatchingPattern(string key, string value) {
     matchingPatterns[key] = value;
 }
@@ -22,14 +28,18 @@ optional<string> Matchable::getMatchingPattern(string key) {
     }
 }
 
+void Matchable::setMatchingPatterns(Matchable& other) {
+    *this = other;
+}
+
 void Matchable::removeMatchingPattern(string key) {
     matchingPatterns.erase(key);
 }
 
-int Matchable::getCoutOfMatches(shared_ptr<Matchable> other) {
+int Matchable::getCoutOfMatches(Matchable& other) {
     int matchCount = 0;
     for(const auto& [key, value] : matchingPatterns) {
-        optional<string> foundMatchingPattern = other->getMatchingPattern(key);
+        optional<string> foundMatchingPattern = other.getMatchingPattern(key);
         if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
             matchCount++;
         }
@@ -37,20 +47,29 @@ int Matchable::getCoutOfMatches(shared_ptr<Matchable> other) {
     return matchCount;
 }
 
+int Matchable::getCoutOfMatches(shared_ptr<Matchable> other) {
+    return getCoutOfMatches(*other);
+}
+
 bool Matchable::matchesAllOfMineToAnyOfTheOther(shared_ptr<Matchable> other) {
     return (getCountOfMatchingPatterns() == 0) ||
         (getCountOfMatchingPatterns() == getCoutOfMatches(other));
 }
 
-bool Matchable::matchesAll(shared_ptr<Matchable> other) {
+bool Matchable::matchesAll(Matchable& other) {
     int matchCount = 0;
-    if(bothHaveMatchingPatterns(*other) && bothHaveSameNumberOfMatchingPatterns(*other)) {
+    if(bothHaveMatchingPatterns(other) && bothHaveSameNumberOfMatchingPatterns(other)) {
         matchCount = getCoutOfMatches(other);
     } else {
         LOGGER.info("Patterns do not match because of different counts");
     }
     LOGGER.info("Patterns matched " + to_string(matchCount) + "/" + to_string(getCountOfMatchingPatterns()));
     return (matchCount == getCountOfMatchingPatterns()) && (matchCount > 0);
+
+}
+
+bool Matchable::matchesAll(shared_ptr<Matchable> other) {
+    return matchesAll(*other);
 }
 
 bool Matchable::bothHaveMatchingPatterns(Matchable& other) {
@@ -74,6 +93,10 @@ bool Matchable::RegexMatch(string s1, string s2) {
 
 bool Matchable::hasMatchingPatterns() {
     return getCountOfMatchingPatterns() > 0;
+}
+
+map<string, string> Matchable::getMatchingPatterns() {
+    return matchingPatterns;
 }
 
 }

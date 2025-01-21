@@ -15,6 +15,7 @@
 
 using namespace std;
 
+namespace event_forge {
 class MosquittoWrapper {
  public:
   static std::shared_mutex mqttConnectorInitMutex;
@@ -58,5 +59,5 @@ class MosquittoWrapper {
   void subscribeToAllTopics();
   void logMosquittoMessage(int mosquittoReturnCode, string successMessage, string errorMessage);
 };
-
+} // namespace event_forge
 #endif  // MOSQUITTO_WRAPPER_H

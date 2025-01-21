@@ -4,6 +4,7 @@
 #include "pipelinefifo.h"
 #include "pipeline.h"
 
+namespace event_forge {
 class NetworkListener {
     public:
         NetworkListener() = default;
@@ -20,5 +21,5 @@ class NetworkListener {
     private:
         bool listening = false;
 };
-
+} //namespace event_forge
 #endif //#define NETWORK_LISTENER_H

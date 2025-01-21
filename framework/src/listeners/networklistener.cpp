@@ -1,5 +1,7 @@
 #include"networklistener.h"
 
+namespace event_forge {
+
 void NetworkListener::init(shared_ptr<PipelineFiFo> fifo) {
     pipelineFifo = fifo;
 }
@@ -11,3 +13,4 @@ optional<shared_ptr<PipelineProcessingData>> NetworkListener::getLastMessage() {
         return nullopt;
     }
 }
+} // namespace event_forge

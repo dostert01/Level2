@@ -11,7 +11,7 @@
 #include "mosquittowrapper.h"
 #include "payloadnames.h"
 
-using namespace event_forge;
+namespace event_forge {
 
 shared_mutex MosquittoWrapper::mqttConnectorInitMutex;
 
@@ -210,3 +210,4 @@ void MosquittoWrapper::initParams(string &hostName, int port,
 bool MosquittoWrapper::isInitComplete() {
   return initComplete && connected;
 }
+} // namespace event_forge
