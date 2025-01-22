@@ -1,5 +1,7 @@
 #include"networklistener.h"
 
+using namespace std;
+
 namespace event_forge {
 
 void NetworkListener::init(shared_ptr<PipelineFiFo> fifo) {

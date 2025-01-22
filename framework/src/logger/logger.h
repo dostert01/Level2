@@ -1,5 +1,4 @@
-#ifndef SECOND_TAKE_LOGGER
-#define SECOND_TAKE_LOGGER
+#pragma once
 
 #include <map>
 #include <memory>
@@ -13,7 +12,6 @@
 
 #define LOGGER Logger::getInstance()
 
-using namespace std;
 namespace event_forge {
 
 class Logger {
@@ -22,31 +20,29 @@ class Logger {
   static Logger &getInstance();
   static Logger *getInstanceAsPointer();
   friend bool operator==(const Logger &lhs, const Logger &rhs);
-  void trace(const string &message);
-  void debug(const string &message);
-  void info(const string &message);
-  void warn(const string &message);
-  void error(const string &message);
-  void fatal(const string &message);
+  void trace(const std::string &message);
+  void debug(const std::string &message);
+  void info(const std::string &message);
+  void warn(const std::string &message);
+  void error(const std::string &message);
+  void fatal(const std::string &message);
   void removeAllDestinations();
   size_t getCountOfLoggingDestinations();
-  void addLoggingDestination(unique_ptr<LoggingDestination> destination);
-  void setLoggingDestination(unique_ptr<LoggingDestination> destination);
+  void addLoggingDestination(std::unique_ptr<LoggingDestination> destination);
+  void setLoggingDestination(std::unique_ptr<LoggingDestination> destination);
   void setMaxLogLevel(LogLevel logLevel);
 
  private:
   Logger();
-  unique_ptr<TimeProvider> timeProvider;
-  vector<unique_ptr<LoggingDestination>> loggingDestinations;
+  std::unique_ptr<TimeProvider> timeProvider;
+  std::vector<std::unique_ptr<LoggingDestination>> loggingDestinations;
   LogLevel maxLogLevel;
   LogLevelStringMapper logLevelStringMapper;
-  shared_mutex mutex;
+  std::shared_mutex mutex;
 
-  void doLogging(const LogLevel &logLevel, const string &message);
+  void doLogging(const LogLevel &logLevel, const std::string &message);
   bool logThisLevel(const LogLevel &logLevel);
   void checkLogLevelInEnvironment();
 };
 
 }  // namespace event_forge
-
-#endif  // SECOND_TAKE_LOGGER

@@ -3,6 +3,7 @@
 
 #define PAYLOAD_NAME_MQTT_RECEIVED_DATA "MQTT received data"
 #define PAYLOAD_NAME_FILE_RECEIVED_DATA "File received data"
+#define PAYLOAD_NAME_FILE_SEND_DATA "FILE_SEND_TEXT_DATA"
 #define PAYLOAD_NAME_PROCESSING_ERROR "___processingError___"
 
 #define PAYLOAD_MIMETYPE_APPLICATION_OCTET_STREAM "application/octet-stream"

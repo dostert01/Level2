@@ -8,7 +8,6 @@
 #include "networklistener.h"
 #include "mosquittowrapper.h"
 
-using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
 
 namespace event_forge {
@@ -16,28 +15,28 @@ namespace event_forge {
 class MQTTTopic {
   public:
     MQTTTopic(json jsonObject);
-    string getName();
+    std::string getName();
   private:
-    string name;
+    std::string name;
 };
 
 class MQTTListener : public NetworkListener {
     public:
         MQTTListener() = default;
         MQTTListener(json jsonObject);
-        static shared_ptr<MQTTListener> getInstance();
-        void init(shared_ptr<PipelineFiFo> fifo);
+        static std::shared_ptr<MQTTListener> getInstance();
+        void init(std::shared_ptr<PipelineFiFo> fifo);
         void startListening();
-        string getHostName();
+        std::string getHostName();
         int getPort();
-        string getClientId();
-        optional<string> getTopic(int index);
-        vector<string> getTopicNames();
+        std::string getClientId();
+        std::optional<std::string> getTopic(int index);
+        std::vector<std::string> getTopicNames();
     private:
-        string hostName = "none";
+        std::string hostName = "none";
         int port = 1234;
-        string clientId = "hallo";
-        vector<shared_ptr<MQTTTopic>> topics;
+        std::string clientId = "hallo";
+        std::vector<std::shared_ptr<MQTTTopic>> topics;
         std::shared_ptr<MosquittoWrapper> mqtt;
 };
 

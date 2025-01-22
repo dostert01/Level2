@@ -1,7 +1,6 @@
 #include "mqttlistener.h"
 #include "applicationcontext.h"
 
-using namespace std;
 namespace event_forge {
 
 MQTTListener::MQTTListener(json jsonObject) {
@@ -11,11 +10,11 @@ MQTTListener::MQTTListener(json jsonObject) {
   topics = APP_CONTEXT.createObjectsFromJson<MQTTTopic>(jsonObject, "topics");
 };
 
-shared_ptr<MQTTListener> MQTTListener::getInstance() {
-  return make_shared<MQTTListener>();
+std::shared_ptr<MQTTListener> MQTTListener::getInstance() {
+  return std::make_shared<MQTTListener>();
 }
 
-void MQTTListener::init(shared_ptr<PipelineFiFo> fifo) {
+void MQTTListener::init(std::shared_ptr<PipelineFiFo> fifo) {
     NetworkListener::init(fifo);
     MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
     mqtt = MosquittoWrapper::getInstance(hostName, port, clientId, getTopicNames());
@@ -27,7 +26,7 @@ void MQTTListener::startListening() {
     setIsListening(mqtt->isListening());
 }
 
-string MQTTListener::getHostName() {
+std::string MQTTListener::getHostName() {
     return hostName;
 }
 
@@ -35,20 +34,20 @@ int MQTTListener::getPort() {
     return port;
 }
 
-string MQTTListener::getClientId() {
+std::string MQTTListener::getClientId() {
     return clientId;
 }
 
-optional<string> MQTTListener::getTopic(int index) {
+std::optional<std::string> MQTTListener::getTopic(int index) {
     if((index > -1) && (index < topics.size())) {
         return topics[index].get()->getName();
     } else {
-        return nullopt;
+        return std::nullopt;
     }
 }
 
-vector<string> MQTTListener::getTopicNames() {
-    vector<string> returnValue;
+std::vector<std::string> MQTTListener::getTopicNames() {
+    std::vector<std::string> returnValue;
     for(auto topic : topics) {
         returnValue.push_back(topic.get()->getName());
     }
@@ -60,7 +59,7 @@ MQTTTopic::MQTTTopic(json jsonObject) {
   name = jsonObject["name"];
 }
 
-string MQTTTopic::getName() {
+std::string MQTTTopic::getName() {
   return name;
 }
 } // namespace event_forge

@@ -10,6 +10,7 @@
 #include "mqttconnector.h"
 #include "logger.h"
 
+using namespace std;
 namespace event_forge {
 
 std::shared_ptr<MosquittoWrapper> mqtt;

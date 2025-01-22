@@ -8,7 +8,7 @@ namespace event_forge {
 Logger::Logger() {
   logLevelStringMapper = LogLevelStringMapper();
   setMaxLogLevel(LogLevel::LOG_LEVEL_TRACE);
-  timeProvider = make_unique<DefaultTimeProvider>();
+  timeProvider = std::make_unique<DefaultTimeProvider>();
   LoggingDestinationFactory destinationFactory = LoggingDestinationFactory();
   addLoggingDestination(destinationFactory.createDestinationStdOut());
 }
@@ -26,39 +26,39 @@ bool operator==(const Logger &lhs, const Logger &rhs) {
   return (&lhs.getInstance() == &rhs.getInstance());
 }
 
-void Logger::trace(const string &message) {
+void Logger::trace(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_TRACE, message);
 }
 
-void Logger::debug(const string &message) {
+void Logger::debug(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_DEBUG, message);
 }
 
-void Logger::info(const string &message) {
+void Logger::info(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_INFO, message);
 }
 
-void Logger::warn(const string &message) {
+void Logger::warn(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_WARN, message);
 }
 
-void Logger::error(const string &message) {
+void Logger::error(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_ERROR, message);
 }
 
-void Logger::fatal(const string &message) {
+void Logger::fatal(const std::string &message) {
   doLogging(LogLevel::LOG_LEVEL_FATAL, message);
 }
 
 void Logger::checkLogLevelInEnvironment() {
   const char* maxLogLevelFromEnv = getenv(MAX_LOG_LEVEL_ENV_VAR_NAME);
   if(maxLogLevelFromEnv != NULL) {
-    optional<LogLevel> level = logLevelStringMapper.string2LogLevel(maxLogLevelFromEnv);
+    std::optional<LogLevel> level = logLevelStringMapper.string2LogLevel(maxLogLevelFromEnv);
     if(level.has_value()){
       maxLogLevel = level.value();
     } else {
-      cerr << "Warning: Unknown log level string found in environment: " <<
-        MAX_LOG_LEVEL_ENV_VAR_NAME << " = " << maxLogLevelFromEnv << endl;
+      std::cerr << "Warning: Unknown log level std::string found in environment: " <<
+        MAX_LOG_LEVEL_ENV_VAR_NAME << " = " << maxLogLevelFromEnv << std::endl;
     }
   }
 }
@@ -68,10 +68,10 @@ bool Logger::logThisLevel(const LogLevel &logLevel) {
   return (logLevel <= maxLogLevel);
 }
 
-void Logger::doLogging(const LogLevel &logLevel, const string &message) {
-  unique_lock<shared_mutex> lock(mutex);
+void Logger::doLogging(const LogLevel &logLevel, const std::string &message) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   if(logThisLevel(logLevel)){
-    string timestamp = timeProvider->getTimeStampOfNow();
+    std::string timestamp = timeProvider->getTimeStampOfNow();
     for (const auto &currentLoggingDestination : loggingDestinations) {
       currentLoggingDestination->doLogging(logLevel, message, timestamp);
     }
@@ -79,27 +79,27 @@ void Logger::doLogging(const LogLevel &logLevel, const string &message) {
 }
 
 void Logger::removeAllDestinations() {
-  unique_lock<shared_mutex> lock(mutex);
+  std::unique_lock<std::shared_mutex> lock(mutex);
   loggingDestinations.clear();
 }
 
 size_t Logger::getCountOfLoggingDestinations() {
-  shared_lock<shared_mutex> lock(mutex);
+  std::shared_lock<std::shared_mutex> lock(mutex);
   return loggingDestinations.size();
 }
 
-void Logger::addLoggingDestination(unique_ptr<LoggingDestination> destination) {
-  unique_lock<shared_mutex> lock(mutex);
+void Logger::addLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
   loggingDestinations.push_back(move(destination));
 }
 
-void Logger::setLoggingDestination(unique_ptr<LoggingDestination> destination) {
+void Logger::setLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
   removeAllDestinations();
-  addLoggingDestination(move(destination));
+  addLoggingDestination(std::move(destination));
 }
 
 void Logger::setMaxLogLevel(LogLevel logLevel) {
-  unique_lock<shared_mutex> lock(mutex);
+  std::unique_lock<std::shared_mutex> lock(mutex);
   maxLogLevel = logLevel;
 }
 

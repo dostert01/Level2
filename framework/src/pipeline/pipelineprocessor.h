@@ -1,5 +1,4 @@
-#ifndef SECOND_TAKE_PIPELINE_PROCESSOR
-#define SECOND_TAKE_PIPELINE_PROCESSOR
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -12,40 +11,38 @@
 #include "pipeline.h"
 #include "pipelinefifo.h"
 
-using namespace std;
 namespace event_forge {
 
     class PipeLineProcessor {
         public:
             PipeLineProcessor() = default;
             ~PipeLineProcessor();
-            static unique_ptr<PipeLineProcessor> getInstance();
-            static optional<unique_ptr<PipeLineProcessor>> getInstance(const string configFilePath);
+            static std::unique_ptr<PipeLineProcessor> getInstance();
+            static std::optional<std::unique_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
             uint getCountOfPipelines();
-            string getProcessName();
-            optional<shared_ptr<Pipeline>> getPipelineByName(string pipelineName);
-            void execute(shared_ptr<PipelineProcessingData> payload);
-            void startProcessingLoop(shared_ptr<PipelineFiFo> fifo);
+            std::string getProcessName();
+            std::optional<std::shared_ptr<Pipeline>> getPipelineByName(std::string pipelineName);
+            void execute(std::shared_ptr<PipelineProcessingData> payload);
+            void startProcessingLoop(std::shared_ptr<PipelineFiFo> fifo);
             bool isProcessingLoopRunning();
             void stopProcessingLoop();
         private:
-            string configFileDir;
-            string processName;
-            thread processingLoopThread;
-            atomic_bool keepThreadRunning;
-            shared_mutex pipelineExecutionMutex;
-            vector<shared_ptr<Pipeline>> pipelines;
-            void loadProcessorConfig(const string& configFilePath);
+            std::string configFileDir;
+            std::string processName;
+            std::thread processingLoopThread;
+            std::atomic_bool keepThreadRunning;
+            std::shared_mutex pipelineExecutionMutex;
+            std::vector<std::shared_ptr<Pipeline>> pipelines;
+            void loadProcessorConfig(const std::string& configFilePath);
             void setConfigFileDirFromConfigFileName(
-                const string& configFilePath);
+                const std::string& configFilePath);
             void loadHeaderData(const json& jsonData);
             void loadPipelines(const json& jsonData);
-            string getDirNameFromPath(const string path);
-            string getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition);
-            void readMatchingPatternsFromJson(shared_ptr<Pipeline> pipeline, const json& pipelineDefinition);
-            void processingLoop(shared_ptr<PipelineFiFo> fifo);
+            std::string getDirNameFromPath(const std::string path);
+            std::string getPipelineConfigFileNameFromJsonData(const nlohmann::json_abi_v3_11_3::json &currentPipelineDefinition);
+            void readMatchingPatternsFromJson(std::shared_ptr<Pipeline> pipeline, const json& pipelineDefinition);
+            void processingLoop(std::shared_ptr<PipelineFiFo> fifo);
     };
 
 }  // namespace event_forge
 
-#endif  // SECOND_TAKE_PIPELINE_PROCESSOR

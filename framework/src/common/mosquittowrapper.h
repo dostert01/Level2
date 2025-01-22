@@ -1,5 +1,4 @@
-#ifndef MOSQUITTO_WRAPPER_H
-#define MOSQUITTO_WRAPPER_H
+#pragma once
 
 #define MQTT_CONNECTOR_PARAM_NAME_HOSTNAME "hostName"
 #define MQTT_CONNECTOR_PARAM_NAME_PORT "port"
@@ -13,43 +12,41 @@
 
 #include "pipelinefifo.h"
 
-using namespace std;
-
 namespace event_forge {
 class MosquittoWrapper {
  public:
   static std::shared_mutex mqttConnectorInitMutex;
-  static shared_ptr<MosquittoWrapper> getInstance(string hostName,
+  static std::shared_ptr<MosquittoWrapper> getInstance(std::string hostName,
                                                   int port,
-                                                  string clientId,
-                                                  string topic);
-  static shared_ptr<MosquittoWrapper> getInstance(string hostName,
+                                                  std::string clientId,
+                                                  std::string topic);
+  static std::shared_ptr<MosquittoWrapper> getInstance(std::string hostName,
                                                   int port,
-                                                  string clientId,
-                                                  vector<string> topics);
+                                                  std::string clientId,
+                                                  std::vector<std::string> topics);
   MosquittoWrapper() = default;
   ~MosquittoWrapper();
-  void init(string hostName, int port, string clientId, string topic);
+  void init(std::string hostName, int port, std::string clientId, std::string topic);
   bool isInitComplete();
-  void sendData(string payloadString);
-  void startListening(shared_ptr<PipelineFiFo> fifo);
+  void sendData(std::string payloadString);
+  void startListening(std::shared_ptr<PipelineFiFo> fifo);
   bool isListening();
-  string getHostName();
-  optional<shared_ptr<PipelineFiFo>> getPipelineFifo();
+  std::string getHostName();
+  std::optional<std::shared_ptr<PipelineFiFo>> getPipelineFifo();
 
  private:
-  string hostName;
+  std::string hostName;
   int port;
-  string clientId;
-  vector<string> topics;
+  std::string clientId;
+  std::vector<std::string> topics;
   bool initComplete;
   bool connected;
   bool listening;
-  shared_ptr<PipelineFiFo> pipelineFifo;
+  std::shared_ptr<PipelineFiFo> pipelineFifo;
   struct mosquitto *mosquittoHandle;
-  void init(string hostName, int port, string clientId, vector<string>& topics);
-  void initParams(string &hostName, int port, string &clientId, vector<string> topics);
-  void setPipelineFifo(shared_ptr<PipelineFiFo> fifo);
+  void init(std::string hostName, int port, std::string clientId, std::vector<std::string>& topics);
+  void initParams(std::string &hostName, int port, std::string &clientId, std::vector<std::string> topics);
+  void setPipelineFifo(std::shared_ptr<PipelineFiFo> fifo);
   void initMosquittoLib();
   void initMosquittoConnection();
   void openMosquittoConnection();
@@ -57,7 +54,6 @@ class MosquittoWrapper {
   void disconnectFromBroker();
   void startMosquittoLoop();
   void subscribeToAllTopics();
-  void logMosquittoMessage(int mosquittoReturnCode, string successMessage, string errorMessage);
+  void logMosquittoMessage(int mosquittoReturnCode, std::string successMessage, std::string errorMessage);
 };
 } // namespace event_forge
-#endif  // MOSQUITTO_WRAPPER_H

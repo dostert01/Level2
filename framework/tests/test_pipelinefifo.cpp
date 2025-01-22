@@ -3,6 +3,7 @@
 #include "pipelinefifo.h"
 #include "../logger/logger.h"
 
+using namespace std;
 using namespace event_forge;
 
 TEST(PipeLineFifo, canGetAnInstance) {

@@ -24,7 +24,7 @@ std::optional<std::string> Matchable::getMatchingPattern(std::string key) {
     if(matchingPatterns.contains(key)) {
         return matchingPatterns[key];
     } else {
-        return nullopt;
+        return std::nullopt;
     }
 }
 
@@ -63,7 +63,7 @@ bool Matchable::matchesAll(Matchable& other) {
     } else {
         LOGGER.info("Patterns do not match because of different counts");
     }
-    LOGGER.info("Patterns matched " + to_string(matchCount) + "/" + to_string(getCountOfMatchingPatterns()));
+    LOGGER.info("Patterns matched " + std::to_string(matchCount) + "/" + std::to_string(getCountOfMatchingPatterns()));
     return (matchCount == getCountOfMatchingPatterns()) && (matchCount > 0);
 
 }
@@ -83,9 +83,9 @@ bool Matchable::bothHaveSameNumberOfMatchingPatterns(Matchable& other) {
 bool Matchable::RegexMatch(std::string s1, std::string s2) {
     bool match = false;
     try {
-        regex regex(s1);
+        std::regex regex(s1);
         match = regex_match(s2, regex);
-    } catch (const exception& e) {
+    } catch (const std::exception& e) {
         LOGGER.error("Failed to match regular expression '" + s1 + "' with value '" + s2 + "' - " + e.what());
     }
     return match;

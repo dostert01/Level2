@@ -1,5 +1,4 @@
-#ifndef SECOND_TAKE_PIPELINE
-#define SECOND_TAKE_PIPELINE
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -11,19 +10,18 @@
 #include "payloadnames.h"
 
 using json = nlohmann::json;
-using namespace std;
 namespace event_forge {
 
 #ifndef UNDEFINED_JSON_DATA
 #define UNDEFINED_JSON_DATA "undefined"
 #endif
 
-class PipelineException : public exception {
+class PipelineException : public std::exception {
     public:
-        explicit PipelineException(const string& message);
+        explicit PipelineException(const std::string& message);
         virtual const char* what() const noexcept override;
     private:
-        string message;
+        std::string message;
 }; 
 
 using LibInitFunction = int (*)(PipelineStepInitData& initData);
@@ -34,18 +32,18 @@ class PipelineStep {
     public:
         PipelineStep() = default;
         ~PipelineStep();
-        void setStepName(const string stepName);
-        string getStepName();
-        void setLibraryName(const string libraryName);
+        void setStepName(const std::string stepName);
+        std::string getStepName();
+        void setLibraryName(const std::string libraryName);
         bool isInitComplete();
         void runInitFunction();
-        void runProcessingFunction(shared_ptr<PipelineProcessingData> processingData);
+        void runProcessingFunction(std::shared_ptr<PipelineProcessingData> processingData);
         void runFinishFunction();
         void loadLib();
         void loadNamedArguments(const json& jsonData);
     private:
-        string stepName;
-        string libraryName;
+        std::string stepName;
+        std::string libraryName;
         void *hLib;
         LibInitFunction libInit;
         LibProcessFunction libProcess;
@@ -56,23 +54,21 @@ class PipelineStep {
 class Pipeline : public Matchable {
     public:
         Pipeline() = default;
-        static shared_ptr<Pipeline> getInstance();
-        static optional<shared_ptr<Pipeline>> getInstance(const string configFilePath);
+        static std::shared_ptr<Pipeline> getInstance();
+        static std::optional<std::shared_ptr<Pipeline>> getInstance(const std::string configFilePath);
         uint getCountOfPipelineSteps();
-        optional<shared_ptr<PipelineStep>> getStepByName(const string& stepName);
-        void setPipelineName(const string& pipelineName);
-        string getPipelineName();
+        std::optional<std::shared_ptr<PipelineStep>> getStepByName(const std::string& stepName);
+        void setPipelineName(const std::string& pipelineName);
+        std::string getPipelineName();
         void execute();
-        void execute(shared_ptr<PipelineProcessingData> processData);
+        void execute(std::shared_ptr<PipelineProcessingData> processData);
     private:
-        string pipelineName;
-        vector<shared_ptr<PipelineStep>> pipelineSteps;
-        void loadPipelineConfig(const string& configFilePath);
+        std::string pipelineName;
+        std::vector<std::shared_ptr<PipelineStep>> pipelineSteps;
+        void loadPipelineConfig(const std::string& configFilePath);
         void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);
-        void tagProcessingData(shared_ptr<PipelineProcessingData> processData);
+        void tagProcessingData(std::shared_ptr<PipelineProcessingData> processData);
 };
 
 }
-
-#endif // SECOND_TAKE_PIPELINE

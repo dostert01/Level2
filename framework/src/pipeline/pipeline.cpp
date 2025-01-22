@@ -6,6 +6,8 @@
 #include "logger.h"
 #include "pipeline.h"
 
+using namespace std;
+
 namespace event_forge {
 
 #define JSON_PROPERTY_PIPELINE_NAME "pipelineName"

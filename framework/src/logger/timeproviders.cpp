@@ -1,12 +1,11 @@
-#include "timeproviders.h"
-
 #include <ctime>
 
+#include "timeproviders.h"
 namespace event_forge {
 
 TimeProvider::~TimeProvider() {}
 
-string DefaultTimeProvider::getTimeStampOfNow() {
+std::string DefaultTimeProvider::getTimeStampOfNow() {
   time_t timeBuffer;
   struct tm *localTime;
   char buffer[64];
@@ -14,7 +13,7 @@ string DefaultTimeProvider::getTimeStampOfNow() {
   time(&timeBuffer);
   localTime = localtime(&timeBuffer);
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
-  string str(buffer);
+  std::string str(buffer);
   return str;
 }
 

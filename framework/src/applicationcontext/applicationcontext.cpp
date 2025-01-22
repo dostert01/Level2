@@ -1,7 +1,6 @@
 #include <applicationcontext.h>
 #include <logger.h>
 #include <stdlib.h>
-#include <string>
 #include <unistd.h>
 
 #include <fstream>
@@ -24,26 +23,26 @@ bool operator==(const ApplicationContext& lhs, const ApplicationContext& rhs) {
   return (&lhs.getInstance() == &rhs.getInstance());
 }
 
-optional<string> ApplicationContext::readEnv(string variableName) {
+std::optional<std::string> ApplicationContext::readEnv(std::string variableName) {
   char* value = secure_getenv(variableName.c_str());
   if (value != NULL) {
-    return string(value);
+    return std::string(value);
   } else {
-    return nullopt;
+    return std::nullopt;
   }
 }
 
-optional<string> ApplicationContext::getCurrentWorkingDirectory() {
+std::optional<std::string> ApplicationContext::getCurrentWorkingDirectory() {
   char* value = getcwd(NULL, 0);
   if (value != NULL) {
-    string returnValue = string(value);
+    std::string returnValue = std::string(value);
     free(value);
     return returnValue;
   } else {
     char buffer[DEFAULT_BUFFER_SIZE];
     char* errorText = strerror_r(errno, buffer, DEFAULT_BUFFER_SIZE);
-    LOGGER.warn(string(errorText));
-    return nullopt;
+    LOGGER.warn(std::string(errorText));
+    return std::nullopt;
   }
 }
 
@@ -59,11 +58,11 @@ void ApplicationContext::loadApplicationConfig(const std::string& configFilePath
   }
 }
 
-vector<string> ApplicationContext::splitString(string toSplit, string separator) {
-    vector<string> result;
+std::vector<std::string> ApplicationContext::splitString(std::string toSplit, std::string separator) {
+    std::vector<std::string> result;
     int start = 0;
     int found = toSplit.find(separator, start);
-    while(found != string::npos) {
+    while(found != std::string::npos) {
         result.push_back(toSplit.substr(start, found - start));
         start += (found - start) + separator.length();
         found = toSplit.find(separator, start);
@@ -72,23 +71,23 @@ vector<string> ApplicationContext::splitString(string toSplit, string separator)
     return result;
 }
 
-  optional<json> ApplicationContext::findRecursiveInJsonTree(string path) {
+  std::optional<json> ApplicationContext::findRecursiveInJsonTree(std::string path) {
     return findRecursiveInJsonTree(jsonAppConfigData, path);
   }
 
-  optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, string path) {
+  std::optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, std::string path) {
     LOGGER.debug("searching for json objects with path: '" + path + "'");
-    vector<string> pathElements = splitString(path, "/");
+    std::vector<std::string> pathElements = splitString(path, "/");
     json currentJson = objectAsJson;
     for (auto pathElement : pathElements) {
       if (currentJson.contains(pathElement)) {
         currentJson = currentJson[pathElement];
       } else {
         LOGGER.error(
-            "json string '" + currentJson.dump() +
+            "json std::string '" + currentJson.dump() +
             "' does not contain the required object or array named: '" +
             pathElement + "'");
-        return nullopt;
+        return std::nullopt;
       }
     }
     return currentJson;

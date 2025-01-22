@@ -1,5 +1,4 @@
-#ifndef SECOND_TAKE_APP_CTX
-#define SECOND_TAKE_APP_CTX
+#pragma once
 
 #include <logger.h>
 
@@ -12,7 +11,6 @@
 #define APP_CONTEXT ApplicationContext::getInstance()
 
 using namespace nlohmann::json_abi_v3_11_3;
-using namespace std;
 
 namespace event_forge {
 
@@ -22,25 +20,25 @@ class ApplicationContext {
   static ApplicationContext *getInstanceAsPointer();
   friend bool operator==(const ApplicationContext &lhs,
                          const ApplicationContext &rhs);
-  optional<string> readEnv(string variableName);
-  optional<string> getCurrentWorkingDirectory();
+  std::optional<std::string> readEnv(std::string variableName);
+  std::optional<std::string> getCurrentWorkingDirectory();
   void loadApplicationConfig(const std::string &configFilePath);
-  vector<string> splitString(string toSplit, string separator);
-  optional<json> findRecursiveInJsonTree(string path);
-  optional<json> findRecursiveInJsonTree(json objectAsJson, string path);
+  std::vector<std::string> splitString(std::string toSplit, std::string separator);
+  std::optional<json> findRecursiveInJsonTree(std::string path);
+  std::optional<json> findRecursiveInJsonTree(json objectAsJson, std::string path);
 
   template <typename T, typename... Args>
-  vector<shared_ptr<T>> createObjectsFromJson(json objectAsJson, string path, Args &&...args) {
-    vector<shared_ptr<T>> returnValue;
-    optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
+  std::vector<std::shared_ptr<T>> createObjectsFromJson(json objectAsJson, std::string path, Args &&...args) {
+    std::vector<std::shared_ptr<T>> returnValue;
+    std::optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
     if (toBeCreatedFrom.has_value()) {
       for (auto &jsonObject : toBeCreatedFrom.value()) {
         LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
         try {
-          returnValue.emplace_back(make_shared<T>(jsonObject, std::forward<Args>(args)...));
-        } catch (const exception &e) {
+          returnValue.emplace_back(std::make_shared<T>(jsonObject, std::forward<Args>(args)...));
+        } catch (const std::exception &e) {
           LOGGER.error(
-              string("Exception occurred during parsing json to an object. The "
+              std::string("Exception occurred during parsing json to an object. The "
                      "corresponding object will be missing! Errormessage: ") + e.what());
         }
       }
@@ -49,7 +47,7 @@ class ApplicationContext {
   };
 
   template <typename T, typename... Args>
-  vector<shared_ptr<T>> createObjectsFromAppConfigJson(string path, Args &&...args) {
+  std::vector<std::shared_ptr<T>> createObjectsFromAppConfigJson(std::string path, Args &&...args) {
     return std::move(createObjectsFromJson<T>(jsonAppConfigData, path, std::forward<Args>(args)...));
   };
 
@@ -59,5 +57,3 @@ class ApplicationContext {
 };
 
 }  // namespace event_forge
-
-#endif  // SECOND_TAKE_APP_CTX

@@ -5,8 +5,6 @@
 #include "logger.h"
 #include "pipelineapi.h"
 
-using namespace std;
-
 namespace event_forge {
 
 class FileWriter {
@@ -14,11 +12,12 @@ class FileWriter {
         FileWriter(PipelineStepInitData& initData);
         void writeFile(PipelineProcessingData& processData);
     private:
-        string targetDirectory;
-        string getNamedArgument(PipelineStepInitData& initData, string paramName);
-        string createFileName(PipelineProcessingData& processData);
+        std::string targetDirectory;
+        std::string getNamedArgument(PipelineStepInitData& initData, std::string paramName);
+        std::string createFileName(PipelineProcessingData& processData);
         void tryWritingTheFile(PipelineProcessingData& processData);
-        bool ensureDirectoryExists(string path);
+        std::string getPayloadForWriting(PipelineProcessingData& processData);
+        bool ensureDirectoryExists(std::string path);
 };
 
 } // namespace event_forge

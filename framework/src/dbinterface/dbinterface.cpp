@@ -13,7 +13,7 @@ bool Database::isOpen() {
 /*
     DatabaseSQLite
 */
-bool DatabaseSQLite::open(map<string, string>& connectionParams) {
+bool DatabaseSQLite::open(std::map<std::string, std::string>& connectionParams) {
     if(!isOpen()) {
         auto fileName = connectionParams.find(DB_CONNECTION_PARAM_FILE_NAME);
         if(fileName != connectionParams.end()) {
@@ -42,7 +42,7 @@ static int rowReaderCallback(void *instanceOfRecordSet, int argc, char **argv, c
     int i;
     if(instanceOfRecordSet != NULL) {
         RecordSet* resultSet = (RecordSet*)instanceOfRecordSet;
-        shared_ptr<Row> newRow = resultSet->addNewRow();
+        std::shared_ptr<Row> newRow = resultSet->addNewRow();
         for(i = 0; i<argc; i++) {
             newRow->setFieldValue(azColName[i], argv[i] ? argv[i] : "NULL", argv[i] == NULL);
         }
@@ -50,9 +50,9 @@ static int rowReaderCallback(void *instanceOfRecordSet, int argc, char **argv, c
     return 0;
 }
 
-shared_ptr<RecordSet> DatabaseSQLite::executeQuery(string sql) {
+std::shared_ptr<RecordSet> DatabaseSQLite::executeQuery(std::string sql) {
     char *errorMessage = NULL;
-    auto result = make_shared<RecordSet>();
+    auto result = std::make_shared<RecordSet>();
     if(sqlite3_exec(dbConnection, sql.c_str(), rowReaderCallback, result.get(), &errorMessage) == SQLITE_OK) {
         LOGGER.info("executed SQL '" + sql + "'");
     } else {
@@ -61,7 +61,7 @@ shared_ptr<RecordSet> DatabaseSQLite::executeQuery(string sql) {
     return result;
 }
 
-void DatabaseSQLite::logSqlExecuteError(char *errorMessage, string sql) {
+void DatabaseSQLite::logSqlExecuteError(char *errorMessage, std::string sql) {
   if (errorMessage != NULL) {
     LOGGER.error("failed executing SQL '" + sql + "' : " + errorMessage);
     sqlite3_free(errorMessage);
@@ -78,11 +78,11 @@ void DatabaseSQLite::logOpenSuccess() {
     }
 }
 
-void DatabaseSQLite::logSqLiteError(string errorMsgPrefix) {
+void DatabaseSQLite::logSqLiteError(std::string errorMsgPrefix) {
     LOGGER.error(errorMsgPrefix + " sqlite3_errmsg reports '" + sqlite3_errmsg(dbConnection) + "'");
 }
 
-void DatabaseSQLite::logErrorLackingParameter(string paramaterName) {
+void DatabaseSQLite::logErrorLackingParameter(std::string paramaterName) {
     LOGGER.error("Failed to open DB. connectionParams is lacking parameter '" + paramaterName + "'");
 }
 
@@ -90,11 +90,11 @@ void DatabaseSQLite::logErrorLackingParameter(string paramaterName) {
     RecordSet
 */
 RecordSet::RecordSet() {
-    rows = make_shared<vector<shared_ptr<Row>>>();
+    rows = std::make_shared<std::vector<std::shared_ptr<Row>>>();
 }
 
-shared_ptr<Row> RecordSet::addNewRow() {
-    auto newRow = make_shared<Row>();
+std::shared_ptr<Row> RecordSet::addNewRow() {
+    auto newRow = std::make_shared<Row>();
     rows->push_back(newRow);
     return newRow;
 }
@@ -103,23 +103,23 @@ uint RecordSet::getRowCount() {
     return rows->size();
 }
 
-optional<string> RecordSet::getValue(string fieldName, uint rowIndex) {
-    optional<string> fieldValue = nullopt;
+std::optional<std::string> RecordSet::getValue(std::string fieldName, uint rowIndex) {
+    std::optional<std::string> fieldValue = std::nullopt;
     if(rowIndex < getRowCount()) {
         fieldValue = rows->at(rowIndex)->getFieldValue(fieldName);
     }
     if(!fieldValue.has_value()) {
-        LOGGER.error("No value found for column " + fieldName + " in row " + to_string(rowIndex));
+        LOGGER.error("No value found for column " + fieldName + " in row " + std::to_string(rowIndex));
     }
     return fieldValue;
 }
 
-bool RecordSet::getIsNull(string fieldName, uint rowIndex) {
+bool RecordSet::getIsNull(std::string fieldName, uint rowIndex) {
     bool fieldValue = true;
     if(rowIndex < getRowCount()) {
         fieldValue = rows->at(rowIndex)->getIsFieldValueNull(fieldName);
     } else {
-        LOGGER.error("Row index '" + to_string(rowIndex) +
+        LOGGER.error("Row index '" + std::to_string(rowIndex) +
             "' is out of bounds while reading property of field '" + fieldName + "'");
     }
     return fieldValue;
@@ -129,11 +129,11 @@ bool RecordSet::getIsNull(string fieldName, uint rowIndex) {
     Row
 */
 Row::Row() {
-    fields = make_shared<map<string, Field>>();
+    fields = std::make_shared<std::map<std::string, Field>>();
 }
 
-optional<string> Row::getFieldValue(string fieldName) {
-    optional<string> returnValue = nullopt;
+std::optional<std::string> Row::getFieldValue(std::string fieldName) {
+    std::optional<std::string> returnValue = std::nullopt;
     auto field = fields->find(fieldName);
     if(field != fields->end()) {
         returnValue = field->second.getValue();
@@ -144,7 +144,7 @@ optional<string> Row::getFieldValue(string fieldName) {
     return returnValue;
 }
 
-bool Row::getIsFieldValueNull(string fieldName) {
+bool Row::getIsFieldValueNull(std::string fieldName) {
     bool returnValue = true;
     auto field = fields->find(fieldName);
     if(field != fields->end()) {
@@ -155,7 +155,7 @@ bool Row::getIsFieldValueNull(string fieldName) {
     return returnValue;
 }
 
-void Row::setFieldValue(string fieldName, string value, bool isNull) {
+void Row::setFieldValue(std::string fieldName, std::string value, bool isNull) {
     auto field = fields->find(fieldName);
     if(field != fields->end()) {
         field->second.setValue(value);
@@ -165,23 +165,23 @@ void Row::setFieldValue(string fieldName, string value, bool isNull) {
     }
 }
 
-void Row::setFieldValue(string fieldName, string value) {
+void Row::setFieldValue(std::string fieldName, std::string value) {
     setFieldValue(fieldName, value, false);
 }
 
 /*
     Field
 */
-Field::Field(string value) : Field(value, false) {
+Field::Field(std::string value) : Field(value, false) {
 
 }
 
-Field::Field(string value, bool isNull) {
+Field::Field(std::string value, bool isNull) {
     this->setValue(value);
     this->setIsNull(isNull);
 }
 
-void Field::setValue(string value) {
+void Field::setValue(std::string value) {
     this->value = value;
 }
 
@@ -193,7 +193,7 @@ bool Field::getIsNull() {
     return isNull;
 }
 
-string Field::getValue() {
+std::string Field::getValue() {
     return value;
 }
 
