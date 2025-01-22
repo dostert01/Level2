@@ -69,7 +69,6 @@ class PipelineProcessingData : public Matchable, public SerializableJson {
     public:
         PipelineProcessingData();
         ~PipelineProcessingData();
-        string lastProcessedPipelineName;
         int processingCounter = 0;
         static shared_ptr<PipelineProcessingData> getInstance();
         void addPayloadData(string payloadName, string mimetype, const string& data);

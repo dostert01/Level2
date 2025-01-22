@@ -83,7 +83,8 @@ void ProcessingPayload::setPayload(shared_ptr<BinaryProcessingData> payload) {
 
 void to_json(nlohmann::json& j, const ProcessingPayload* p) {
 
-    j = nlohmann::json{{"payloadName", p->payloadName}, {"mimetype", p->mimetype}, {"payload", p->stringPayloadData}};
+    string base64Payload = event_forge::Base64Encoder::encodeNoNewLines(p->stringPayloadData);
+    j = nlohmann::json{{"payloadName", p->payloadName}, {"mimetype", p->mimetype}, {"payload", base64Payload}};
 
     json parametersObject = json::object();
     for(const auto& [key, value] : ((PipelineProcessingData*)p)->getMatchingPatterns()) {
@@ -125,6 +126,7 @@ void PipelineProcessingData::setDefaultProperties() {
         "_" + getFormattedCounter());
     addMatchingPattern(PAYLOAD_MATCHING_PATTERN_DATE_CREATED, getTimeStampOfNow("%Y%m%d"));
     addMatchingPattern(PAYLOAD_MATCHING_PATTERN_TIME_CREATED, getTimeStampOfNow("%H%M%S"));
+    setLastProcessedPipelineName("");
 }
 
 string PipelineProcessingData::getFormattedCounter() {
@@ -215,16 +217,16 @@ void PipelineProcessingData::increaseProcessingCounter() {
 }
 
 void PipelineProcessingData::setLastProcessedPipelineName(string pipelineName) {
-    lastProcessedPipelineName = pipelineName;
+    addMatchingPattern("lastProcessedPipelineName", pipelineName);
 }
 
 string PipelineProcessingData::getLastProcessedPipelineName() {
-    return lastProcessedPipelineName;
+    return getMatchingPattern("lastProcessedPipelineName").value_or("");
 }
 
 void to_json(nlohmann::json& j, const PipelineProcessingData* p) {
 
-    j = nlohmann::json{{"lastProcessedPipelineName", p->lastProcessedPipelineName}, {"processingCounter", p->processingCounter}};
+    j = nlohmann::json{{"processingCounter", p->processingCounter}};
 
     json processingPayloadArray = json::array();
     for(auto payload : ((PipelineProcessingData*)p)->getPayloads()) {
@@ -247,7 +249,6 @@ void to_json(nlohmann::json& j, const PipelineProcessingData* p) {
 }
 
 void from_json(const nlohmann::json& j, PipelineProcessingData& p) {
-    j.at("lastProcessedPipelineName").get_to(p.lastProcessedPipelineName);
     j.at("processingCounter").get_to(p.processingCounter);
 }
 
@@ -256,28 +257,6 @@ void PipelineProcessingData::toJson(void* jsonData) {
     JSON.push_back(j);
 }
 
-/*
-void PipelineProcessingData::toJson(void* jsonData) {
-    std::cout << "PipelineProcessingData::toJson" << std::endl;
-    auto j = JSON.find("PipelineProcessingDatas");
-    if(j == JSON.end()) {
-        JSON.push_back(json::object_t::value_type("PipelineProcessingDatas", {}));
-        j = JSON.find("PipelineProcessingDatas");
-    }
-    j.value().push_back(
-        {
-            {"lastProcessedPipelineName", lastProcessedPipelineName},
-            {"processingCounter", processingCounter},
-            {"bla", "fasel"}
-        });
-    //JSON.push_back(json::object_t::value_type("ProcessingPayloads", {}));
-    //    j = JSON.find("ProcessingPayloads");
-    for(auto currentProcessingPayload : payloadDataCollection) {
-        currentProcessingPayload->toJson(&j);
-    }
-
-}
-*/
 /*
     ProcessingError
 */
