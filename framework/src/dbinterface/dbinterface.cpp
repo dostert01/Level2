@@ -1,5 +1,5 @@
 #include "dbinterface.h"
-#include "../logger/logger.h"
+#include "logger.h"
 
 namespace event_forge {
     

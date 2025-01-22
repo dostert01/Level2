@@ -20,13 +20,17 @@ add_library(mosquittowrapper SHARED
     $<TARGET_OBJECTS:pipelinefifo>
 )
 
+add_library(common SHARED
+    base64.cpp
+    matchable.cpp
+)
+
 target_link_libraries(mosquittowrapper
     ${MOSQUITTO_LIBRARY}
 )
 
-add_library(common SHARED
-    base64.cpp
-    matchable.cpp
+target_link_libraries(common
+    logger
 )
 
 # Specify the include directories for the library

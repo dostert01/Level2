@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "matchable.h"
-#include "../logger/logger.h"
+#include "logger.h"
 
 namespace event_forge {
 

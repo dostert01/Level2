@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "logger/logger.h"
+#include "logger.h"
 
 using namespace event_forge;
 using namespace std;

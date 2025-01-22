@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #include "pipelineprocessor.h"
-#include "../logger/logger.h"
+#include "logger.h"
 
 
 using namespace std;

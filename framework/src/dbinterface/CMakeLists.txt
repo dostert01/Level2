@@ -20,7 +20,7 @@ cmake_print_variables(SQLite3_VERSION)
 add_library(dbinterface SHARED
     dbinterface.cpp)
 
-target_link_libraries(dbinterface PRIVATE ${SQLite3_LIBRARIES})
+target_link_libraries(dbinterface PRIVATE ${SQLite3_LIBRARIES} logger)
 
 # Specify the include directories for the library
 target_include_directories(dbinterface PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${SQLite3_INCLUDE_DIRS})
