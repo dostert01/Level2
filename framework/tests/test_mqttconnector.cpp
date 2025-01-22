@@ -56,7 +56,9 @@ TEST(MQTTConnector, CanSend) {
     shared_ptr<PipelineProcessingData> processData = PipelineProcessingData::getInstance();
     processData->addPayloadData("MQTT_SEND_TEXT_DATA", "text/plain", "Hello via MQTT");
     //thread t(test_mqttconnector::listenToIncomingMessages);
-    pipeline1.value()->execute(processData);
+    EXPECT_TRUE(pipeline1.has_value());
+    if(pipeline1.has_value())
+        pipeline1.value()->execute(processData);
     //t.join();
     EXPECT_EQ(1, 1);
 }

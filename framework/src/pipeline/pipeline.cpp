@@ -152,24 +152,29 @@ void PipelineStep::setLibraryName(const string libraryName) {
 void PipelineStep::loadLib() {
     string libraryFileName = "lib" + libraryName + ".so";
     LOGGER.info("Loading shared object into pipeline: " + libraryFileName);
-    hLib = dlopen(libraryFileName.c_str(), RTLD_LAZY);
-    char* error = dlerror();
-    if((hLib == NULL) && (error != NULL)) {
-        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " : " + error);
-    } else if((hLib != NULL) && (error != NULL)) {
-        throw PipelineException("Shared object " + libraryFileName + " loaded into pipeline with error : " + error);
-    }
-    libInit = (LibInitFunction)(dlsym(hLib, "pipeline_step_module_init"));
-    if(libInit == NULL) {
-        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_init : "  + dlerror());
-    }
-    libProcess = (LibProcessFunction)(dlsym(hLib, "pipeline_step_module_process"));
-    if(libProcess == NULL) {
-        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_process : "  + dlerror());
-    }
-    libFinish = (LibFinishFunction)(dlsym(hLib, "pipeline_step_module_finish"));
-    if(libFinish == NULL) {
-        throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_finish : "  + dlerror());
+    try {
+        hLib = dlopen(libraryFileName.c_str(), RTLD_LAZY);
+        char* error = dlerror();
+        if((hLib == NULL) && (error != NULL)) {
+            throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " : " + error);
+        } else if((hLib != NULL) && (error != NULL)) {
+            throw PipelineException("Shared object " + libraryFileName + " loaded into pipeline with error : " + error);
+        }
+        libInit = (LibInitFunction)(dlsym(hLib, "pipeline_step_module_init"));
+        if(libInit == NULL) {
+            throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_init : "  + dlerror());
+        }
+        libProcess = (LibProcessFunction)(dlsym(hLib, "pipeline_step_module_process"));
+        if(libProcess == NULL) {
+            throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_process : "  + dlerror());
+        }
+        libFinish = (LibFinishFunction)(dlsym(hLib, "pipeline_step_module_finish"));
+        if(libFinish == NULL) {
+            throw PipelineException("Failed to load pipeline step from shared object " + libraryFileName + " while trying to load pipeline_step_module_finish : "  + dlerror());
+        }
+    } catch (const exception& e) {
+        LOGGER.error("loading shared object " + libraryName + " failed. Exception was thrown: " + e.what());
+        LOGGER.error("library module " + libraryName + " must stay disabled due to previous errors during loading of the module!");
     }
     runInitFunction();
 }
@@ -184,16 +189,26 @@ bool PipelineStep::isInitComplete() {
 }
 
 void PipelineStep::runInitFunction() {
-    libInit(initData);
+    if(isInitComplete())
+        libInit(initData);
+    else
+        LOGGER.warn("libInit of module '" + libraryName + "' was called without being fully initialized before and will not be executed");
 }
 
 void PipelineStep::runProcessingFunction(shared_ptr<PipelineProcessingData> processingData) { 
-    libProcess(*processingData);
+    if(isInitComplete())
+        libProcess(*processingData);
+    else
+        LOGGER.warn("libProcess of module '" + libraryName + "' was called without being fully initialized before and will not be executed");
 }
 
 void PipelineStep::runFinishFunction() {
-    LOGGER.info("Invoking the finish function for: " + this->libraryName);
-    libFinish();
+    if(isInitComplete()) {
+        LOGGER.info("Invoking the finish function for: " + this->libraryName);
+        libFinish();
+    } else {
+        LOGGER.warn("libFinish of module '" + libraryName + "' was called without being fully initialized before and will not be executed");
+    }
 }
 
 //-------------------------------------------------------------------
