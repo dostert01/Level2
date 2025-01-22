@@ -6,30 +6,28 @@
 #include <optional>
 #include <memory>
 
-using namespace std;
-
 namespace event_forge {
 
 class Matchable {
     public:
         Matchable() = default;
-        void addMatchingPattern(string key, string value);
+        void addMatchingPattern(std::string key, std::string value);
         uint getCountOfMatchingPatterns();
-        optional<string> getMatchingPattern(string key);
+        std::optional<std::string> getMatchingPattern(std::string key);
         void setMatchingPatterns(Matchable& other);
-        void removeMatchingPattern(string key);
-        bool matchesAll(shared_ptr<Matchable> other);
+        void removeMatchingPattern(std::string key);
+        bool matchesAll(std::shared_ptr<Matchable> other);
         bool matchesAll(Matchable& other);
-        bool matchesAllOfMineToAnyOfTheOther(shared_ptr<Matchable> other);
+        bool matchesAllOfMineToAnyOfTheOther(std::shared_ptr<Matchable> other);
         bool hasMatchingPatterns();
-        map<string, string> getMatchingPatterns();
+        std::map<std::string, std::string> getMatchingPatterns();
         Matchable& operator=(const Matchable& other);
     private:
-        map<string, string> matchingPatterns;
-        bool RegexMatch(string s1, string s2);
+        std::map<std::string, std::string> matchingPatterns;
+        bool RegexMatch(std::string s1, std::string s2);
         bool bothHaveMatchingPatterns(Matchable& other);
         bool bothHaveSameNumberOfMatchingPatterns(Matchable& other);
-        int getCoutOfMatches(shared_ptr<Matchable> other);
+        int getCoutOfMatches(std::shared_ptr<Matchable> other);
         int getCoutOfMatches(Matchable& other);
 };
 

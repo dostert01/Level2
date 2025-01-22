@@ -12,7 +12,7 @@ Matchable& Matchable::operator=(const Matchable& other) {
     return *this;
 }
 
-void Matchable::addMatchingPattern(string key, string value) {
+void Matchable::addMatchingPattern(std::string key, std::string value) {
     matchingPatterns[key] = value;
 }
 
@@ -20,7 +20,7 @@ uint Matchable::getCountOfMatchingPatterns() {
     return matchingPatterns.size();
 }
 
-optional<string> Matchable::getMatchingPattern(string key) {
+std::optional<std::string> Matchable::getMatchingPattern(std::string key) {
     if(matchingPatterns.contains(key)) {
         return matchingPatterns[key];
     } else {
@@ -32,14 +32,14 @@ void Matchable::setMatchingPatterns(Matchable& other) {
     *this = other;
 }
 
-void Matchable::removeMatchingPattern(string key) {
+void Matchable::removeMatchingPattern(std::string key) {
     matchingPatterns.erase(key);
 }
 
 int Matchable::getCoutOfMatches(Matchable& other) {
     int matchCount = 0;
     for(const auto& [key, value] : matchingPatterns) {
-        optional<string> foundMatchingPattern = other.getMatchingPattern(key);
+        std::optional<std::string> foundMatchingPattern = other.getMatchingPattern(key);
         if(foundMatchingPattern.has_value() && RegexMatch(value, foundMatchingPattern.value())) {
             matchCount++;
         }
@@ -47,11 +47,11 @@ int Matchable::getCoutOfMatches(Matchable& other) {
     return matchCount;
 }
 
-int Matchable::getCoutOfMatches(shared_ptr<Matchable> other) {
+int Matchable::getCoutOfMatches(std::shared_ptr<Matchable> other) {
     return getCoutOfMatches(*other);
 }
 
-bool Matchable::matchesAllOfMineToAnyOfTheOther(shared_ptr<Matchable> other) {
+bool Matchable::matchesAllOfMineToAnyOfTheOther(std::shared_ptr<Matchable> other) {
     return (getCountOfMatchingPatterns() == 0) ||
         (getCountOfMatchingPatterns() == getCoutOfMatches(other));
 }
@@ -68,7 +68,7 @@ bool Matchable::matchesAll(Matchable& other) {
 
 }
 
-bool Matchable::matchesAll(shared_ptr<Matchable> other) {
+bool Matchable::matchesAll(std::shared_ptr<Matchable> other) {
     return matchesAll(*other);
 }
 
@@ -80,7 +80,7 @@ bool Matchable::bothHaveSameNumberOfMatchingPatterns(Matchable& other) {
     return this->getCountOfMatchingPatterns() == other.getCountOfMatchingPatterns();
 }
 
-bool Matchable::RegexMatch(string s1, string s2) {
+bool Matchable::RegexMatch(std::string s1, std::string s2) {
     bool match = false;
     try {
         regex regex(s1);
@@ -95,7 +95,7 @@ bool Matchable::hasMatchingPatterns() {
     return getCountOfMatchingPatterns() > 0;
 }
 
-map<string, string> Matchable::getMatchingPatterns() {
+std::map<std::string, std::string> Matchable::getMatchingPatterns() {
     return matchingPatterns;
 }
 

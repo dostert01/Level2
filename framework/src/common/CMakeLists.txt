@@ -26,6 +26,7 @@ target_link_libraries(mosquittowrapper
 
 add_library(common SHARED
     base64.cpp
+    matchable.cpp
 )
 
 # Specify the include directories for the library
@@ -35,5 +36,10 @@ target_include_directories(mosquittowrapper PUBLIC
     ${LOGGER_INCLUDE_DIR}
     ${PIPELINE_INCLUDE_DIR}
 )
+
+target_include_directories(common PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 target_compile_definitions(mosquittowrapper PRIVATE BUILDING_DLL)
 target_compile_definitions(common PRIVATE BUILDING_DLL)

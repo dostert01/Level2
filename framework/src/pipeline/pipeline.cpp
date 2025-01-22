@@ -132,7 +132,7 @@ PipelineStep::~PipelineStep() {
 void PipelineStep::loadNamedArguments(const json& jsonData) {
     if(jsonData.contains(JSON_PROPERTY_NAMED_ARGUMENTS) && jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].is_object()) {
         for (const auto& item : jsonData[JSON_PROPERTY_NAMED_ARGUMENTS].items()) {
-            initData.namedArguments.insert({item.key(), (item.value().get<string>())});
+            initData.addNamedArgument(item.key(), (item.value().get<string>()));
         }
     }
 }

@@ -12,7 +12,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(./samplelibs)
 
 add_library(pipelineapi SHARED
-    apistructs.cpp
+    processingerror.cpp
+    processingpayload.cpp
+    pipelineprocessingdata.cpp
+    pipelinestepinitdata.cpp
     $<TARGET_OBJECTS:common>
 )
 
