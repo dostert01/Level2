@@ -34,11 +34,6 @@ void initMQTTConnection(PipelineStepInitData& initData) {
   mqtt = MosquittoWrapper::getInstance(hostName, stoi(port), clientId, topic);
 }
 
-int pipeline_step_module_init(PipelineStepInitData& initData) {
-  initMQTTConnection(initData);
-  return 0;
-}
-
 void sendData(PipelineProcessingData& processData) {
   auto payload = processData.getPayload(PAYLOAD_NAME_MQTT_SEND_TEXT_DATA);
   if(payload.has_value()) {
@@ -50,11 +45,18 @@ void sendData(PipelineProcessingData& processData) {
   }
 }
 
-int pipeline_step_module_process(PipelineProcessingData& processData) {
-  if(mqtt->isInitComplete()) {
-    sendData(processData);
+} // namespace event_forge
+
+int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
+  event_forge::initMQTTConnection(initData);
+  return 0;
+}
+
+int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
+  if(event_forge::mqtt->isInitComplete()) {
+    event_forge::sendData(processData);
   } else {
-    LOGGER.warn("Client is not connected to the MQTT broker. No data can be sent.");
+    event_forge::LOGGER.warn("Client is not connected to the MQTT broker. No data can be sent.");
   }
   return 0;
 }
@@ -63,4 +65,3 @@ int pipeline_step_module_finish() {
   return 0;
 }
 
-} // namespace event_forge

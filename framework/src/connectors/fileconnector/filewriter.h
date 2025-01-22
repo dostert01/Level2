@@ -7,6 +7,8 @@
 
 using namespace std;
 
+namespace event_forge {
+
 class FileWriter {
     public:
         FileWriter(PipelineStepInitData& initData);
@@ -19,4 +21,5 @@ class FileWriter {
         bool ensureDirectoryExists(string path);
 };
 
+} // namespace event_forge
 #endif //#ifndef FILE_WRITER_H

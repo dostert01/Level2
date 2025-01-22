@@ -2,18 +2,16 @@
 
 #include "filewriter.h"
 
-
-
 using namespace std;
 
-FileWriter *fileWriter = nullptr;
+event_forge::FileWriter *fileWriter = nullptr;
 
-int pipeline_step_module_init(PipelineStepInitData& initData) {
-  fileWriter = new FileWriter(initData);
+int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
+  fileWriter = new event_forge::FileWriter(initData);
   return 0;
 }
 
-int pipeline_step_module_process(PipelineProcessingData& processData) {
+int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
   fileWriter->writeFile(processData);
   return 0;
 }

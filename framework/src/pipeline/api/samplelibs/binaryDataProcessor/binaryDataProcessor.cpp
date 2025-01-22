@@ -8,10 +8,10 @@
 std::string firstArgument;
 std::string secondArgument;
 
-void processTheProcessingData(PipelineProcessingData& processData);
+void processTheProcessingData(event_forge::PipelineProcessingData& processData);
 void processArgumentsFromJson();
 
-int pipeline_step_module_init(PipelineStepInitData& initData) {
+int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
 
     std::optional<std::string> s  = initData.getNamedArgument("first argument");
     if(s.has_value()) {
@@ -24,13 +24,13 @@ int pipeline_step_module_init(PipelineStepInitData& initData) {
     return 0;
 }
 
-int pipeline_step_module_process(PipelineProcessingData& processData) {
+int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
   processTheProcessingData(processData);
   return 0;
 }
 
-void processTheProcessingData(PipelineProcessingData& processData) {
-  auto binData = make_shared<ProcessingError>("ProcessingError",
+void processTheProcessingData(event_forge::PipelineProcessingData& processData) {
+  auto binData = make_shared<event_forge::ProcessingError>("ProcessingError",
     "ProcessingError is the only BinaryDataPayload, that currently is supported. "
     "firstArgument: " + firstArgument + " " +
     "secondArgument: " + secondArgument);
