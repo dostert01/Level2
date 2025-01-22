@@ -16,6 +16,7 @@ add_library(pipelineapi SHARED
     processingpayload.cpp
     pipelineprocessingdata.cpp
     pipelinestepinitdata.cpp
+    binaryprocessingdata.cpp
     $<TARGET_OBJECTS:common>
 )
 

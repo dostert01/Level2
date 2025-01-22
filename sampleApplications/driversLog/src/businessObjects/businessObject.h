@@ -1,12 +1,13 @@
-#ifndef INC_BUSINESS_OBJECT_H
-#define INC_BUSINESS_OBJECT_H
+#pragma once 
 
 #include "pipelineapi.h"
+#include "apistructs.h"
+#include "serializables.h"
 
-class BusinessObject : public BinaryProcessingData, public SerializableDB, public SerializableJson {
+using namespace event_forge;
+class BusinessObject : public BinaryProcessingData, public SerializableJson {
     public:
         BusinessObject() = default;
         virtual ~BusinessObject() = default;
 };
 
-#endif //INC_BUSINESS_OBJECT_H
