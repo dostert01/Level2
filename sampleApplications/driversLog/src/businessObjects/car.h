@@ -16,6 +16,7 @@ class Car : public BusinessObject {
         bool initFromDataBase(shared_ptr<Database> db){return "";};
         string toJson(){return "";};
         void initFromJson(string jsonString){};
+        void toJson(void* jsonData) override {};
     private:
         string model;
         string licensePlate;

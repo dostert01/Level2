@@ -34,7 +34,7 @@ link_libraries(
 add_executable(test_car
     test_car.cpp)
 
-target_link_libraries(test_car gtest gtest_main dl)
+target_link_libraries(test_car gtest gtest_main dl logger dbinterface businessObjects)
 
 # Tests registrieren
 add_test(NAME test_car COMMAND test_car)

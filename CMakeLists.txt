@@ -10,6 +10,11 @@ include(CMakePrintHelpers)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
+set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+cmake_print_variables(PROJECT_ROOT_DIR)
+
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -17,6 +22,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add sub projects
 add_subdirectory(_deps/googletest)
 add_subdirectory(framework)
+add_subdirectory(sampleApplications)
 
 # Tests hinzufügen
 enable_testing()
