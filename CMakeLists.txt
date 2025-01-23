@@ -9,6 +9,7 @@ include(FetchContent)
 include(CMakePrintHelpers)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
+# Credits go to Niels Lohmann for nlohmann/json
 
 set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
