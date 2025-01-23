@@ -16,7 +16,7 @@
 
 ## Preface
 
-This software is still in a very early state. This means, that not all features, that are described in the current documentation, are already (fully) implemented and available. In particular, being a framework, this project requires real life use cases, which are also ot implemented yet. However, it is even more important to mention them already now, to be able to describe the big picture and the purpose of this project. This way, I'd like to share the idea of what is already possible and what might be missing.
+This software is still in a very early state. This means, that not all features, that are described in the current documentation, are already (fully) implemented and available. In particular, being a framework, this project requires real life use cases, which are also not implemented yet. However, it is even more important to mention them already now, to be able to describe the big picture and the purpose of this project. This way, I'd like to share the idea of what is already possible and what might be missing.
 
 In case you are interested in participating and/or contributing, both would be very welcome and appreciated. But of course I am also happy if you simply use the project for your own purposes :-).
 
@@ -39,7 +39,7 @@ The runtime implements the input-processing-output (IPO) pattern. While doing so
 - Interfaces to external systems in the form of listeners (for receiving of incoming data), connectors (for sending data to external systems)
 - Capability to choose between parallel and strict fifo processing of business logic
 - Synchronous and asynchronous processing
-- Scalability from having very small footprint in the hosting system to high performance and high data throughput on more capable system
+- Scalability from having very small footprint in the hosting system to high performance and high data throughput on more capable systems
 
 #### Business Objects
 
@@ -49,22 +49,11 @@ When reaching the system, incoming data is being enriched with meta information,
 
 #### Business Logic
 
-The smallest building blocks of business logic inside the system are business logic modules. These modules themselves implement the IPO pattern. They are based on a simple API, what allows modular extensibility of the system's capabilities in a way, that is independent of development and release cycle of the framework itself.
+The smallest building blocks of business logic inside the framework are business logic modules. These modules themselves implement the IPO pattern. They are based on a simple API, what allows modular extensibility of the system's capabilities in a way, that is independent of development and release cycle of the framework itself.
 
 Business logic modules can be chained together into pipelines. This is, where the state (respectively the meta information) of a payload and its business object comes into play. Each pipeline can have a set to matching patterns attached. These patterns are matched against the state of any incoming payload. Once a pipeline's matching patters match a payload, this particular payload will be processed by the corresponding pipeline. During the processing of a payload, a pipeline or more precise the contained business logic modules can apply any kind of changes to the payload and its state information. This can either cause the payload to be processed by subsequent matching pipelines or being handed over to external systems.
 
-
-
-- Ability to run anywhere (on Linux) from small embedded systems to big cloud instances
-- Small memory footprint
-- As few external dependencies as possible or rather reasonable
-- Modularity
-- Performance
-- Ability to modify and add new business logic after deployment
-
 ## Technical Implementation
-
-
 
 ### Provided Modules
 
@@ -91,7 +80,7 @@ After cloning the repo cd into the root of the repo and do the following:
     `cmake . && make && ctest -V`
 
     This will automatically execute `getDependencies.sh` and download  `googletest` to `_deps/googletest/` from where `cmake`  will trigger its build.
-    
+
     Further on, [CMakeLists.txt](./CMakeLists.txt) will download [nlohmann/json](https://github.com/nlohmann/json) and make it available to the project build.
 
 
