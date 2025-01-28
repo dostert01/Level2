@@ -95,10 +95,12 @@ target_link_libraries(test_dbinterface
 
 add_executable(test_httplistener
     test_httplistener.cpp
-    $<TARGET_OBJECTS:httplistener>
-    $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>
-    $<TARGET_OBJECTS:applicationcontext>)
+)
+
+target_link_libraries(test_httplistener PRIVATE
+    httplistener
+)
 
 add_executable(test_fileconnector
     test_fileconnector.cpp
@@ -107,31 +109,30 @@ add_executable(test_fileconnector
 
 add_executable(test_filelistener
     test_filelistener.cpp
-    $<TARGET_OBJECTS:filelistener>
-    $<TARGET_OBJECTS:pipeline>
-    $<TARGET_OBJECTS:pipelinefifo>
-    $<TARGET_OBJECTS:applicationcontext>)
+)
+
+target_link_libraries(test_filelistener PRIVATE
+    filelistener
+)
 
 if(MOSQUITTO_FOUND)
     add_executable(test_mqttconnector
         test_mqttconnector.cpp
-        $<TARGET_OBJECTS:pipeline>
-        $<TARGET_OBJECTS:mqttconnector>
     )
     target_link_libraries(test_mqttconnector
         ${MOSQUITTO_LIBRARY}
         mosquittowrapper
+        mqttconnector
+        pipeline
     )
 
     add_executable(test_mqttlistener
         test_mqttlistener.cpp
-        $<TARGET_OBJECTS:pipeline>
-        $<TARGET_OBJECTS:mqttlistener>
-        $<TARGET_OBJECTS:applicationcontext>
     )
     target_link_libraries(test_mqttlistener
         ${MOSQUITTO_LIBRARY}
         mosquittowrapper
+        mqttlistener
     )
 else()
     message("INFO: Building without support for MQTT")

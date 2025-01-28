@@ -5,3 +5,4 @@ test_apistructs
 test_common
 test_filelistener
 test_httplistener
+test_httplistener

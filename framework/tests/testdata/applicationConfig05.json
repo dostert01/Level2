@@ -16,7 +16,7 @@
         ],
         "HTTPListeners": [
             {
-                "port": 8899,
+                "port": 8889,
                 "maxClients" : 10
             }
         ]

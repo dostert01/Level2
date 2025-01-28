@@ -17,13 +17,12 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 # Specify the library
 add_library(httplistener SHARED
     httplistener.cpp
-    ../networklistener.cpp
 )
 
 target_link_libraries(httplistener PUBLIC
     pipelineapi
-    pipelinefifo
     applicationcontext
+    listeners
     nlohmann_json::nlohmann_json dl
 )
 

@@ -1,26 +1,30 @@
-#include "httplistener.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <memory>
+
 #include "applicationcontext.h"
+#include "httplistener.h"
 
 namespace event_forge {
 
-HTTPListener::HTTPListener(json jsonObject) {
-  port = jsonObject["port"];
+HTTPListener::HTTPListener(json jsonObject) : GenericServer(jsonObject) {
 };
+
+HTTPListener::~HTTPListener() {
+}
 
 std::shared_ptr<HTTPListener> HTTPListener::getInstance() {
   return std::make_shared<HTTPListener>();
 }
 
-void HTTPListener::init(std::shared_ptr<PipelineFiFo> fifo) {
-    NetworkListener::init(fifo);
-    initComplete = true;
-}
+void HTTPListener::handleClientConnection(int clientSocket, std::string clientHost) {
 
-void HTTPListener::startListening() {
-}
-
-int HTTPListener::getPort() {
-    return port;
 }
 
 } // namespace event_forge
