@@ -1,0 +1,6 @@
+GET /api/1.0/index.html HTTP/1.1
+no valid header line here
+Host: www.example.com
+User-Agent: curl/7.68.0
+Accept: */*
+

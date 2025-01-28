@@ -21,6 +21,7 @@ GenericServer::GenericServer(json jsonObject) {
   port = jsonObject["port"];
   maxClients = jsonObject["maxClients"];
   serverSocket = -1;
+  keepListeningThreadRunning.store(false);
 };
 
 GenericServer::~GenericServer() {
@@ -86,6 +87,7 @@ void GenericServer::listeningThreadFunction() {
   
   struct epoll_event ev, events[MAX_EVENTS];
   int epollfd = epoll_create1(0);
+  memset(&ev, 0, sizeof(struct epoll_event));
   ev.events = EPOLLIN;
   ev.data.fd = serverSocket;
   epoll_ctl(epollfd, EPOLL_CTL_ADD, serverSocket, &ev);

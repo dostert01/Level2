@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 #include <thread>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "logger.h"
 #include "pipeline.h"
 #include "applicationcontext.h"
-#include "payloadnames.h"
 #include "httplistener.h"
+#include "http11.h"
 
 #define HALF_A_SECOND 500000
 
@@ -13,6 +16,8 @@ using namespace event_forge;
 
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_05 "/applicationConfig05.json"
+#define HTTP_REQUEST_TEST_FILE_01 "/httpRequest01.txt"
+#define HTTP_REQUEST_TEST_FILE_02 "/httpRequest02.txt"
 
 namespace test_httplistener {
     std::string workingDir;
@@ -81,7 +86,7 @@ TEST(HTTPListener, ListenerCanBeCreatedThroughAppContext) {
     APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_02);
     auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
     EXPECT_EQ(1, listeners.size());
-    EXPECT_EQ(8889, listeners[0]->getPort());
+    EXPECT_EQ(8899, listeners[0]->getPort());
 }
 
 TEST(HTTPListener, isListeningStatusWorks01) {
@@ -114,5 +119,26 @@ TEST(HTTPListener, CanReceiveSomeData) {
     EXPECT_EQ(0, test_httplistener::sendHelloWorld());
 }
 
+TEST(Http11, canParseFirstLine) {
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_EQ("GET", request.value()->getMethod());
+    EXPECT_EQ("/api/1.0/index.html", request.value()->getPath());
+}
 
+TEST(Http11, canParseNormalHeaderLines) {
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_EQ("www.example.com", request.value()->getHeaderFieldValue("Host"));
+    EXPECT_EQ("curl/7.68.0", request.value()->getHeaderFieldValue("User-Agent"));
+    EXPECT_EQ("*/*", request.value()->getHeaderFieldValue("Accept"));    
+}
 
+TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_02).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_EQ(std::nullopt, request);
+}
