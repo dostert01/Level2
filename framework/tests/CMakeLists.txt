@@ -24,6 +24,7 @@ include_directories(
     ${MQTT_CONNECTOR_DIR}
     ${MQTT_LISTENER_DIR}
     ${FILE_LISTENER_DIR}
+    ${HTTP_LISTENER_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${LISTENERS_DIR}
     ${COMMON_INCLUDE_DIR}
@@ -92,6 +93,13 @@ add_executable(test_dbinterface
 target_link_libraries(test_dbinterface
     ${SQLite3_LIBRARIES})
 
+add_executable(test_httplistener
+    test_httplistener.cpp
+    $<TARGET_OBJECTS:httplistener>
+    $<TARGET_OBJECTS:pipeline>
+    $<TARGET_OBJECTS:pipelinefifo>
+    $<TARGET_OBJECTS:applicationcontext>)
+
 add_executable(test_fileconnector
     test_fileconnector.cpp
     $<TARGET_OBJECTS:pipeline>
@@ -156,6 +164,9 @@ set_tests_properties(test_pipelinefifo PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${
 
 add_test(NAME test_dbinterface COMMAND test_dbinterface)
 set_tests_properties(test_dbinterface PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_httplistener COMMAND test_httplistener)
+set_tests_properties(test_httplistener PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_fileconnector COMMAND test_fileconnector)
 set_tests_properties(test_fileconnector PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

@@ -23,9 +23,9 @@ add_library(pipelinefifo SHARED
 )
 
 target_include_directories(pipeline PUBLIC api ${CMAKE_CURRENT_SOURCE_DIR} ${COMMON_INCLUDE_DIR})
-target_include_directories(pipelinefifo PUBLIC api ${COMMON_INCLUDE_DIR})
+target_include_directories(pipelinefifo PUBLIC api ${COMMON_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(pipeline PRIVATE logger common pipelinefifo nlohmann_json::nlohmann_json dl)
-target_link_libraries(pipelinefifo PRIVATE logger nlohmann_json::nlohmann_json dl)
+target_link_libraries(pipeline PUBLIC logger common pipelinefifo nlohmann_json::nlohmann_json dl)
+target_link_libraries(pipelinefifo PUBLIC logger nlohmann_json::nlohmann_json dl)
 
 target_compile_definitions(pipeline PRIVATE BUILDING_DLL)

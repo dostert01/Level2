@@ -4,3 +4,4 @@ test_fileconnector
 test_apistructs
 test_common
 test_filelistener
+test_httplistener
