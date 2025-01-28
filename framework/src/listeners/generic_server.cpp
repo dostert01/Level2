@@ -60,6 +60,53 @@ void GenericServer::stopListening() {
   }
 }
 
+void GenericServer::workingThreadFunction(int clientSocket, std::string clientHost) {
+  LOGGER.trace("start processing incoming connection");
+  setNonBlocking(clientSocket);
+  handleClientConnection(clientSocket, clientHost);
+  close(clientSocket);
+  LOGGER.trace("finished processing incoming connection");
+}
+
+void GenericServer::workingThreadsCleanerFunction() {
+  LOGGER.info("starting working thread monitoring");
+  while (keepListeningThreadRunning.load() || haveWorkingThreads()) {
+    usleep(HALF_A_SECOND * 4);
+    eraseFinishedWorkingThreads();
+  }
+}
+
+void GenericServer::listeningThreadFunction() {
+  createReusableServerSocket();
+  bindServerSocket();
+  listenOnServerSocket();
+  if(initComplete) {
+    LOGGER.info("server is listening on port " + std::to_string(port) + ". Error: " + std::string(strerror(errno)));
+  }
+  
+  struct epoll_event ev, events[MAX_EVENTS];
+  int epollfd = epoll_create1(0);
+  ev.events = EPOLLIN;
+  ev.data.fd = serverSocket;
+  epoll_ctl(epollfd, EPOLL_CTL_ADD, serverSocket, &ev);
+  while(keepListeningThreadRunning.load()) {
+    int countEvents = epoll_wait(epollfd, &ev, MAX_EVENTS, 1000);
+    if(countEvents == -1) {
+      LOGGER.error("error encountered during waiting for an event to occurre on the server socket: " + std::string(strerror(errno)));
+    } else if (countEvents > 0) {
+      for(int i = 0; i < countEvents; i++) {
+        struct sockaddr_in clientAddress;
+        socklen_t addressStructLen = sizeof(clientAddress);
+        int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &addressStructLen);
+        LOGGER.info("New connection from " + std::string(inet_ntoa(clientAddress.sin_addr)) + ":" + std::to_string(ntohs(clientAddress.sin_port)));
+        std::future<void> workingThread = std::async(std::launch::async, &GenericServer::workingThreadFunction, this, clientSocket, std::string(inet_ntoa(clientAddress.sin_addr)));
+        auto workingThreadPointer = std::make_shared<std::future<void>>(std::move(workingThread));
+        addToListOfWorkingThreads(workingThreadPointer);
+      }
+    }
+  }
+}
+
 void GenericServer::createServerSocket() {
   if(initComplete) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -67,27 +114,6 @@ void GenericServer::createServerSocket() {
       handleListeningError("failed creating listening socket: " + std::string(strerror(errno)));
     }
   }
-}
-
-void GenericServer::setSocketOptions() {
-  if(initComplete) {
-    int socketOptionValue = 1;
-    if(setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &socketOptionValue, sizeof(socketOptionValue)) == -1) {
-      handleListeningError("failed setting socket options: " + std::string(strerror(errno)));
-    }
-    setNonBlocking(serverSocket);
-  }
-}
-
-void GenericServer::setNonBlocking(int fileDescriptor) {
-    int flags = fcntl(fileDescriptor, F_GETFL, 0);
-    if(flags == -1) {
-      handleListeningError("failed reading flags from file descriptor: " + std::string(strerror(errno)));
-    }
-    flags = flags | O_NONBLOCK;
-    if(fcntl(fileDescriptor, F_SETFL, flags) == -1) {
-      handleListeningError("failed setting the file descriptor to non blocking: " + std::string(strerror(errno)));
-    }
 }
 
 void GenericServer::createReusableServerSocket() {
@@ -119,12 +145,25 @@ void GenericServer::listenOnServerSocket() {
   }
 }
 
-void GenericServer::workingThreadsCleanerFunction() {
-  LOGGER.info("starting working thread monitoring");
-  while (keepListeningThreadRunning.load() || haveWorkingThreads()) {
-    usleep(HALF_A_SECOND * 4);
-    eraseFinishedWorkingThreads();
+void GenericServer::setSocketOptions() {
+  if(initComplete) {
+    int socketOptionValue = 1;
+    if(setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &socketOptionValue, sizeof(socketOptionValue)) == -1) {
+      handleListeningError("failed setting socket options: " + std::string(strerror(errno)));
+    }
+    setNonBlocking(serverSocket);
   }
+}
+
+void GenericServer::setNonBlocking(int fileDescriptor) {
+    int flags = fcntl(fileDescriptor, F_GETFL, 0);
+    if(flags == -1) {
+      handleListeningError("failed reading flags from file descriptor: " + std::string(strerror(errno)));
+    }
+    flags = flags | O_NONBLOCK;
+    if(fcntl(fileDescriptor, F_SETFL, flags) == -1) {
+      handleListeningError("failed setting the file descriptor to non blocking: " + std::string(strerror(errno)));
+    }
 }
 
 bool GenericServer::haveWorkingThreads() {
@@ -139,45 +178,6 @@ void GenericServer::eraseFinishedWorkingThreads() {
       LOGGER.info("removing finished working thread");
       it->get()->get();
       workingThreads.erase(it);
-    }
-  }
-}
-
-void GenericServer::workingThreadFunction(int clientSocket, std::string clientHost) {
-  LOGGER.trace("start processing incoming connection");
-  setNonBlocking(clientSocket);
-  usleep(HALF_A_SECOND * 10);
-  close(clientSocket);
-  LOGGER.trace("finished processing incoming connection");
-}
-
-void GenericServer::listeningThreadFunction() {
-  createReusableServerSocket();
-  bindServerSocket();
-  listenOnServerSocket();
-  if(initComplete) {
-    LOGGER.info("server is listening on port " + std::to_string(port) + ". Error: " + std::string(strerror(errno)));
-  }
-  
-  struct epoll_event ev, events[MAX_EVENTS];
-  int epollfd = epoll_create1(0);
-  ev.events = EPOLLIN;
-  ev.data.fd = serverSocket;
-  epoll_ctl(epollfd, EPOLL_CTL_ADD, serverSocket, &ev);
-  while(keepListeningThreadRunning.load()) {
-    int countEvents = epoll_wait(epollfd, &ev, MAX_EVENTS, 1000);
-    if(countEvents == -1) {
-      LOGGER.error("error encountered during waiting for an event to occurre on the server socket: " + std::string(strerror(errno)));
-    } else if (countEvents > 0) {
-      for(int i = 0; i < countEvents; i++) {
-        struct sockaddr_in clientAddress;
-        socklen_t addressStructLen = sizeof(clientAddress);
-        int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &addressStructLen);
-        LOGGER.info("New connection from " + std::string(inet_ntoa(clientAddress.sin_addr)) + ":" + std::to_string(ntohs(clientAddress.sin_port)));
-        std::future<void> workingThread = std::async(std::launch::async, &GenericServer::workingThreadFunction, this, clientSocket, std::string(inet_ntoa(clientAddress.sin_addr)));
-        auto workingThreadPointer = std::make_shared<std::future<void>>(std::move(workingThread));
-        addToListOfWorkingThreads(workingThreadPointer);
-      }
     }
   }
 }
