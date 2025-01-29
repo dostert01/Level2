@@ -15,20 +15,29 @@ class HttpException : public std::exception {
         std::string message;
 }; 
 
+using UrlParamsMultiMap = std::multimap<std::string, std::string>;
+using UrlParamsRange = std::pair<UrlParamsMultiMap::const_iterator, UrlParamsMultiMap::const_iterator>;
+
 class HttpRequest {
     public:
-        HttpRequest() = default;
+        HttpRequest();
         void setMethod(const std::string& method);
         std::string getMethod();
-        void setPath(const std::string& path);
+        void setPath(const std::string& pathValue);
         std::string getPath();
         std::optional<std::string> getHeaderFieldValue(std::string fieldName);
         void addHeaderField(std::string fieldName, std::string fieldValue);
+        int getCountOfUrlParams();
+        UrlParamsRange getUrlParams(std::string searchKey);
+        std::shared_ptr<UrlParamsMultiMap> getAllUrlParams();
     private:
         std::string method;
         std::string path;
         std::map<std::string, std::string> headerFields;
-
+        std::shared_ptr<UrlParamsMultiMap> urlParams;
+        bool pathHasUrlParams();
+        void parseUrlParamsFromPath();
+        void addUrlParam(std::string key, std::string value);
 };
 
 class Http11 {
@@ -44,7 +53,7 @@ class Http11 {
         void readFirst2K(int fileDescriptor);
         void parseFirstLine(char* linebuffer);
         void parseHeaderFiledLine(char* linebuffer);
-        void readHeader();
+        void parseHeader();
 };
 
 } // namespace event_forge

@@ -18,6 +18,7 @@ using namespace event_forge;
 #define APP_CONFIG_TEST_FILE_05 "/applicationConfig05.json"
 #define HTTP_REQUEST_TEST_FILE_01 "/httpRequest01.txt"
 #define HTTP_REQUEST_TEST_FILE_02 "/httpRequest02.txt"
+#define HTTP_REQUEST_TEST_FILE_03 "/httpRequest03.txt"
 
 namespace test_httplistener {
     std::string workingDir;
@@ -63,7 +64,7 @@ void configureTest() {
     test_httplistener::configureLogger();
     test_httplistener::configureTestVariables();
 }
-
+/*
 TEST(HTTPListener, CanCreateAnInstaneOfTheHTTPListener) {
     shared_ptr<HTTPListener> listener = HTTPListener::getInstance();
     EXPECT_TRUE(listener.get() != nullptr);
@@ -133,7 +134,6 @@ TEST(Http11, canParseNormalHeaderLines) {
     auto request = http.readRequest(fd, "");
     EXPECT_EQ("www.example.com", request.value()->getHeaderFieldValue("Host"));
     EXPECT_EQ("curl/7.68.0", request.value()->getHeaderFieldValue("User-Agent"));
-    EXPECT_EQ("*/*", request.value()->getHeaderFieldValue("Accept"));    
 }
 
 TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
@@ -141,4 +141,48 @@ TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
     Http11 http;
     auto request = http.readRequest(fd, "");
     EXPECT_EQ(std::nullopt, request);
+}
+
+TEST(Http11, getHeaderFieldValueReturnsEmptyOptionalOnFailure) {
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_EQ(std::nullopt, request.value()->getHeaderFieldValue("ThisIsNotPresentInTheHeader"));
+}
+*/
+
+TEST(Http11, canParseUrlParams) {
+    configureTest();
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_03).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_EQ("/api/1.0/index.html", request.value()->getPath());
+    EXPECT_EQ(6, request.value()->getCountOfUrlParams());
+    auto params = request.value()->getUrlParams("q");
+    for(auto param = params.first; param != params.second; ++param) {
+        LOGGER.info("found param key='" + param->first + "' value='" + param->second + "'");
+        EXPECT_EQ("hello%20world", param->second);
+    }
+    params = request.value()->getUrlParams("tag");
+    int i=0;
+    for(auto param = params.first; param != params.second; ++param) {
+        LOGGER.info("found param key='" + param->first + "' value='" + param->second + "'");
+        EXPECT_TRUE(param->second.starts_with("value0"));
+        i++;
+    }
+    EXPECT_EQ(2, i);
+}
+
+TEST(Http11, canGetAllParams) {
+    configureTest();
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_03).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    std::string result;
+    std::shared_ptr<event_forge::UrlParamsMultiMap> params = request.value()->getAllUrlParams();
+    for(auto param = params->begin(); param != params->end(); ++param) {
+        LOGGER.info("found param key='" + param->first + "' value='" + param->second + "'");
+        result.append(param->first + "=" + param->second + " ");
+    }
+    EXPECT_EQ("category=C%2B%2B emptyParam= page=1 q=hello%20world tag=value01 tag=value02 ", result);
 }

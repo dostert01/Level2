@@ -1,5 +1,6 @@
 #include <string.h>
 #include <cstring>
+#include <sstream>
 
 #include "http11.h"
 #include "logger.h"
@@ -11,10 +12,16 @@
 #define HEADER_FIELD_SEPARATOR ": "
 #define METHOD_PATH_SEPARATOR " /"
 #define PATH_PROTOCOL_SEPARATOR " HTTP/1.1"
+#define PATH_QUERY_SEPARATOR "?"
+#define QUERY_PARAM_SEPARATOR '&'
+#define KEY_VALUE_SEPARATOR "="
 
 namespace event_forge {
 
 //-------------------------------------------------------------------
+HttpRequest::HttpRequest() {
+    urlParams = std::make_shared<UrlParamsMultiMap>();
+}
 
 void HttpRequest::setMethod(const std::string& method) {
     this->method = method;
@@ -24,8 +31,11 @@ std::string HttpRequest::getMethod() {
     return method;   
 }
 
-void HttpRequest::setPath(const std::string& path) {
-    this->path = path;
+void HttpRequest::setPath(const std::string& pathValue) {
+    path = pathValue;
+    if(pathHasUrlParams()) {
+        parseUrlParamsFromPath();
+    }
 }
 
 std::string HttpRequest::getPath() {
@@ -42,7 +52,44 @@ std::optional<std::string> HttpRequest::getHeaderFieldValue(std::string fieldNam
 }
 
 void HttpRequest::addHeaderField(std::string fieldName, std::string fieldValue) {
+    LOGGER.trace("HttpRequest - adding header field: " + fieldName + ": " + fieldValue);
     headerFields[fieldName] = fieldValue;
+}
+
+int HttpRequest::getCountOfUrlParams() {
+    return urlParams->size();
+}
+
+bool HttpRequest::pathHasUrlParams() {
+    return path.find(PATH_QUERY_SEPARATOR) != std::string::npos;
+}
+
+void HttpRequest::parseUrlParamsFromPath() {
+    int queryStringStart = path.find(PATH_QUERY_SEPARATOR);
+    if(queryStringStart != std::string::npos) {
+        std::istringstream queryString(path.substr(queryStringStart + 1));
+        path = path.substr(0, queryStringStart);
+        std::string singleParam;
+        while(std::getline(queryString, singleParam, QUERY_PARAM_SEPARATOR)) {
+            int pos;
+            if((pos = singleParam.find(KEY_VALUE_SEPARATOR)) != std::string::npos) {
+                addUrlParam(singleParam.substr(0, pos), singleParam.substr(pos + 1));
+            }
+        }
+    }
+}
+
+void HttpRequest::addUrlParam(std::string key, std::string value) {
+    urlParams->insert({key, value});
+}
+
+UrlParamsRange HttpRequest::getUrlParams(std::string searchKey) {
+    auto returnValue = urlParams->equal_range(searchKey);
+    return returnValue;
+}
+
+std::shared_ptr<UrlParamsMultiMap>  HttpRequest::getAllUrlParams() {
+    return urlParams;
 }
 
 //-------------------------------------------------------------------
@@ -58,7 +105,7 @@ std::optional<std::shared_ptr<HttpRequest>> Http11::readRequest(int fileDescript
   std::optional<std::shared_ptr<HttpRequest>> returnValue = std::nullopt;
   try {
     readFirst2K(fileDescriptor);
-    readHeader();
+    parseHeader();
     returnValue = request;
   } catch (const std::exception& e) {
     LOGGER.error("Failed reading incoming request: " + std::string(e.what()));
@@ -66,7 +113,7 @@ std::optional<std::shared_ptr<HttpRequest>> Http11::readRequest(int fileDescript
   return returnValue;
 }
 
-void Http11::readHeader() {
+void Http11::parseHeader() {
   char* headerEnd = std::strstr(rawDataBuffer, HEADER_TERMINATOR);
   if(!headerEnd) {
     throw HttpException("first " + std::to_string(bytesRead) + " bytes of message do not contain a valid header!");
@@ -134,13 +181,14 @@ void Http11::readFirst2K(int fileDescriptor) {
   bytesRead = 0;
   ssize_t chunkSize;
   rawDataBuffer = NULL;
-  while (((chunkSize = read(fileDescriptor, buffer, MAX_READ)) > 0) &&
-         (bytesRead < MAX_READ)) {
+  while (((chunkSize = read(fileDescriptor, buffer, MAX_READ)) > 0) && (bytesRead < MAX_READ)) {
     if (chunkSize > 0) {
       rawDataBuffer = (char*)realloc(rawDataBuffer, bytesRead + chunkSize + 1);
       memcpy(rawDataBuffer + bytesRead, buffer, chunkSize);
       bytesRead += chunkSize;
       rawDataBuffer[bytesRead] = 0;
+    } else if (chunkSize < 0) {
+        throw HttpException("error during reading from socket file descriptor: '" + std::string(strerror(errno)));
     }
   }
   readingFinished = (chunkSize == 0);
