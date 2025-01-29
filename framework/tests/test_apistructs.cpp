@@ -90,7 +90,7 @@ TEST(ProcessingError, canWriteItselfToJson) {
     error1.toJson(&j);
     error2.toJson(&j);
     EXPECT_EQ("[{\"errorCode\":\"error code 01\",\"errorMessage\":\"error message 01\"},{\"errorCode\":\"error code 02\",\"errorMessage\":\"error message 02\"}]", j.dump());
-     std::cout << std::setw(4) << j << '\n';
+    std::cout << std::setw(4) << j << '\n';
 }
 
 TEST(ProcessingError, canWriteItselfToJson02) {

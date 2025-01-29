@@ -22,12 +22,12 @@ PipeLineProcessor::~PipeLineProcessor() {
     stopProcessingLoop();
 }
 
-unique_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
-    auto instance = make_unique<PipeLineProcessor>();
+shared_ptr<PipeLineProcessor> PipeLineProcessor::getInstance() {
+    auto instance = make_shared<PipeLineProcessor>();
     return instance;
 }
 
-optional<unique_ptr<PipeLineProcessor>> PipeLineProcessor::getInstance(const string configFilePath) {
+optional<shared_ptr<PipeLineProcessor>> PipeLineProcessor::getInstance(const string configFilePath) {
     auto instance = getInstance();
     try {
         LOGGER.info("Loading pipeline processor configuration from file: " + configFilePath);

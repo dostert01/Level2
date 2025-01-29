@@ -22,6 +22,7 @@ add_library(httplistener SHARED
 
 target_link_libraries(httplistener PUBLIC
     pipelineapi
+    pipeline
     applicationcontext
     listeners
     nlohmann_json::nlohmann_json dl

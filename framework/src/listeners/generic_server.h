@@ -20,6 +20,7 @@ class GenericServer : public NetworkListener {
         GenericServer(json jsonObject);
         ~GenericServer();
         void init(std::shared_ptr<PipelineFiFo> fifo);
+        void init(std::shared_ptr<PipeLineProcessor> processor);
         void startListening();
         int getPort();
     private:

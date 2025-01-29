@@ -12,6 +12,7 @@ class Matchable {
     public:
         Matchable() = default;
         void addMatchingPattern(std::string key, std::string value);
+        void addMatchingPatterns(std::map<std::string, std::string>& patterns);
         uint getCountOfMatchingPatterns();
         std::optional<std::string> getMatchingPattern(std::string key);
         void setMatchingPatterns(Matchable& other);

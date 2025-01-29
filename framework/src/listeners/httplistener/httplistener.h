@@ -1,27 +1,36 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <thread>
 #include <atomic>
 #include <future>
-#include <shared_mutex>
+#include <memory>
 #include <nlohmann/json.hpp>
+#include <shared_mutex>
+#include <thread>
+#include <vector>
 
 #include "generic_server.h"
+#include "http11.h"
 
 using namespace nlohmann::json_abi_v3_11_3;
 
 namespace event_forge {
 
 class HTTPListener : public GenericServer {
-    public:
-        HTTPListener() = default;
-        HTTPListener(json jsonObject);
-        ~HTTPListener();
-        static std::shared_ptr<HTTPListener> getInstance();
-    private:
-        void handleClientConnection(int clientSocket, std::string clientHost);
+ public:
+  HTTPListener() = default;
+  HTTPListener(json jsonObject);
+  ~HTTPListener();
+  static std::shared_ptr<HTTPListener> getInstance();
+  std::shared_ptr<PipelineProcessingData> getLastProcessingData();
+ private:
+  std::shared_ptr<PipelineProcessingData> processingData;
+  void handleClientConnection(int clientSocket, std::string clientHost) override;
+  void processData();
+  void preparePayloadString(
+      std::optional<std::shared_ptr<HttpRequest>> &request,
+      std::string &payload);
+  void setPayloadParameters(std::string &clientHost);
+  void prepareProcessingData(std::string &payload, std::string &clientHost);
 };
 
-} // namespace event_forge
+}  // namespace event_forge

@@ -17,8 +17,8 @@ namespace event_forge {
         public:
             PipeLineProcessor() = default;
             ~PipeLineProcessor();
-            static std::unique_ptr<PipeLineProcessor> getInstance();
-            static std::optional<std::unique_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
+            static std::shared_ptr<PipeLineProcessor> getInstance();
+            static std::optional<std::shared_ptr<PipeLineProcessor>> getInstance(const std::string configFilePath);
             uint getCountOfPipelines();
             std::string getProcessName();
             std::optional<std::shared_ptr<Pipeline>> getPipelineByName(std::string pipelineName);

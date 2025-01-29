@@ -34,9 +34,7 @@ void PipelineFiFo::enqueue(std::string payloadName, std::string mimetype, const 
 void PipelineFiFo::addMatchingPatterns(
     std::map<std::string, std::string> &matchingPatterns,
     std::shared_ptr<PipelineProcessingData> &data) {
-  for (const auto &[key, value] : matchingPatterns) {
-    data->addMatchingPattern(key, value);
-  }
+  data->addMatchingPatterns(matchingPatterns);
 }
 
 std::optional<std::shared_ptr<PipelineProcessingData>> PipelineFiFo::dequeue() {

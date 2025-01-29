@@ -33,6 +33,11 @@ void GenericServer::init(std::shared_ptr<PipelineFiFo> fifo) {
     initComplete = true;
 }
 
+void GenericServer::init(std::shared_ptr<PipeLineProcessor> processor) {
+    NetworkListener::init(processor);
+    initComplete = true;
+}
+
 void GenericServer::startListening() {
   keepListeningThreadRunning.store(true);
   listeningThread = std::thread(&GenericServer::listeningThreadFunction, this);

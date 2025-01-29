@@ -16,6 +16,12 @@ void Matchable::addMatchingPattern(std::string key, std::string value) {
     matchingPatterns[key] = value;
 }
 
+void Matchable::addMatchingPatterns(std::map<std::string, std::string>& patterns) {
+  for (const auto &[key, value] : patterns) {
+    addMatchingPattern(key, value);
+  }
+}
+
 uint Matchable::getCountOfMatchingPatterns() {
     return matchingPatterns.size();
 }
