@@ -16,6 +16,9 @@ cmake_print_variables(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 # Specify the library
 add_library(httplistener SHARED
     httplistener.cpp
+    httpexception.cpp
+    httprequest.cpp
+    httpresponse.cpp
     http11.cpp
 )
 
