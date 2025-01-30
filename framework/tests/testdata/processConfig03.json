@@ -1,0 +1,15 @@
+{
+    "processName" : "answer hello world to a http GET request",
+    "pipelines" : [
+        {
+            "pipelineConfigFile":"pipelineConfig08.json",
+            "matchingPatterns" : [
+                {
+                    "http.rcv.entity_header_field.method": "GET",
+                    "http.rcv.entity_header_field.path": "/api/1.0",
+                    "http.rcv.url_parameter.what": "helloworld"
+                }
+            ]
+        }
+    ]
+}

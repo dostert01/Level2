@@ -1,0 +1,10 @@
+{
+    "pipelineName" : "just say hello world and nothing else",
+    "pipelineSteps" : [
+        {
+            "stepName":"add hello world to the payload",
+            "libraryName":"helloWorld",
+            "namedArguments" : {}
+        }
+    ]
+}
