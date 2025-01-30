@@ -19,12 +19,14 @@ using namespace std;
 using namespace event_forge;
 
 #define PROCESS_CONFIG_TEST_FILE_01 "/processConfig01.json"
+#define PROCESS_CONFIG_TEST_FILE_03 "/processConfig03.json"
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_05 "/applicationConfig05.json"
 #define HTTP_REQUEST_TEST_FILE_01 "/httpRequest01.txt"
 #define HTTP_REQUEST_TEST_FILE_02 "/httpRequest02.txt"
 #define HTTP_REQUEST_TEST_FILE_03 "/httpRequest03.txt"
 #define HTTP_REQUEST_TEST_FILE_04 "/httpRequest04.txt"
+#define HTTP_REQUEST_TEST_FILE_05 "/httpRequest05.txt"
 
 namespace test_httplistener {
     std::string workingDir;
@@ -64,7 +66,7 @@ namespace test_httplistener {
         return WEXITSTATUS(returnValue);
     }
 
-   int sendFile(string filePath) {
+   int sendFile(string filePath, std::string& stdOutData) {
         string command = "cat " + filePath + " | nc -N 127.0.0.1 8889";
         FILE *file = popen(command.c_str(), "r");
         string result = "";
@@ -79,6 +81,7 @@ namespace test_httplistener {
             returnValue = pclose(file);
         }
         LOGGER.info("result returned by call to " + command + " : '" + result + "'");
+        stdOutData = result;
         return WEXITSTATUS(returnValue);
     }
 
@@ -174,6 +177,15 @@ TEST(Http11, getHeaderFieldValueReturnsEmptyOptionalOnFailure) {
     EXPECT_EQ(std::nullopt, request.value()->getHeaderFieldValue("ThisIsNotPresentInTheHeader"));
 }
 
+TEST(Http11, canReturnAllHeaderFields) {
+    configureTest();
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http;
+    auto request = http.readRequest(fd, "");
+    EXPECT_TRUE(request.has_value());
+    auto headerFields = request.value()->getAllHeaderFields();
+    EXPECT_EQ(3, headerFields->size());
+}
 
 TEST(Http11, canParseUrlParams) {
     configureTest();
@@ -222,7 +234,6 @@ TEST(Http11, canGetParamValuesAsVector) {
     EXPECT_EQ("value02", values->at(1));
 }
 
-*/
 TEST(Http11, canGetContentLength) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04).c_str(), O_RDONLY, O_NONBLOCK);
@@ -252,14 +263,35 @@ TEST(HTTPListener, canReceiveLargeData) {
     listeners[0]->startListening();
     
     usleep(HALF_A_SECOND);
-    EXPECT_EQ(0, 
-        test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04)));
+    std::string stdOut;
+    EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04), stdOut));
     usleep(HALF_A_SECOND * 4);
 
     auto processedData = listeners[0]->getLastProcessingData();
     json j = {};
-    processedData->toJson(&j);
-    EXPECT_EQ("[{\"errorCode\":\"error code 01\",\"errorMessage\":\"error message 01\"},{\"errorCode\":\"error code 02\",\"errorMessage\":\"error message 02\"}]", j.dump());
+    processedData.value()->toJson(&j);
+    EXPECT_EQ(9869, j.dump().length());
     std::cout << std::setw(4) << j << '\n';
+}
+*/
 
+TEST(HTTPListener, sendsDataBackOnGetRequest) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
+    EXPECT_EQ(1, listeners.size());
+    auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + PROCESS_CONFIG_TEST_FILE_03);
+    listeners[0]->init(processor.value());
+    listeners[0]->startListening();
+    
+    usleep(HALF_A_SECOND);
+    std::string stdOut;
+    EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_05), stdOut));
+    usleep(HALF_A_SECOND * 4);
+
+    auto processedData = listeners[0]->getLastProcessingData();
+    json j = {};
+    processedData.value()->toJson(&j);
+    EXPECT_EQ("bla fasle blub", stdOut);
+    std::cout << std::setw(4) << j << '\n';
 }

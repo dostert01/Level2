@@ -21,16 +21,18 @@ class HTTPListener : public GenericServer {
   HTTPListener(json jsonObject);
   ~HTTPListener();
   static std::shared_ptr<HTTPListener> getInstance();
-  std::shared_ptr<PipelineProcessingData> getLastProcessingData();
+  std::optional<std::shared_ptr<PipelineProcessingData>> getLastProcessingData();
  private:
   std::shared_ptr<PipelineProcessingData> processingData;
   void handleClientConnection(int clientSocket, std::string clientHost) override;
   void processData();
   void preparePayloadString(
-      std::optional<std::shared_ptr<HttpRequest>> &request,
-      std::string &payload);
-  void setPayloadParameters(std::string &clientHost);
-  void prepareProcessingData(std::string &payload, std::string &clientHost);
+      std::shared_ptr<HttpRequest> request, std::string &payload);
+  void setPayloadParameters(std::shared_ptr<HttpRequest> request, std::string &clientHost);
+  void collectHeaderPayloadParameters(std::map<std::string, std::string> &payloadParams, std::shared_ptr<HttpRequest> &request);
+  void collectUrlPayloadParameters(std::shared_ptr<HttpRequest> &request, std::map<std::string, std::string> &payloadParams);
+  void collectDefaultPayloadParameters(std::map<std::string, std::string> &payloadParams, std::string &clientHost);
+  void prepareProcessingData(std::shared_ptr<HttpRequest> request, std::string &payload, std::string &clientHost);
 };
 
-}  // namespace event_forge
+}  // namespace 

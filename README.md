@@ -1,5 +1,5 @@
-# LaForge
-- [LaForge](#laforge)
+# Level2
+- [Level2](#level2)
   - [Preface](#preface)
   - [What it is](#what-it-is)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
@@ -22,7 +22,7 @@ In case you are interested in participating and/or contributing, both would be v
 
 ## What it is
 
-LaForge is an event driven business application framework written in C++. Its main idea is to keep **Business Objects**, **Business Logic** and **Runtime** separated from each other to allow
+Level2 is an event driven business application framework written in C++. Its main idea is to keep **Business Objects**, **Business Logic** and **Runtime** separated from each other to allow
 
 - the runtime to be scalable
 - business objects to be defined independent of the runtime and the business logic
@@ -88,7 +88,7 @@ After cloning the repo cd into the root of the repo and do the following:
 
 #### MQTT
 
-To build with support for MQTT, it is required to have [Eclipse Mosquitto](https://mosquitto.org/) and its development packages installed. [CMakeLists.txt](./framework/CMakeLists.txt) uses `find_package(Mosquito REQUIRED)` to make it available for the build process. However, LaForge can still be built without this dependency. MQTT support will be excluded from the build if Mosquitto can not be found.
+To build with support for MQTT, it is required to have [Eclipse Mosquitto](https://mosquitto.org/) and its development packages installed. [CMakeLists.txt](./framework/CMakeLists.txt) uses `find_package(Mosquito REQUIRED)` to make it available for the build process. However, Level2 can still be built without this dependency. MQTT support will be excluded from the build if Mosquitto can not be found.
 
 For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](./framework/tests/test_mqttconnector.cpp) and [test_mqttlistener.cpp](./framework/tests/test_mqttlistener.cpp) it is required to have an MQTT broker listening on port 1883 on the loopback interface.
 

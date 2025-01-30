@@ -12,7 +12,9 @@ FetchContent_MakeAvailable(json)
 # Credits go to Niels Lohmann for nlohmann/json
 
 set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 
 cmake_print_variables(PROJECT_ROOT_DIR)
 

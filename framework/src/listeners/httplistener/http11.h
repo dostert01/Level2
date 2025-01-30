@@ -28,6 +28,7 @@ class HttpRequest {
         std::string getPath();
         std::optional<std::string> getHeaderFieldValue(std::string fieldName);
         void addHeaderField(std::string fieldName, std::string fieldValue);
+        std::shared_ptr<std::map<std::string, std::string>> getAllHeaderFields();
         std::optional<int> getContentLength();
         int getCountOfUrlParams();
         UrlParamsRange getUrlParams(std::string searchKey);
@@ -40,7 +41,7 @@ class HttpRequest {
         std::string method;
         std::string path;
         const char* contentStart;
-        std::map<std::string, std::string> headerFields;
+        std::shared_ptr<std::map<std::string, std::string>> headerFields;
         std::shared_ptr<UrlParamsMultiMap> urlParams;
         bool pathHasUrlParams();
         void parseUrlParamsFromPath();
@@ -49,7 +50,7 @@ class HttpRequest {
 
 class Http11 {
     public:
-        Http11() = default;
+        Http11();
         ~Http11();
         std::optional<std::shared_ptr<HttpRequest>> readRequest(int fileDescriptor, std::string clientHostName);
         ssize_t getBytesRead();

@@ -9,7 +9,7 @@
 #define READ_BUFFER_SIZE 2049
 #define MAX_READ (READ_BUFFER_SIZE - 1)
 #define LINE_TERMINATOR "\r\n"
-#define HEADER_TERMINATOR "\r\n\r\n"
+#define HEADER_TERMINATOR std::string("\r\n\r\n").c_str()
 #define HEADER_FIELD_SEPARATOR ": "
 #define METHOD_PATH_SEPARATOR " /"
 #define PATH_PROTOCOL_SEPARATOR " HTTP/1.1"
@@ -24,6 +24,7 @@ namespace event_forge {
 //-------------------------------------------------------------------
 HttpRequest::HttpRequest() {
     urlParams = std::make_shared<UrlParamsMultiMap>();
+    headerFields = std::make_shared<std::map<std::string, std::string>>();
     contentStart = NULL;
 }
 
@@ -67,8 +68,8 @@ bool HttpRequest::hasPayload() {
 
 std::optional<std::string> HttpRequest::getHeaderFieldValue(std::string fieldName) {
     std::optional<std::string> returnValue = std::nullopt;
-    auto found = headerFields.find(fieldName);
-    if(found != headerFields.end()) {
+    auto found = headerFields->find(fieldName);
+    if(found != headerFields->end()) {
         returnValue = found->second;
     }
     return returnValue;
@@ -76,7 +77,11 @@ std::optional<std::string> HttpRequest::getHeaderFieldValue(std::string fieldNam
 
 void HttpRequest::addHeaderField(std::string fieldName, std::string fieldValue) {
     LOGGER.trace("HttpRequest - adding header field: " + fieldName + ": " + fieldValue);
-    headerFields[fieldName] = fieldValue;
+    headerFields->insert({fieldName, fieldValue});
+}
+
+std::shared_ptr<std::map<std::string, std::string>> HttpRequest::getAllHeaderFields() {
+    return headerFields;
 }
 
 std::optional<int> HttpRequest::getContentLength() {
@@ -140,6 +145,9 @@ std::shared_ptr<std::vector<std::string>> HttpRequest::getUrlParamValues(std::st
 }
 
 //-------------------------------------------------------------------
+Http11::Http11() {
+    rawDataBuffer = NULL;
+}
 
 Http11::~Http11() {
     if(rawDataBuffer) {
@@ -229,6 +237,9 @@ void Http11::parseHeaderFiledLine(char* linebuffer) {
 }
 
 void Http11::readFirst2K(int fileDescriptor) {
+  if(fileDescriptor < 0) {
+    throw HttpException("readFirst2K called with invalid file descriptor: '" + std::string(strerror(errno)));
+  }
   char buffer[READ_BUFFER_SIZE];
   memset(buffer, 0, READ_BUFFER_SIZE);
   bytesRead = 0;
