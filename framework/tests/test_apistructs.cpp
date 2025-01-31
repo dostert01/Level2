@@ -122,7 +122,7 @@ TEST(PipelineProcessingData, canWriteItselfToJson) {
     data1->addError("0", "no error here ;-P");
     json j = {};
     data1->toJson(&j);
-    EXPECT_EQ(850, j.dump().length());
+    EXPECT_EQ(877, j.dump().length());
     std::cout << std::setw(4) << j << '\n';
 }
 

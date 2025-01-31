@@ -111,16 +111,22 @@ int PipelineProcessingData::getProcessingCounter() {
     return processingCounter;
 }
 
+std::string PipelineProcessingData::getFormattedProcessingCounter() {
+    char buffer[1024];
+    sprintf(buffer, "%05d", getProcessingCounter());
+    return std::string(buffer);
+}
+
 void PipelineProcessingData::increaseProcessingCounter() {
     processingCounter++;
 }
 
 void PipelineProcessingData::setLastProcessedPipelineName(std::string pipelineName) {
-    addMatchingPattern("lastProcessedPipelineName", pipelineName);
+    addMatchingPattern(PAYLOAD_MATCHING_PATTERN_LAST_PIPELINE, pipelineName);
 }
 
 std::string PipelineProcessingData::getLastProcessedPipelineName() {
-    return getMatchingPattern("lastProcessedPipelineName").value_or("");
+    return getMatchingPattern(PAYLOAD_MATCHING_PATTERN_LAST_PIPELINE).value_or("");
 }
 
 void to_json(nlohmann::json& j, const PipelineProcessingData* p) {

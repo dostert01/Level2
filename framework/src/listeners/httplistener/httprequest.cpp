@@ -5,9 +5,8 @@
 
 namespace event_forge {
 
-HttpRequest::HttpRequest() {
+HttpRequest::HttpRequest() : HeaderFieldOwner() {
     urlParams = std::make_shared<UrlParamsMultiMap>();
-    headerFields = std::make_shared<std::map<std::string, std::string>>();
     contentStart = NULL;
 }
 
@@ -47,24 +46,6 @@ std::optional<const char*> HttpRequest::getContentPointer() {
 
 bool HttpRequest::hasPayload() {
     return getContentPointer().has_value();
-}
-
-std::optional<std::string> HttpRequest::getHeaderFieldValue(std::string fieldName) {
-    std::optional<std::string> returnValue = std::nullopt;
-    auto found = headerFields->find(fieldName);
-    if(found != headerFields->end()) {
-        returnValue = found->second;
-    }
-    return returnValue;
-}
-
-void HttpRequest::addHeaderField(std::string fieldName, std::string fieldValue) {
-    LOGGER.trace("HttpRequest - adding header field: " + fieldName + ": " + fieldValue);
-    headerFields->insert({fieldName, fieldValue});
-}
-
-std::shared_ptr<std::map<std::string, std::string>> HttpRequest::getAllHeaderFields() {
-    return headerFields;
 }
 
 std::optional<int> HttpRequest::getContentLength() {

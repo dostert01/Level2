@@ -10,6 +10,7 @@
 #include "applicationcontext.h"
 #include "httplistener.h"
 #include "http11.h"
+#include "httpdefs.h"
 
 using json = nlohmann::json;
 
@@ -91,7 +92,7 @@ void configureTest() {
     test_httplistener::configureLogger();
     test_httplistener::configureTestVariables();
 }
-/*
+
 TEST(HTTPListener, CanCreateAnInstaneOfTheHTTPListener) {
     shared_ptr<HTTPListener> listener = HTTPListener::getInstance();
     EXPECT_TRUE(listener.get() != nullptr);
@@ -164,6 +165,7 @@ TEST(Http11, canParseNormalHeaderLines) {
 }
 
 TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
+    configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_02).c_str(), O_RDONLY, O_NONBLOCK);
     Http11 http;
     auto request = http.readRequest(fd, "");
@@ -270,10 +272,10 @@ TEST(HTTPListener, canReceiveLargeData) {
     auto processedData = listeners[0]->getLastProcessingData();
     json j = {};
     processedData.value()->toJson(&j);
-    EXPECT_EQ(9869, j.dump().length());
+    EXPECT_EQ(11195, j.dump().length());
     std::cout << std::setw(4) << j << '\n';
 }
-*/
+
 
 TEST(HTTPListener, sendsDataBackOnGetRequest) {
     configureTest();
@@ -294,4 +296,62 @@ TEST(HTTPListener, sendsDataBackOnGetRequest) {
     processedData.value()->toJson(&j);
     EXPECT_EQ("bla fasle blub", stdOut);
     std::cout << std::setw(4) << j << '\n';
+}
+
+TEST(HttpResponse, getsInitializedWithDefaults) {
+    HttpResponse response;
+    EXPECT_EQ("200 OK", response.getStatusCode());
+    EXPECT_EQ("HTTP/1.1", response.getProtocol());
+    EXPECT_EQ(4, response.getAllHeaderFields()->size());
+    EXPECT_EQ("close", response.getHeaderFieldValue("Connection").value_or("failure"));
+    EXPECT_EQ("text/plain; charset=utf-8", response.getHeaderFieldValue("Content-Type").value_or("failure"));
+    EXPECT_EQ("level2 httpListener", response.getHeaderFieldValue("Server").value_or("failure"));
+    EXPECT_EQ("6", response.getHeaderFieldValue("Content-Length").value_or("failure"));
+}
+
+TEST(HttpResponse, hasDefaultHeader) {
+    HttpResponse response;
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 6\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n", response.getHeader());
+}
+
+TEST(HttpResponse, headContainsConentLengthIfPayloadWasAdded) {
+    HttpResponse response;
+    response.setPayload("this is a payload, that contains 45 chars :-)");
+    EXPECT_EQ("45", response.getHeaderFieldValue("Content-Length").value_or("failure"));
+}
+
+TEST(HttpResponse, settingStatusCodesOtherThan2xxOverwritesThePayload) {
+    HttpResponse response;
+    EXPECT_EQ("200 OK", std::string(response.getPayloadPointer().value()));
+    response.setStatusCode(HTTP_STATUS_CODE_411);
+    EXPECT_EQ(HTTP_STATUS_CODE_411, std::string(response.getPayloadPointer().value()));
+    response.setStatusCode(HTTP_STATUS_CODE_200);
+    EXPECT_EQ(HTTP_STATUS_CODE_411, std::string(response.getPayloadPointer().value()));
+}
+
+TEST(HttpResponse, canSetPayloadAsPointerAndPayloadWillBeOwnedByTheHttpResponse) {
+    HttpResponse response;
+    void* p = malloc(4096);
+    memset(p, 42, 4096);
+    response.setPayload(p, 4096);
+    free(p);
+    p = NULL;
+    EXPECT_EQ(4096, strlen(response.getPayloadPointer().value()));
+    EXPECT_EQ("4096", response.getHeaderFieldValue("Content-Length").value_or("failure"));
+}
+
+TEST(HttpResponse, getContentLengthWorks) {
+    HttpResponse response;
+    void* p = malloc(4096);
+    memset(p, 42, 4096);
+    response.setPayload(p, 4096);
+    free(p);
+    p = NULL;
+    EXPECT_EQ(4096, response.getContentLength());
+}
+
+TEST(HttpResponse, getContentLengthCanHandleInvalidValues) {
+    HttpResponse response;
+    response.addHeaderField(HTTP_FIELD_NAME_CONTENT_LENGTH, "non numeric value will fail conversion to size_t");
+    EXPECT_EQ(0, response.getContentLength());
 }

@@ -20,6 +20,7 @@ add_library(httplistener SHARED
     httprequest.cpp
     httpresponse.cpp
     http11.cpp
+    headerfieldowner.cpp
 )
 
 target_link_libraries(httplistener PUBLIC

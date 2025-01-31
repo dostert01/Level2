@@ -23,6 +23,7 @@ class Http11 {
         ssize_t bytesRead;
         char* rawDataBuffer;
         char* contentStart;
+        char* lineBuffer;
         int contentStartOffset;
         bool readingFinished;
         std::shared_ptr<HttpRequest> request;
@@ -30,8 +31,9 @@ class Http11 {
         void readRemainingData(int fileDescriptor);
         void pollForMoreData(int fileDescriptor);
         void parseFirstLine(char* linebuffer);
-        void parseHeaderFiledLine(char* linebuffer);
+        void parseHeaderFieldLine(char* linebuffer);
         void parseHeader();
+        void parseSingleHeaderLine(char* currentLineEnd, char*& currentLineStart);
 };
 
 } // namespace event_forge

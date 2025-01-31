@@ -29,6 +29,7 @@ class PipelineProcessingData : public Matchable, public SerializableJson {
         std::optional<std::shared_ptr<ProcessingPayload>> getLastPayload();
         int getCountOfPayloads();
         int getProcessingCounter();
+        std::string getFormattedProcessingCounter();
         void increaseProcessingCounter();
         void setLastProcessedPipelineName(std::string pipelineName);
         std::string getLastProcessedPipelineName();

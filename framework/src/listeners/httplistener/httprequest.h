@@ -6,21 +6,19 @@
 #include <unistd.h>
 #include <vector>
 
+#include "headerfieldowner.h"
 namespace event_forge {
 
 using UrlParamsMultiMap = std::multimap<std::string, std::string>;
 using UrlParamsRange = std::pair<UrlParamsMultiMap::const_iterator, UrlParamsMultiMap::const_iterator>;
 
-class HttpRequest {
+class HttpRequest : public HeaderFieldOwner {
     public:
         HttpRequest();
         void setMethod(const std::string& method);
         std::string getMethod();
         void setPath(const std::string& pathValue);
         std::string getPath();
-        std::optional<std::string> getHeaderFieldValue(std::string fieldName);
-        void addHeaderField(std::string fieldName, std::string fieldValue);
-        std::shared_ptr<std::map<std::string, std::string>> getAllHeaderFields();
         std::optional<int> getContentLength();
         int getCountOfUrlParams();
         UrlParamsRange getUrlParams(std::string searchKey);
@@ -33,7 +31,6 @@ class HttpRequest {
         std::string method;
         std::string path;
         const char* contentStart;
-        std::shared_ptr<std::map<std::string, std::string>> headerFields;
         std::shared_ptr<UrlParamsMultiMap> urlParams;
         bool pathHasUrlParams();
         void parseUrlParamsFromPath();

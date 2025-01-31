@@ -45,12 +45,33 @@ void Pipeline::execute(shared_ptr<PipelineProcessingData> processData) {
     if((!hasMatchingPatterns() && !processData->hasMatchingPatterns()) || matchesAllOfMineToAnyOfTheOther(processData)) {
         LOGGER.info("Start processing payload by pipeline '" + getPipelineName() + "'");
         tagProcessingData(processData);
+        int stepCounter = 0;
         for(const auto& currentStep : pipelineSteps) {
+            addProccessStepFootPrint(currentStep, processData, ++stepCounter);
             currentStep.get()->runProcessingFunction(processData);
         }
     } else {
         LOGGER.info("Pipeline '" + getPipelineName() + "' rejects processing of payload because of non matching patterns.");
     }
+}
+
+void Pipeline::addProccessStepFootPrint(std::shared_ptr<PipelineStep> currentStep, std::shared_ptr<PipelineProcessingData> processData, int stepCounter) {
+    std::string localPipelineName = getPipelineName();
+    std::string stepName = currentStep->getStepName();
+    std::replace(localPipelineName.begin(), localPipelineName.end(), ' ', '_');
+    std::replace(stepName.begin(), stepName.end(), ' ', '_');
+    processData->addMatchingPattern(
+        PAYLOAD_MATCHING_PATTERN_PROCESSED_BY_PREFIX +
+        processData->getFormattedProcessingCounter() + "." +
+        localPipelineName + "." +
+        formatInt(stepCounter) + "." +
+        stepName, "true");
+}
+
+std::string Pipeline::formatInt(int stepCounter) {
+    char buffer[1024];
+    sprintf(buffer, "%05d", stepCounter);
+    return std::string(buffer);
 }
 
 void Pipeline::tagProcessingData(shared_ptr<PipelineProcessingData> processData) {

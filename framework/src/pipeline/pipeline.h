@@ -69,6 +69,8 @@ class Pipeline : public Matchable {
         void loadPipelineMetaData(const json& jsonData);
         void loadPipelineSteps(const json& jsonData);
         void tagProcessingData(std::shared_ptr<PipelineProcessingData> processData);
+        void addProccessStepFootPrint(std::shared_ptr<PipelineStep> currentStep, std::shared_ptr<PipelineProcessingData> processData,  int stepCounter);
+        std::string formatInt(int stepCounter);
 };
 
 }
