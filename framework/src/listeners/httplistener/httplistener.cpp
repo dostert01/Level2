@@ -11,7 +11,7 @@
 #include "applicationcontext.h"
 #include "httplistener.h"
 #include "payloadnames.h"
-
+#include "httpdefs.h"
 
 namespace event_forge {
 
@@ -26,17 +26,36 @@ std::shared_ptr<HTTPListener> HTTPListener::getInstance() {
 }
 
 void HTTPListener::handleClientConnection(int clientSocket, std::string clientHost) {
-  Http11 http;
+  Http11 http(clientSocket);
   std::string payload = "";
-  auto request = http.readRequest(clientSocket, clientHost);
+  auto request = http.readRequest(clientHost);
 
   if(request.has_value()) {
     preparePayloadString(request.value(), payload);
     prepareProcessingData(request.value(), payload, clientHost);
     processData();
+    sendResponse(http);
   } else {
     LOGGER.error("failed to load request header during processing of client request.");
   }
+}
+
+void HTTPListener::sendResponse(Http11 &http) {
+  HttpResponse response;
+  if (processingMode == ListenerProcessingMode::synchronous) {
+    if(processingData->getProcessingCounter() == 0) {
+      response.setStatusCode(HTTP_STATUS_CODE_404);
+      response.setPayload(std::string(HTTP_STATUS_CODE_404) + " \nNo processing pipeline matches the request data");
+    } else {
+      auto payload = processingData->getLastPayload();
+      if(payload.has_value()) {
+        response.setPayload(payload.value()->payloadAsString());
+      }
+    }
+  } else if (processingMode == ListenerProcessingMode::asynchronous) {
+    
+  }
+  http.sendResponse(response);
 }
 
 void HTTPListener::processData() {

@@ -26,6 +26,7 @@ class HTTPListener : public GenericServer {
   std::shared_ptr<PipelineProcessingData> processingData;
   void handleClientConnection(int clientSocket, std::string clientHost) override;
   void processData();
+  void sendResponse(Http11 &http);
   void preparePayloadString(
       std::shared_ptr<HttpRequest> request, std::string &payload);
   void setPayloadParameters(std::shared_ptr<HttpRequest> request, std::string &clientHost);

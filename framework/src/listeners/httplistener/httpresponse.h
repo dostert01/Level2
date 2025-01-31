@@ -20,10 +20,12 @@ class HttpResponse : public HeaderFieldOwner {
         void setPayload(const void* payloadPointer, size_t lengthOfPayload);
         std::optional<char*> getPayloadPointer();
         size_t getContentLength();
+        size_t getMessagePointer(void* &message);
     private:
         std::string statusCode;
         std::string protocol;
         char* payload;
+        void* messagePointer;
 };
 
 } //namespace event_forge

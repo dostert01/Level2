@@ -12,6 +12,7 @@ namespace event_forge {
 
 
 HttpResponse::HttpResponse() : HeaderFieldOwner() {
+    messagePointer = NULL;
     payload = NULL;
     setStatusCode(HTTP_STATUS_CODE_200);
     protocol = HTTP_PROTOCOL_VERSION;
@@ -24,6 +25,10 @@ HttpResponse::~HttpResponse() {
     if(payload) {
         free(payload);
         payload = NULL;
+    }
+    if(messagePointer) {
+        free(messagePointer);
+        messagePointer = NULL;
     }
 }
 
@@ -71,6 +76,21 @@ std::optional<char*> HttpResponse::getPayloadPointer() {
         returnValue = payload;
     }
     return returnValue;
+}
+
+size_t HttpResponse::getMessagePointer(void* &message) {
+    std::string header = getHeader();
+    size_t headerLen = strlen(header.c_str());
+    size_t contentLength = getContentLength();
+    size_t messageLen = contentLength + headerLen;
+    this->messagePointer = realloc(this->messagePointer, messageLen);
+    memcpy(this->messagePointer, header.c_str(), headerLen);
+    auto messageBody = getPayloadPointer();
+    if((contentLength > 0) && (messageBody.has_value())) {
+        memcpy(this->messagePointer + headerLen, messageBody.value(), contentLength);
+    }
+    message = this->messagePointer;
+    return messageLen;
 }
 
 size_t HttpResponse::getContentLength() {

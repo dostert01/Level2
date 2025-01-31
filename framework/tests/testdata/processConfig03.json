@@ -5,9 +5,9 @@
             "pipelineConfigFile":"pipelineConfig08.json",
             "matchingPatterns" : [
                 {
-                    "http.rcv.entity_header_field.method": "GET",
-                    "http.rcv.entity_header_field.path": "/api/1.0",
-                    "http.rcv.url_parameter.what": "helloworld"
+                    "http.rcv.headerField.method": "GET",
+                    "http.rcv.headerField.path": "/api/1.0",
+                    "http.rcv.urlParameter.what": "helloworld"
                 }
             ]
         }

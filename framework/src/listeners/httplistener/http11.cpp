@@ -8,9 +8,10 @@
 
 namespace event_forge {
 
-Http11::Http11() {
+Http11::Http11(int fileDescriptor) {
     rawDataBuffer = NULL;
     lineBuffer = NULL;
+    clientSocketFileDescriptor = fileDescriptor;
 }
 
 Http11::~Http11() {
@@ -24,12 +25,18 @@ Http11::~Http11() {
     }
 }
 
-std::optional<std::shared_ptr<HttpRequest>> Http11::readRequest(int fileDescriptor, std::string clientHostName) {
+void Http11::sendResponse(HttpResponse &response) {
+  void *message;
+  size_t messageSize = response.getMessagePointer(message);
+  write(clientSocketFileDescriptor, message, messageSize);
+}
+
+std::optional<std::shared_ptr<HttpRequest>> Http11::readRequest(std::string clientHostName) {
   std::optional<std::shared_ptr<HttpRequest>> returnValue = std::nullopt;
   try {
-    readFirst2K(fileDescriptor);
+    readFirst2K();
     parseHeader();
-    readRemainingData(fileDescriptor);
+    readRemainingData();
     returnValue = request;
   } catch (const std::exception& e) {
     LOGGER.error("Failed reading incoming request: " + std::string(e.what()));
@@ -107,8 +114,8 @@ void Http11::parseHeaderFieldLine(char* linebuffer) {
     request->addHeaderField(fieldName, fieldValue);
 }
 
-void Http11::readFirst2K(int fileDescriptor) {
-  if(fileDescriptor < 0) {
+void Http11::readFirst2K() {
+  if(clientSocketFileDescriptor < 0) {
     throw HttpException("readFirst2K called with invalid file descriptor: '"
       + std::string(strerror(errno)), HTTP_STATUS_CODE_500);
   }
@@ -117,34 +124,34 @@ void Http11::readFirst2K(int fileDescriptor) {
   bytesRead = 0;
   rawDataBuffer = NULL;
   ssize_t chunkSize;
-  while ((bytesRead < MAX_READ) && ((chunkSize = read(fileDescriptor, buffer, MAX_READ)) > 0)) {
+  while ((bytesRead < MAX_READ) && ((chunkSize = read(clientSocketFileDescriptor, buffer, MAX_READ)) > 0)) {
     if (chunkSize > 0) {
       rawDataBuffer = (char*)realloc(rawDataBuffer, bytesRead + chunkSize + 1);
       memcpy(rawDataBuffer + bytesRead, buffer, chunkSize);
       bytesRead += chunkSize;
       rawDataBuffer[bytesRead] = 0;
     } else if (chunkSize < 0) {
-        pollForMoreData(fileDescriptor);
+        pollForMoreData();
     }
   }
   readingFinished = (chunkSize == 0);
 }
 
-void Http11::readRemainingData(int fileDescriptor) {
+void Http11::readRemainingData() {
   if(!readingFinished && request->getContentLength().has_value()) {
       int expectedMessageLength = request->getContentLength().value() + contentStartOffset;
       LOGGER.trace("continuing to read from socket - " + std::to_string(bytesRead) + " of " + std::to_string(expectedMessageLength) + " byted have been read. Trying to fetch the rest ...");
       char buffer[READ_BUFFER_SIZE];
       memset(buffer, 0, READ_BUFFER_SIZE);
       ssize_t chunkSize;
-      while ((bytesRead < expectedMessageLength) && ((chunkSize = read(fileDescriptor, buffer, MAX_READ)) > 0)) {
+      while ((bytesRead < expectedMessageLength) && ((chunkSize = read(clientSocketFileDescriptor, buffer, MAX_READ)) > 0)) {
           if (chunkSize > 0) {
               rawDataBuffer = (char*)realloc(rawDataBuffer, bytesRead + chunkSize + 1);
               memcpy(rawDataBuffer + bytesRead, buffer, chunkSize);
               bytesRead += chunkSize;
               rawDataBuffer[bytesRead] = 0;
           } else if (chunkSize < 0) {
-            pollForMoreData(fileDescriptor);
+            pollForMoreData();
           } else {
               throw HttpException("error during reading from socket. Maybe client has close the connection: '" +
                 std::string(strerror(errno)), HTTP_STATUS_CODE_400);
@@ -159,9 +166,9 @@ void Http11::readRemainingData(int fileDescriptor) {
   }
 }
 
-void Http11::pollForMoreData(int fileDescriptor) {
+void Http11::pollForMoreData() {
   if ((errno == EAGAIN) && (errno == EWOULDBLOCK)) {
-    struct pollfd fds = {fileDescriptor, POLLIN, 0};
+    struct pollfd fds = {clientSocketFileDescriptor, POLLIN, 0};
     int failCounter = 0;
     while ((failCounter++ < TIMEOUT_IN_SECONDS) && (poll(&fds, 1, ONE_SECOND) == 0));
     if(failCounter >= TIMEOUT_IN_SECONDS) {

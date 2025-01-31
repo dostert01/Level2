@@ -15,10 +15,11 @@ namespace event_forge {
 
 class Http11 {
     public:
-        Http11();
+        Http11(int fileDescriptor);
         ~Http11();
-        std::optional<std::shared_ptr<HttpRequest>> readRequest(int fileDescriptor, std::string clientHostName);
+        std::optional<std::shared_ptr<HttpRequest>> readRequest(std::string clientHostName);
         ssize_t getBytesRead();
+        void sendResponse(HttpResponse &response);
        private:
         ssize_t bytesRead;
         char* rawDataBuffer;
@@ -26,10 +27,11 @@ class Http11 {
         char* lineBuffer;
         int contentStartOffset;
         bool readingFinished;
+        int clientSocketFileDescriptor;
         std::shared_ptr<HttpRequest> request;
-        void readFirst2K(int fileDescriptor);
-        void readRemainingData(int fileDescriptor);
-        void pollForMoreData(int fileDescriptor);
+        void readFirst2K();
+        void readRemainingData();
+        void pollForMoreData();
         void parseFirstLine(char* linebuffer);
         void parseHeaderFieldLine(char* linebuffer);
         void parseHeader();

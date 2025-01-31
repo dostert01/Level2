@@ -28,6 +28,7 @@ using namespace event_forge;
 #define HTTP_REQUEST_TEST_FILE_03 "/httpRequest03.txt"
 #define HTTP_REQUEST_TEST_FILE_04 "/httpRequest04.txt"
 #define HTTP_REQUEST_TEST_FILE_05 "/httpRequest05.txt"
+#define HTTP_REQUEST_TEST_FILE_06 "/httpRequest06.txt"
 
 namespace test_httplistener {
     std::string workingDir;
@@ -58,7 +59,7 @@ namespace test_httplistener {
             LOGGER.info("popen returned valid file pointer");
             char buffer[2048];
             while(fgets(buffer, 2048, file) != NULL) {
-                LOGGER.info("reding result ...");
+                LOGGER.info("reading result: " + std::string(buffer));
                 result.append(buffer);
             }
             returnValue = pclose(file);
@@ -76,7 +77,7 @@ namespace test_httplistener {
             LOGGER.info("popen returned valid file pointer");
             char buffer[2048];
             while(fgets(buffer, 2048, file) != NULL) {
-                LOGGER.info("reding result ...");
+                LOGGER.info("reading result: " + std::string(buffer));
                 result.append(buffer);
             }
             returnValue = pclose(file);
@@ -150,16 +151,16 @@ TEST(HTTPListener, CanReceiveSomeData) {
 
 TEST(Http11, canParseFirstLine) {
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_EQ("GET", request.value()->getMethod());
     EXPECT_EQ("/api/1.0/index.html", request.value()->getPath());
 }
 
 TEST(Http11, canParseNormalHeaderLines) {
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_EQ("www.example.com", request.value()->getHeaderFieldValue("Host"));
     EXPECT_EQ("curl/7.68.0", request.value()->getHeaderFieldValue("User-Agent"));
 }
@@ -167,23 +168,23 @@ TEST(Http11, canParseNormalHeaderLines) {
 TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_02).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_EQ(std::nullopt, request);
 }
 
 TEST(Http11, getHeaderFieldValueReturnsEmptyOptionalOnFailure) {
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_EQ(std::nullopt, request.value()->getHeaderFieldValue("ThisIsNotPresentInTheHeader"));
 }
 
 TEST(Http11, canReturnAllHeaderFields) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_TRUE(request.has_value());
     auto headerFields = request.value()->getAllHeaderFields();
     EXPECT_EQ(3, headerFields->size());
@@ -192,8 +193,8 @@ TEST(Http11, canReturnAllHeaderFields) {
 TEST(Http11, canParseUrlParams) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_03).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     EXPECT_EQ("/api/1.0/index.html", request.value()->getPath());
     EXPECT_EQ(6, request.value()->getCountOfUrlParams());
     auto params = request.value()->getUrlParams("q");
@@ -214,8 +215,8 @@ TEST(Http11, canParseUrlParams) {
 TEST(Http11, canGetAllParams) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_03).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     std::string result;
     std::shared_ptr<event_forge::UrlParamsMultiMap> params = request.value()->getAllUrlParams();
     for(auto param = params->begin(); param != params->end(); ++param) {
@@ -228,8 +229,8 @@ TEST(Http11, canGetAllParams) {
 TEST(Http11, canGetParamValuesAsVector) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_03).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     auto values = request.value()->getUrlParamValues("tag");
     EXPECT_EQ(2, values->size());
     EXPECT_EQ("value01", values->at(0));
@@ -239,8 +240,8 @@ TEST(Http11, canGetParamValuesAsVector) {
 TEST(Http11, canGetContentLength) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    auto request = http.readRequest(fd, "");
+    Http11 http(fd);
+    auto request = http.readRequest("");
     auto value = request.value()->getContentLength();
     EXPECT_FALSE(value == std::nullopt);
     EXPECT_EQ(5536, value.value());
@@ -249,8 +250,8 @@ TEST(Http11, canGetContentLength) {
 TEST(Http11, canReadLargeData) {
     configureTest();
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04).c_str(), O_RDONLY, O_NONBLOCK);
-    Http11 http;
-    http.readRequest(fd, "");
+    Http11 http(fd);
+    http.readRequest("");
     EXPECT_EQ(5745, http.getBytesRead());
 }
 
@@ -276,7 +277,6 @@ TEST(HTTPListener, canReceiveLargeData) {
     std::cout << std::setw(4) << j << '\n';
 }
 
-
 TEST(HTTPListener, sendsDataBackOnGetRequest) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
@@ -285,7 +285,7 @@ TEST(HTTPListener, sendsDataBackOnGetRequest) {
     auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + PROCESS_CONFIG_TEST_FILE_03);
     listeners[0]->init(processor.value());
     listeners[0]->startListening();
-    
+
     usleep(HALF_A_SECOND);
     std::string stdOut;
     EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_05), stdOut));
@@ -294,7 +294,28 @@ TEST(HTTPListener, sendsDataBackOnGetRequest) {
     auto processedData = listeners[0]->getLastProcessingData();
     json j = {};
     processedData.value()->toJson(&j);
-    EXPECT_EQ("bla fasle blub", stdOut);
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 11\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\nhello world", stdOut);
+    std::cout << std::setw(4) << j << '\n';
+}
+
+TEST(HTTPListener, returnsHttpErrorIfNoProcessingPipelineWasFound) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
+    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
+    EXPECT_EQ(1, listeners.size());
+    auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + PROCESS_CONFIG_TEST_FILE_03);
+    listeners[0]->init(processor.value());
+    listeners[0]->startListening();
+
+    usleep(HALF_A_SECOND);
+    std::string stdOut;
+    EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_06), stdOut));
+    usleep(HALF_A_SECOND * 4);
+
+    auto processedData = listeners[0]->getLastProcessingData();
+    json j = {};
+    processedData.value()->toJson(&j);
+    EXPECT_EQ("HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 62\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n404 Not Found \nNo processing pipeline matches the request data", stdOut);
     std::cout << std::setw(4) << j << '\n';
 }
 
