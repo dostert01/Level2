@@ -34,16 +34,20 @@ void HTTPListener::handleClientConnection(int clientSocket, std::string clientHo
     preparePayloadString(request.value(), payload);
     prepareProcessingData(request.value(), payload, clientHost);
     processData();
-    sendResponse(http);
   } else {
     LOGGER.error("failed to load request header during processing of client request.");
   }
+  sendResponse(http);
 }
 
 void HTTPListener::sendResponse(Http11 &http) {
   HttpResponse response;
   if (processingMode == ListenerProcessingMode::synchronous) {
-    if(processingData->getProcessingCounter() == 0) {
+    if(http.hasErrors()) {
+      HttpException ex = http.getLastError();
+      response.setStatusCode(ex.getHttpReturnCode());
+      response.setPayload(ex.getHttpReturnCode() + " \n" + ex.what());
+    } else if(processingData->getProcessingCounter() == 0) {
       response.setStatusCode(HTTP_STATUS_CODE_404);
       response.setPayload(std::string(HTTP_STATUS_CODE_404) + " \nNo processing pipeline matches the request data");
     } else {

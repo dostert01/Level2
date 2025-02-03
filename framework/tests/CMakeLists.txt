@@ -67,7 +67,7 @@ add_executable(test_apistructs
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
 
-    add_executable(test_pipelineprocessor
+add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)

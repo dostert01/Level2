@@ -20,6 +20,8 @@ class Http11 {
         std::optional<std::shared_ptr<HttpRequest>> readRequest(std::string clientHostName);
         ssize_t getBytesRead();
         void sendResponse(HttpResponse &response);
+        bool hasErrors();
+        HttpException getLastError();
        private:
         ssize_t bytesRead;
         char* rawDataBuffer;
@@ -29,6 +31,7 @@ class Http11 {
         bool readingFinished;
         int clientSocketFileDescriptor;
         std::shared_ptr<HttpRequest> request;
+        std::shared_ptr<std::vector<HttpException>> httpExceptions;
         void readFirst2K();
         void readRemainingData();
         void pollForMoreData();

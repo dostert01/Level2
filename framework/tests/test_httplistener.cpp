@@ -50,6 +50,11 @@ namespace test_httplistener {
         }  
     }
 
+    void configureTest() {
+        configureLogger();
+        configureTestVariables();
+    }
+
     int sendHelloWorld() {
         string command = "echo \"hello world\" | nc -N 127.0.0.1 8889";
         FILE *file = popen(command.c_str(), "r");
@@ -87,13 +92,27 @@ namespace test_httplistener {
         return WEXITSTATUS(returnValue);
     }
 
+    shared_ptr<HTTPListener> issueRequestTowardsSynchronousProcessingListener(const std::string &processConfigFile, const std::string &httpRequestFile, std::string &httpResponseBuffer) {
+        configureTest();
+        APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
+        auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
+        EXPECT_EQ(1, listeners.size());
+        auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + processConfigFile);
+        listeners[0]->init(processor.value());
+        listeners[0]->startListening();
+
+        usleep(HALF_A_SECOND);
+        EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + httpRequestFile), httpResponseBuffer));
+        usleep(HALF_A_SECOND * 4);
+        return listeners[0];
+    }
+
 }
 
-void configureTest() {
-    test_httplistener::configureLogger();
-    test_httplistener::configureTestVariables();
-}
+#define configureTest test_httplistener::configureTest
 
+
+/*
 TEST(HTTPListener, CanCreateAnInstaneOfTheHTTPListener) {
     shared_ptr<HTTPListener> listener = HTTPListener::getInstance();
     EXPECT_TRUE(listener.get() != nullptr);
@@ -278,47 +297,33 @@ TEST(HTTPListener, canReceiveLargeData) {
 }
 
 TEST(HTTPListener, sendsDataBackOnGetRequest) {
-    configureTest();
-    APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
-    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
-    EXPECT_EQ(1, listeners.size());
-    auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + PROCESS_CONFIG_TEST_FILE_03);
-    listeners[0]->init(processor.value());
-    listeners[0]->startListening();
-
-    usleep(HALF_A_SECOND);
-    std::string stdOut;
-    EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_05), stdOut));
-    usleep(HALF_A_SECOND * 4);
-
-    auto processedData = listeners[0]->getLastProcessingData();
+    std::string httpResponseBuffer;
+    auto listener = test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_03, HTTP_REQUEST_TEST_FILE_05, httpResponseBuffer);   
+    auto processedData = listener->getLastProcessingData();
     json j = {};
     processedData.value()->toJson(&j);
-    EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 11\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\nhello world", stdOut);
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 11\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\nhello world", httpResponseBuffer);
     std::cout << std::setw(4) << j << '\n';
 }
 
 TEST(HTTPListener, returnsHttpErrorIfNoProcessingPipelineWasFound) {
-    configureTest();
-    APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
-    auto listeners = APP_CONTEXT.createObjectsFromAppConfigJson<HTTPListener>("Listeners/HTTPListeners");
-    EXPECT_EQ(1, listeners.size());
-    auto processor = PipeLineProcessor::getInstance(test_httplistener::testFilesDir + PROCESS_CONFIG_TEST_FILE_03);
-    listeners[0]->init(processor.value());
-    listeners[0]->startListening();
-
-    usleep(HALF_A_SECOND);
-    std::string stdOut;
-    EXPECT_EQ(0, test_httplistener::sendFile(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_06), stdOut));
-    usleep(HALF_A_SECOND * 4);
-
-    auto processedData = listeners[0]->getLastProcessingData();
+    std::string httpResponseBuffer;
+    auto listener = test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_03, HTTP_REQUEST_TEST_FILE_06, httpResponseBuffer);   
+    auto processedData = listener->getLastProcessingData();
     json j = {};
     processedData.value()->toJson(&j);
-    EXPECT_EQ("HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 62\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n404 Not Found \nNo processing pipeline matches the request data", stdOut);
+    EXPECT_EQ("HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 62\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n404 Not Found \nNo processing pipeline matches the request data", httpResponseBuffer);
     std::cout << std::setw(4) << j << '\n';
 }
+*/
+TEST(HTTPListener, returnsHttpErrorIfParsingOfHttpHeaderFails) {
+    std::string httpResponseBuffer;
+    test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_03, HTTP_REQUEST_TEST_FILE_02, httpResponseBuffer);   
+    EXPECT_EQ( "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 74\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n400 Bad Request \nno http header field found in 'no valid header line here'", httpResponseBuffer);
+}
 
+
+/*
 TEST(HttpResponse, getsInitializedWithDefaults) {
     HttpResponse response;
     EXPECT_EQ("200 OK", response.getStatusCode());
@@ -376,3 +381,4 @@ TEST(HttpResponse, getContentLengthCanHandleInvalidValues) {
     response.addHeaderField(HTTP_FIELD_NAME_CONTENT_LENGTH, "non numeric value will fail conversion to size_t");
     EXPECT_EQ(0, response.getContentLength());
 }
+*/

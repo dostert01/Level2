@@ -12,6 +12,7 @@ Http11::Http11(int fileDescriptor) {
     rawDataBuffer = NULL;
     lineBuffer = NULL;
     clientSocketFileDescriptor = fileDescriptor;
+    httpExceptions = std::make_shared<std::vector<HttpException>>();
 }
 
 Http11::~Http11() {
@@ -42,6 +43,7 @@ std::optional<std::shared_ptr<HttpRequest>> Http11::readRequest(std::string clie
     LOGGER.error("Failed reading incoming request: " + std::string(e.what()));
     if(HttpException *ex = dynamic_cast<HttpException*>((std::exception*)&e); ex != nullptr) {
       LOGGER.trace("Exception is of class HttpException. Http statuscode: '" + ex->getHttpReturnCode() + "'");
+      httpExceptions->push_back(*ex);
     }
   }
   return returnValue;
@@ -179,6 +181,14 @@ void Http11::pollForMoreData() {
     throw HttpException("error during reading from socket file descriptor: '" +
                         std::string(strerror(errno)), HTTP_STATUS_CODE_400);
   }
+}
+
+bool Http11::hasErrors() {
+  return !httpExceptions->empty();
+}
+
+HttpException Http11::getLastError() {
+  return httpExceptions->back();
 }
 
 

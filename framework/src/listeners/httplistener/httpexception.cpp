@@ -2,6 +2,11 @@
 
 namespace event_forge {
 
+HttpException::HttpException(const HttpException &other) : exception() {
+    this->message = other.message;
+    this->suggestedHttpReturnCode = other.suggestedHttpReturnCode;
+}
+
 HttpException::HttpException(const std::string& message) : exception() {
     this->message = message;
     suggestedHttpReturnCode = "";
