@@ -1,0 +1,15 @@
+{
+    "processName" : "say hello and then throw an error",
+    "pipelines" : [
+        {
+            "pipelineConfigFile":"pipelineConfig09.json",
+            "matchingPatterns" : [
+                {
+                    "http.rcv.headerField.method": "GET",
+                    "http.rcv.headerField.path": "/api/1.0",
+                    "http.rcv.urlParameter.what": "throwError"
+                }
+            ]
+        }
+    ]
+}

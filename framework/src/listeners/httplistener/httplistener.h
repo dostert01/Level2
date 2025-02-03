@@ -27,8 +27,14 @@ class HTTPListener : public GenericServer {
   void handleClientConnection(int clientSocket, std::string clientHost) override;
   void processData();
   void sendResponse(Http11 &http);
-  void preparePayloadString(
-      std::shared_ptr<HttpRequest> request, std::string &payload);
+  bool errorsOccurredDuringProcessing();
+  void handleProcessingErrors(event_forge::HttpResponse &response);
+  void setProcessingDataPayloadAsResponsePayload(HttpResponse &response);
+  void handleNotProcessedError(HttpResponse &response);
+  bool processingDataHasNotBeenProcessed();
+  void handleRequestParsingError(Http11 &http, HttpResponse &response);
+  bool errorDuringRequestParsing(Http11 &http);
+  void preparePayloadString(std::shared_ptr<HttpRequest> request, std::string &payload);
   void setPayloadParameters(std::shared_ptr<HttpRequest> request, std::string &clientHost);
   void collectHeaderPayloadParameters(std::map<std::string, std::string> &payloadParams, std::shared_ptr<HttpRequest> &request);
   void collectUrlPayloadParameters(std::shared_ptr<HttpRequest> &request, std::map<std::string, std::string> &payloadParams);

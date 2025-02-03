@@ -1,0 +1,19 @@
+{
+    "pipelineName" : "say hello and then throw",
+    "pipelineSteps" : [
+        {
+            "stepName":"add hello world to the payload",
+            "libraryName":"helloWorld",
+            "namedArguments" : {}
+        },
+        {
+            "stepName":"throw an error",
+            "libraryName":"helloWorld",
+            "namedArguments" : {
+                "throwError": "true",
+                "errorMessage": "this Error has been thrown on purpose"
+            }
+        }
+
+    ]
+}

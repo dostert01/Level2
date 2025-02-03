@@ -21,6 +21,7 @@ using namespace event_forge;
 
 #define PROCESS_CONFIG_TEST_FILE_01 "/processConfig01.json"
 #define PROCESS_CONFIG_TEST_FILE_03 "/processConfig03.json"
+#define PROCESS_CONFIG_TEST_FILE_04 "/processConfig04.json"
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_05 "/applicationConfig05.json"
 #define HTTP_REQUEST_TEST_FILE_01 "/httpRequest01.txt"
@@ -29,6 +30,7 @@ using namespace event_forge;
 #define HTTP_REQUEST_TEST_FILE_04 "/httpRequest04.txt"
 #define HTTP_REQUEST_TEST_FILE_05 "/httpRequest05.txt"
 #define HTTP_REQUEST_TEST_FILE_06 "/httpRequest06.txt"
+#define HTTP_REQUEST_TEST_FILE_07 "/httpRequest07.txt"
 
 namespace test_httplistener {
     std::string workingDir;
@@ -109,10 +111,8 @@ namespace test_httplistener {
 
 }
 
-#define configureTest test_httplistener::configureTest
+#define configureTest() test_httplistener::configureTest()
 
-
-/*
 TEST(HTTPListener, CanCreateAnInstaneOfTheHTTPListener) {
     shared_ptr<HTTPListener> listener = HTTPListener::getInstance();
     EXPECT_TRUE(listener.get() != nullptr);
@@ -274,6 +274,24 @@ TEST(Http11, canReadLargeData) {
     EXPECT_EQ(5745, http.getBytesRead());
 }
 
+
+TEST(Http11, returnsEmptyOptionalExceptionIfNoErrorHasOccurred) {
+    configureTest();
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_04).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http(fd);
+    http.readRequest("");
+    EXPECT_FALSE(http.getLastError().has_value());
+}
+
+TEST(Http11, returnsHttp400BadRequestExceptionIfHeaderIsInvalid) {
+    configureTest();
+    int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_02).c_str(), O_RDONLY, O_NONBLOCK);
+    Http11 http(fd);
+    http.readRequest("");
+    EXPECT_EQ("400 Bad Request", http.getLastError().value().getHttpReturnCode());
+}
+
+
 TEST(HTTPListener, canReceiveLargeData) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
@@ -315,15 +333,23 @@ TEST(HTTPListener, returnsHttpErrorIfNoProcessingPipelineWasFound) {
     EXPECT_EQ("HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 62\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n404 Not Found \nNo processing pipeline matches the request data", httpResponseBuffer);
     std::cout << std::setw(4) << j << '\n';
 }
-*/
-TEST(HTTPListener, returnsHttpErrorIfParsingOfHttpHeaderFails) {
+
+TEST(HTTPListener, returnsHttp400IfParsingOfHttpHeaderFails) {
     std::string httpResponseBuffer;
     test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_03, HTTP_REQUEST_TEST_FILE_02, httpResponseBuffer);   
     EXPECT_EQ( "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 74\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n400 Bad Request \nno http header field found in 'no valid header line here'", httpResponseBuffer);
 }
 
+TEST(HTTPListener, returnsAllErrorsAsHttp500IfProcessingFails) {
+    std::string httpResponseBuffer;
+    auto listener = test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_04, HTTP_REQUEST_TEST_FILE_07, httpResponseBuffer);   
+    auto processedData = listener->getLastProcessingData();
+    json j = {};
+    processedData.value()->toJson(&j);
+    EXPECT_EQ("HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\nContent-Length: 113\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\n500 Internal Server Error\n-42 : this error has been thrown on purpose\n-42 : this error has been thrown on purpose", httpResponseBuffer);
+    std::cout << std::setw(4) << j << '\n';
+}
 
-/*
 TEST(HttpResponse, getsInitializedWithDefaults) {
     HttpResponse response;
     EXPECT_EQ("200 OK", response.getStatusCode());
@@ -381,4 +407,3 @@ TEST(HttpResponse, getContentLengthCanHandleInvalidValues) {
     response.addHeaderField(HTTP_FIELD_NAME_CONTENT_LENGTH, "non numeric value will fail conversion to size_t");
     EXPECT_EQ(0, response.getContentLength());
 }
-*/

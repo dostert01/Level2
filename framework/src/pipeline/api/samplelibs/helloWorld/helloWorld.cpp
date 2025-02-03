@@ -10,6 +10,9 @@ int pipeline_step_module_process(event_forge::PipelineProcessingData& processDat
     std::cout << "Hello World" << std::endl;
     processData.addPayloadData("data to be sent back to the http client", "text/plain", "hello world");
     processData.addMatchingPattern("processed_by_hello_world", "true");
+    if(processData.getMatchingPattern("http.rcv.urlParameter.what").value_or("") == "throwError") {
+        processData.addError("-42", "this error has been thrown on purpose");
+    }
     return 0;
 }
 

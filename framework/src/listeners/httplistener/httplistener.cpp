@@ -40,28 +40,6 @@ void HTTPListener::handleClientConnection(int clientSocket, std::string clientHo
   sendResponse(http);
 }
 
-void HTTPListener::sendResponse(Http11 &http) {
-  HttpResponse response;
-  if (processingMode == ListenerProcessingMode::synchronous) {
-    if(http.hasErrors()) {
-      HttpException ex = http.getLastError();
-      response.setStatusCode(ex.getHttpReturnCode());
-      response.setPayload(ex.getHttpReturnCode() + " \n" + ex.what());
-    } else if(processingData->getProcessingCounter() == 0) {
-      response.setStatusCode(HTTP_STATUS_CODE_404);
-      response.setPayload(std::string(HTTP_STATUS_CODE_404) + " \nNo processing pipeline matches the request data");
-    } else {
-      auto payload = processingData->getLastPayload();
-      if(payload.has_value()) {
-        response.setPayload(payload.value()->payloadAsString());
-      }
-    }
-  } else if (processingMode == ListenerProcessingMode::asynchronous) {
-    
-  }
-  http.sendResponse(response);
-}
-
 void HTTPListener::processData() {
   if (processingMode == ListenerProcessingMode::synchronous) {
     LOGGER.trace("starting synchronous processing");
@@ -85,6 +63,66 @@ void HTTPListener::preparePayloadString(std::shared_ptr<HttpRequest> request, st
   if (request->hasPayload()) {
     payload = std::string(request->getContentPointer().value());
   }
+}
+
+void HTTPListener::sendResponse(Http11 &http) {
+  HttpResponse response;
+  if (processingMode == ListenerProcessingMode::synchronous) {
+    if (errorDuringRequestParsing(http)) {
+      handleRequestParsingError(http, response);
+    } else if (processingDataHasNotBeenProcessed()) {
+      handleNotProcessedError(response);
+    } else if (errorsOccurredDuringProcessing()) {
+      handleProcessingErrors(response);
+    } else {
+      setProcessingDataPayloadAsResponsePayload(response);
+    }
+  } else if (processingMode == ListenerProcessingMode::asynchronous) {
+    
+  }
+  http.sendResponse(response);
+}
+
+bool HTTPListener::errorsOccurredDuringProcessing() {
+  return processingData->hasError();
+}
+
+void HTTPListener::setProcessingDataPayloadAsResponsePayload(HttpResponse &response) {
+  auto payload = processingData->getLastPayload();
+  if (payload.has_value()) {
+    response.setPayload(payload.value()->payloadAsString());
+  }
+}
+
+void HTTPListener::handleProcessingErrors(event_forge::HttpResponse &response) {
+  response.setStatusCode(HTTP_STATUS_CODE_500);
+  std::string errorPayload = HTTP_STATUS_CODE_500;
+  for (auto currentError : processingData->getAllErrors()) {
+    errorPayload.append("\n");
+    errorPayload.append(currentError->getErrorCode());
+    errorPayload.append(" : ");
+    errorPayload.append(currentError->getErrorMessage());
+  }
+  response.setPayload(errorPayload);
+}
+
+void HTTPListener::handleNotProcessedError(HttpResponse &response) {
+  response.setStatusCode(HTTP_STATUS_CODE_404);
+  response.setPayload(std::string(HTTP_STATUS_CODE_404) + " \nNo processing pipeline matches the request data");
+}
+
+bool HTTPListener::processingDataHasNotBeenProcessed() {
+  return processingData->getProcessingCounter() == 0;
+}
+
+void HTTPListener::handleRequestParsingError(Http11 &http, HttpResponse &response) {
+  HttpException ex = http.getLastError().value_or(HttpException(HTTP_STATUS_CODE_200, ""));
+  response.setStatusCode(ex.getHttpReturnCode());
+  response.setPayload(ex.getHttpReturnCode() + " \n" + ex.what());
+}
+
+bool HTTPListener::errorDuringRequestParsing(Http11 &http) {
+  return http.hasErrors();
 }
 
 void HTTPListener::setPayloadParameters(std::shared_ptr<HttpRequest> request, std::string &clientHost) {

@@ -9,8 +9,10 @@
 namespace event_forge {
 
 Http11::Http11(int fileDescriptor) {
-    rawDataBuffer = NULL;
-    lineBuffer = NULL;
+    rawDataBuffer = (char*)malloc(1);
+    *rawDataBuffer = '\0';
+    lineBuffer =  (char*)malloc(1);
+    *lineBuffer = '\0';
     clientSocketFileDescriptor = fileDescriptor;
     httpExceptions = std::make_shared<std::vector<HttpException>>();
 }
@@ -124,7 +126,6 @@ void Http11::readFirst2K() {
   char buffer[READ_BUFFER_SIZE];
   memset(buffer, 0, READ_BUFFER_SIZE);
   bytesRead = 0;
-  rawDataBuffer = NULL;
   ssize_t chunkSize;
   while ((bytesRead < MAX_READ) && ((chunkSize = read(clientSocketFileDescriptor, buffer, MAX_READ)) > 0)) {
     if (chunkSize > 0) {
@@ -187,8 +188,12 @@ bool Http11::hasErrors() {
   return !httpExceptions->empty();
 }
 
-HttpException Http11::getLastError() {
-  return httpExceptions->back();
+std::optional<HttpException> Http11::getLastError() {
+  std::optional<HttpException> returnValue = std::nullopt;
+  if(hasErrors()) {
+    returnValue = httpExceptions->back();
+  }
+  return returnValue;
 }
 
 

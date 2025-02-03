@@ -21,7 +21,7 @@ class Http11 {
         ssize_t getBytesRead();
         void sendResponse(HttpResponse &response);
         bool hasErrors();
-        HttpException getLastError();
+        std::optional<HttpException> getLastError();
        private:
         ssize_t bytesRead;
         char* rawDataBuffer;
