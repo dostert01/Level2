@@ -46,8 +46,8 @@ link_libraries(
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/framework/tests/testdata/" CACHE STRING "Directory where test data is expected by the tests")
 
 # Adding tests
-add_executable(test_eventForge
-    test_eventForge.cpp
+add_executable(test_level2
+    test_level2.cpp
     test_logger.cpp
     test_timeproviders.cpp
     test_loggingdestinations.cpp
@@ -139,8 +139,8 @@ else()
 endif()
 
 # Register tests
-add_test(NAME test_eventForge COMMAND test_eventForge)
-set_tests_properties(test_eventForge PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+add_test(NAME test_level2 COMMAND test_level2)
+set_tests_properties(test_level2 PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_applicationcontext COMMAND test_applicationcontext)
 set_tests_properties(test_applicationcontext PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 include(CMakePrintHelpers)
 
 # Projektname und Version
-project(eventForge VERSION 1.0)
+project(level2 VERSION 1.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 cmake_print_variables(CMAKE_MODULE_PATH)

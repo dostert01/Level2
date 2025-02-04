@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Projektname und Version
-project(eventForge VERSION 1.0)
+project(level2 VERSION 1.0)
 
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)

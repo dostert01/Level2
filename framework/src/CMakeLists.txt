@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 include(CMakePrintHelpers)
 
 # Projektname und Version
-project(eventForge VERSION 1.0)
+project(level2 VERSION 1.0)
 
 # Festlegen des Standards für C++
 set(CMAKE_CXX_STANDARD 20)
@@ -26,12 +26,12 @@ add_subdirectory(listeners)
 add_subdirectory(common)
 
 # Hinzufügen der ausführbaren Datei
-add_executable(eventForge main.cpp)
+add_executable(level2 main.cpp)
 
 # Include the necessary directories
-target_include_directories(eventForge PRIVATE
+target_include_directories(level2 PRIVATE
     ${CMAKE_SOURCE_DIR}/src/logger
     ${CMAKE_SOURCE_DIR}/src/pipeline
 )
 
-target_link_libraries(eventForge PRIVATE logger)
+target_link_libraries(level2 PRIVATE logger)
