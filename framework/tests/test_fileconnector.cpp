@@ -4,7 +4,7 @@
 #include "pipeline.h"
 
 using namespace std;
-using namespace event_forge;
+using namespace level2;
 
 #define PIPELINE_CONFIG_TEST_FILE_07 "/pipelineConfig07.json"
 

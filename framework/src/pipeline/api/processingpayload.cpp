@@ -4,7 +4,7 @@
 using json = nlohmann::json;
 #define JSON (*(json*)(jsonData))
 
-namespace event_forge {
+namespace level2 {
 
 ProcessingPayload::ProcessingPayload(std::string payloadName, std::string mimetype, const std::string& payload) {
     setPayloadName(payloadName);
@@ -25,7 +25,7 @@ std::string ProcessingPayload::payloadAsString() {
 }
 
 std::string ProcessingPayload::payloadAsBase64String() {
-    return event_forge::Base64Encoder::encodeNoNewLines(payloadAsString());
+    return level2::Base64Encoder::encodeNoNewLines(payloadAsString());
 }
 
 std::shared_ptr<BinaryProcessingData> ProcessingPayload::payloadAsBinaryData() {
@@ -58,7 +58,7 @@ void ProcessingPayload::setPayload(std::shared_ptr<BinaryProcessingData> payload
 
 void to_json(nlohmann::json& j, const ProcessingPayload* p) {
 
-    std::string base64Payload = event_forge::Base64Encoder::encodeNoNewLines(p->stringPayloadData);
+    std::string base64Payload = level2::Base64Encoder::encodeNoNewLines(p->stringPayloadData);
     j = nlohmann::json{{"payloadName", p->payloadName}, {"mimetype", p->mimetype}, {"payload", base64Payload}};
 
     json parametersObject = json::object();

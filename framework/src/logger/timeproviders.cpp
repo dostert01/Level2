@@ -1,7 +1,7 @@
 #include <ctime>
 
 #include "timeproviders.h"
-namespace event_forge {
+namespace level2 {
 
 TimeProvider::~TimeProvider() {}
 
@@ -17,4 +17,4 @@ std::string DefaultTimeProvider::getTimeStampOfNow() {
   return str;
 }
 
-}  // namespace event_forge
+}  // namespace level2

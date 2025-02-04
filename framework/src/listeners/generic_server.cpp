@@ -15,7 +15,7 @@
 #define HALF_A_SECOND 500000
 
 using namespace std::chrono_literals;
-namespace event_forge {
+namespace level2 {
 
 GenericServer::GenericServer(json jsonObject) {
   port = jsonObject["port"];
@@ -204,4 +204,4 @@ int GenericServer::getPort() {
     return port;
 }
 
-} // namespace event_forge
+} // namespace level2

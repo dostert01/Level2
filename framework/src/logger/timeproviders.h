@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace event_forge {
+namespace level2 {
 
 class TimeProvider {
  public:
@@ -17,4 +17,4 @@ class DefaultTimeProvider : public TimeProvider {
   std::string getTimeStampOfNow() override;
 };
 
-}  // namespace event_forge
+}  // namespace level2

@@ -11,7 +11,7 @@
 
 #define PIPELINE_PROCESSING_DATA_COUNTER_MAX (INT_MAX / 2)
 
-namespace event_forge {
+namespace level2 {
 
 class PipelineProcessingData : public Matchable, public SerializableJson {
     public:

@@ -1,9 +1,9 @@
 #include "pipelinefifo.h"
 #include "logger.h"
 
-using namespace event_forge;
+using namespace level2;
 
-namespace event_forge {
+namespace level2 {
 
 std::shared_ptr<PipelineFiFo> PipelineFiFo::getInstance() {
     return std::make_shared<PipelineFiFo>();
@@ -53,4 +53,4 @@ int PipelineFiFo::getCountOfElementsInFifo() {
   std::unique_lock<std::shared_mutex> lock(mutex);
   return processingDataFiFo.size();
 }
-} // namespace event_forge
+} // namespace level2

@@ -12,7 +12,7 @@
 
 #include "pipelinefifo.h"
 
-namespace event_forge {
+namespace level2 {
 class MosquittoWrapper {
  public:
   static std::shared_mutex mqttConnectorInitMutex;
@@ -56,4 +56,4 @@ class MosquittoWrapper {
   void subscribeToAllTopics();
   void logMosquittoMessage(int mosquittoReturnCode, std::string successMessage, std::string errorMessage);
 };
-} // namespace event_forge
+} // namespace level2

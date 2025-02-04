@@ -18,7 +18,7 @@
 #include "filelistener.h"
 
 using namespace std;
-using namespace event_forge;
+using namespace level2;
 
 #define PIPELINE_CONFIG_TEST_FILE_06 "/pipelineConfig06.json"
 #define APP_CONFIG_TEST_FILE_03 "/applicationConfig03.json"

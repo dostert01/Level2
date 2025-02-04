@@ -5,7 +5,7 @@
 
 #include "timeproviders.h"
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 
 TEST(TimeProvider, DefaultTimeProviderIsInstanceOfTimeProvider) {

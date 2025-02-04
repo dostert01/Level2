@@ -1,7 +1,7 @@
 #include "dbinterface.h"
 #include "logger.h"
 
-namespace event_forge {
+namespace level2 {
     
 /*
     Database

@@ -8,7 +8,7 @@
 
 #include "apistructs.h"
 
-namespace event_forge {
+namespace level2 {
 class PipelineFiFo {
  public:
   PipelineFiFo() = default;
@@ -29,4 +29,4 @@ class PipelineFiFo {
                            std::shared_ptr<PipelineProcessingData> &data);
 };
 
-} //namespace event_forge
+} //namespace level2

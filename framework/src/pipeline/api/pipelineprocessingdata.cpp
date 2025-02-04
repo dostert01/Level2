@@ -5,7 +5,7 @@
 using json = nlohmann::json;
 #define JSON (*(json*)(jsonData))
 
-namespace event_forge {
+namespace level2 {
 
 std::atomic_int PipelineProcessingData::counter{0};
 

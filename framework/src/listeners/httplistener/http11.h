@@ -10,7 +10,7 @@
 #include "httprequest.h"
 #include "httpresponse.h"
 
-namespace event_forge {
+namespace level2 {
 
 
 class Http11 {
@@ -41,4 +41,4 @@ class Http11 {
         void parseSingleHeaderLine(char* currentLineEnd, char*& currentLineStart);
 };
 
-} // namespace event_forge
+} // namespace level2

@@ -6,7 +6,7 @@
 #include <optional>
 #include <memory>
 
-namespace event_forge {
+namespace level2 {
 
 class Matchable {
     public:

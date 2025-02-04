@@ -13,7 +13,7 @@
 #include "payloadnames.h"
 #include "httpdefs.h"
 
-namespace event_forge {
+namespace level2 {
 
 HTTPListener::HTTPListener(json jsonObject) : GenericServer(jsonObject) {
 };
@@ -94,7 +94,7 @@ void HTTPListener::setProcessingDataPayloadAsResponsePayload(HttpResponse &respo
   }
 }
 
-void HTTPListener::handleProcessingErrors(event_forge::HttpResponse &response) {
+void HTTPListener::handleProcessingErrors(level2::HttpResponse &response) {
   response.setStatusCode(HTTP_STATUS_CODE_500);
   std::string errorPayload = HTTP_STATUS_CODE_500;
   for (auto currentError : processingData->getAllErrors()) {
@@ -163,4 +163,4 @@ std::optional<std::shared_ptr<PipelineProcessingData>> HTTPListener::getLastProc
   return returnValue;
 }
 
-} // namespace event_forge
+} // namespace level2

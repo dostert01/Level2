@@ -6,7 +6,7 @@
 #include "logger.h"
 #include "httpdefs.h"
 
-namespace event_forge {
+namespace level2 {
 
 Http11::Http11(int fileDescriptor) {
     rawDataBuffer = (char*)malloc(1);
@@ -197,5 +197,5 @@ std::optional<HttpException> Http11::getLastError() {
 }
 
 
-} // namespace event_forge
+} // namespace level2
 

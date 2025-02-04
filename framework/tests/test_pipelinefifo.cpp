@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include "pipelinefifo.h"
-#include "../logger/logger.h"
+#include "logger.h"
 
 using namespace std;
-using namespace event_forge;
+using namespace level2;
 
 TEST(PipeLineFifo, canGetAnInstance) {
     shared_ptr<PipelineFiFo> fifo = PipelineFiFo::getInstance();

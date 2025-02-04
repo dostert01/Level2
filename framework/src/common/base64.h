@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace event_forge {
+namespace level2 {
 
 class Base64Encoder {
     public:
@@ -16,4 +16,4 @@ class Base64Encoder {
         static void appendNewLineIfRequired(int& iCurrentLineLen, int iMaxLineLen, std::string& output);
         static std::string base64EncodeThreeChars(const char* input);
 };
-} //namespace event_forge 
+} //namespace level2 

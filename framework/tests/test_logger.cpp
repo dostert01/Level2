@@ -6,7 +6,7 @@
 #include "logger.h"
 
 using namespace std;
-using namespace event_forge;
+using namespace level2;
 
 TEST(Logger, AlwaysCreatesASingletonInstanceAsPointer) {
     Logger* logger1 = Logger::getInstanceAsPointer();

@@ -2,11 +2,11 @@
 #include <iostream>
 #include <vector>
 
-int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
+int pipeline_step_module_init(level2::PipelineStepInitData& initData) {
     return 0;
 }
 
-int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
+int pipeline_step_module_process(level2::PipelineProcessingData& processData) {
     std::cout << "Hello World" << std::endl;
     processData.addPayloadData("data to be sent back to the http client", "text/plain", "hello world");
     processData.addMatchingPattern("processed_by_hello_world", "true");

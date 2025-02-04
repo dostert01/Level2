@@ -7,7 +7,7 @@
 #include "pipelineprocessor.h"
 #include "../logger/logger.h"
 
-using namespace event_forge;
+using namespace level2;
 
 #ifndef LOGGER
 #define LOGGER Logger::getInstance()

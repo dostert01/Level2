@@ -11,7 +11,7 @@
 #include "pipeline.h"
 #include "pipelinefifo.h"
 
-namespace event_forge {
+namespace level2 {
 
     class PipeLineProcessor {
         public:
@@ -44,5 +44,5 @@ namespace event_forge {
             void processingLoop(std::shared_ptr<PipelineFiFo> fifo);
     };
 
-}  // namespace event_forge
+}  // namespace level2
 

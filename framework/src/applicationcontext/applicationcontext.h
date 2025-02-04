@@ -12,7 +12,7 @@
 
 using namespace nlohmann::json_abi_v3_11_3;
 
-namespace event_forge {
+namespace level2 {
 
 class ApplicationContext {
  public:
@@ -56,4 +56,4 @@ class ApplicationContext {
   json jsonAppConfigData;
 };
 
-}  // namespace event_forge
+}  // namespace level2

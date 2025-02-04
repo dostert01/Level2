@@ -1,7 +1,7 @@
 #include <string.h>
 #include "base64.h"
 
-namespace event_forge {
+namespace level2 {
 
 const char Base64Encoder::base64LookupTable[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -67,4 +67,4 @@ void Base64Encoder::appendEncodedToOutput(int& iCurrentLineLen, int iMaxLineLen,
   }
 }
 
-} // namespace event_forge 
+} // namespace level2 

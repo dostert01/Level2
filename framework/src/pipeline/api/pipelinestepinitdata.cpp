@@ -1,6 +1,6 @@
 #include "pipelinestepinitdata.h"
 
-namespace event_forge {
+namespace level2 {
 
 std::optional<std::string> PipelineStepInitData::getNamedArgument(const std::string& argumentName) {
     auto search = namedArguments.find(argumentName);

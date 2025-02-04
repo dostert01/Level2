@@ -4,7 +4,7 @@
 #include "common.h"
 #include "binaryprocessingdata.h"
 
-namespace event_forge {
+namespace level2 {
 
 class ProcessingError : public BinaryProcessingData, public SerializableJson {
     public:

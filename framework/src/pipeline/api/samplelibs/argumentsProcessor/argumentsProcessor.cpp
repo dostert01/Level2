@@ -9,10 +9,10 @@ std::string secondArgument;
 std::string error01;
 std::string error02;
 
-void processTheProcessingData(event_forge::PipelineProcessingData& processData);
+void processTheProcessingData(level2::PipelineProcessingData& processData);
 void processArgumentsFromJson();
 
-int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
+int pipeline_step_module_init(level2::PipelineStepInitData& initData) {
 
     std::optional<std::string> s = initData.getNamedArgument("outputFileName");
     if(s.has_value()) {
@@ -37,14 +37,14 @@ int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
     return 0;
 }
 
-int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
+int pipeline_step_module_process(level2::PipelineProcessingData& processData) {
   processArgumentsFromJson();
   processTheProcessingData(processData);
   return 0;
 }
 
-void processTheProcessingData(event_forge::PipelineProcessingData& processData) {
-  std::optional<std::shared_ptr<event_forge::ProcessingPayload>> p = processData.getPayload("question");
+void processTheProcessingData(level2::PipelineProcessingData& processData) {
+  std::optional<std::shared_ptr<level2::ProcessingPayload>> p = processData.getPayload("question");
   if ((p.has_value()) &&
       (p.value().get()->payloadAsString().compare("What is the answer?") == 0)) {
     std::cout << "adding the answer to the question" << std::endl;

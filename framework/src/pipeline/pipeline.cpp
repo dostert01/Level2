@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace event_forge {
+namespace level2 {
 
 #define JSON_PROPERTY_PIPELINE_NAME "pipelineName"
 #define JSON_PROPERTY_PIPELINE_STEPS "pipelineSteps"

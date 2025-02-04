@@ -17,7 +17,7 @@ using json = nlohmann::json;
 #define HALF_A_SECOND 500000
 
 using namespace std;
-using namespace event_forge;
+using namespace level2;
 
 #define PROCESS_CONFIG_TEST_FILE_01 "/processConfig01.json"
 #define PROCESS_CONFIG_TEST_FILE_03 "/processConfig03.json"
@@ -237,7 +237,7 @@ TEST(Http11, canGetAllParams) {
     Http11 http(fd);
     auto request = http.readRequest("");
     std::string result;
-    std::shared_ptr<event_forge::UrlParamsMultiMap> params = request.value()->getAllUrlParams();
+    std::shared_ptr<level2::UrlParamsMultiMap> params = request.value()->getAllUrlParams();
     for(auto param = params->begin(); param != params->end(); ++param) {
         LOGGER.info("found param key='" + param->first + "' value='" + param->second + "'");
         result.append(param->first + "=" + param->second + " ");

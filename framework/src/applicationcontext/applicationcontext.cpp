@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace event_forge {
+namespace level2 {
 
 #define DEFAULT_BUFFER_SIZE 2048
 
@@ -93,4 +93,4 @@ std::vector<std::string> ApplicationContext::splitString(std::string toSplit, st
     return currentJson;
   }
 
-}  // namespace event_forge
+}  // namespace level2

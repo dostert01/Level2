@@ -1,6 +1,6 @@
 #include "binaryprocessingdata.h"
 
-namespace event_forge {
+namespace level2 {
 
 BinaryProcessingData::~BinaryProcessingData(){};
 

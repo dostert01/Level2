@@ -11,7 +11,7 @@
 #include "logger.h"
 
 using namespace std;
-namespace event_forge {
+namespace level2 {
 
 std::shared_ptr<MosquittoWrapper> mqtt;
 
@@ -46,18 +46,18 @@ void sendData(PipelineProcessingData& processData) {
   }
 }
 
-} // namespace event_forge
+} // namespace level2
 
-int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
-  event_forge::initMQTTConnection(initData);
+int pipeline_step_module_init(level2::PipelineStepInitData& initData) {
+  level2::initMQTTConnection(initData);
   return 0;
 }
 
-int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
-  if(event_forge::mqtt->isInitComplete()) {
-    event_forge::sendData(processData);
+int pipeline_step_module_process(level2::PipelineProcessingData& processData) {
+  if(level2::mqtt->isInitComplete()) {
+    level2::sendData(processData);
   } else {
-    event_forge::LOGGER.warn("Client is not connected to the MQTT broker. No data can be sent.");
+    level2::LOGGER.warn("Client is not connected to the MQTT broker. No data can be sent.");
   }
   return 0;
 }

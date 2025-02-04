@@ -4,7 +4,7 @@
 #include "matchable.h"
 #include "logger.h"
 
-namespace event_forge {
+namespace level2 {
 
 Matchable& Matchable::operator=(const Matchable& other) {
     matchingPatterns.clear();

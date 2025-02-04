@@ -6,7 +6,7 @@
 
 #include "loglevels.h"
 
-namespace event_forge {
+namespace level2 {
 
 #define SQUARE_BRACKET_LEFT "["
 #define SQUARE_BRACKET_RIGHT "]"
@@ -72,6 +72,6 @@ class LoggingDestinationFactory {
   std::unique_ptr<LoggingDestination> createDestinationSyslog(const std::string applicationName);
 };
 
-}  // namespace event_forge
+}  // namespace level2
 
 #endif  // LOGGING_DESTINATIONS_H
