@@ -2,6 +2,7 @@
 - [Level2](#level2)
   - [What it is](#what-it-is)
   - [Preface](#preface)
+    - [Why this silly name "Level2"](#why-this-silly-name-level2)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
       - [Runtime](#runtime)
       - [Business Objects](#business-objects)
@@ -29,9 +30,17 @@ Level2 is an event driven business application framework written in C++. Its mai
 
 ## Preface
 
-This software is still in a very early state. This means, that not all features, that are described in the current documentation, are already (fully) implemented and available. In particular, being a framework, this project requires real life use cases, which are also not implemented yet. However, it is even more important to mention them already now, to be able to describe the big picture and the purpose of this project. This way, I'd like to share the idea of what is already possible and what might be missing.
+This software is still in a very early state. This means, that it is not production ready yet and not all features, that are described in the current documentation or that are required for production readiness, are already (fully) implemented and available. In particular, being a framework, this project requires real life use cases as proof of concept, which are also not implemented yet.
 
-In case you are interested in participating and/or contributing, both would be very welcome and appreciated. But of course I am also happy if you simply use the project for your own purposes :-).
+Even though, there might still be numerous gaps to be filled, Level2 already is capable of processing any kind of structured (text based) data using configurable and modularized workflows. Hence, the development has reached a point, where it makes sense to start spending further development effort with real business requirements in mind. This is mainly the case, because the core concept and core functionalities are already in place and working.
+
+So, if you are looking for a small, performant, scalable open source framework to base your business applications on, Level2 might be worth a look for you. In case you are interested in participating and/or contributing, both would be very welcome and appreciated. But of course I am also happy if you simply use the project for your own purposes.
+
+### Why this silly name "Level2"
+
+Because Level2 is my second implementation of an event driven modular business application framework. This time completely from scratch as free software and with the knowledge of certain important dos and don'ts in mind.
+
+This will help to leap applications, that are running on this framework to the next level (level2) in terms of scalability, performance and minimization of TCO. Or as Sledge Hammer would say: "Trust me, I know what I'm doing" ;-)
 
 ### The main building blocks in a nutshell
 
@@ -72,7 +81,7 @@ Business logic modules can be chained together into pipelines. This is, where th
 
 - Formatted and filtered **Logging** to any destination. Currently implemented are logging destinations for `stdout`, `stderr`, `file` and `syslog`. See [here](./framework/src/logger/README.md) for details.
 
-- **Application Context** covers thread save access to environmental information about the application and the main configuration of the application as such. Modules of the application (currently the listeners) can be bootstrapped using the `ApplicationContext`.
+- **Application Context** covers thread safe access to environmental information about the application and the main configuration of the application as such. Modules of the application (currently the listeners) can be bootstrapped using the `ApplicationContext`.
 
 ## How to build it
 
@@ -112,8 +121,6 @@ For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](
 
 ## How to use
 
-Please find one first sample application [here](./sampleApplications/README.md). (Work in Progress ;-) )
-
 First real roundtrip, that makes use of HttpListener to
 
 - trigger synchronous processing
@@ -122,13 +129,18 @@ First real roundtrip, that makes use of HttpListener to
 
 can be found in an integration test in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp). Please refer to test function `TEST(HTTPListener, sendsDataBackOnGetRequest)` to see for more details on the source code part of the implementation as well as the configuration of the required (simple) processing pipeline.
 
+Please find one first sample application [here](./sampleApplications/README.md). (Work in Progress ;-) )
+
 ## Current bucket list
 
-- Documentation
+- Documentation, documentation, documentation
 - A first **sample application** as a proof of concept and showcase
 - Authentication API and module for the HTTP server (HttpListener)
 - Request filtering API and module for the HTTP server (HttpListener)
 - **HTTP client** / HttpConnector.
-- **Monitoring** capabilities should be extended beyond whats already possible by dumping the `PipelineProcessingData` and friends to Json. At least at the end of each pipeline, it could make sense to automatically persist the corresponding payload object. How the json serialization works cam be seen for instance in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp) in `TEST(HTTPListener, sendsDataBackOnGetRequest)`.
+- Blueprinting a setup to run HttpListener behind a reverse proxy
+- Sample implementation of a weberver for static content using HttpListener
+- Proof of concept for passing [db connections represented by instances of class `Database`](./framework/src/dbinterface/dbinterface.h) from one processing module to another through the processing pipeline.
+- Thread safe database connection pooling
+- **Monitoring** capabilities should be extended beyond whats already possible by dumping the `PipelineProcessingData` and friends to Json. At least at the end of each pipeline, it could make sense to automatically persist the corresponding payload object. How the json serialization works can be seen for instance in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp) in `TEST(HTTPListener, sendsDataBackOnGetRequest)`.
 - Make dependency to SQLite optional
-
