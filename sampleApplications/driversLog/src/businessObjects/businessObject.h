@@ -4,7 +4,7 @@
 #include "apistructs.h"
 #include "serializables.h"
 
-using namespace event_forge;
+using namespace level2;
 class BusinessObject : public BinaryProcessingData, public SerializableJson {
     public:
         BusinessObject() = default;

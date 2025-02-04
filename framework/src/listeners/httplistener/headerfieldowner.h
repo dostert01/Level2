@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <vector>
 
-namespace event_forge {
+namespace level2 {
 
 class HeaderFieldOwner {
     public:
@@ -18,4 +18,4 @@ class HeaderFieldOwner {
         std::shared_ptr<std::map<std::string, std::string>> headerFields;
 };
 
-} //namespace event_forge
+} //namespace level2

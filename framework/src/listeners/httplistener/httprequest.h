@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "headerfieldowner.h"
-namespace event_forge {
+namespace level2 {
 
 using UrlParamsMultiMap = std::multimap<std::string, std::string>;
 using UrlParamsRange = std::pair<UrlParamsMultiMap::const_iterator, UrlParamsMultiMap::const_iterator>;
@@ -37,4 +37,4 @@ class HttpRequest : public HeaderFieldOwner {
         void addUrlParam(std::string key, std::string value);
 };
 
-} //namespace event_forge
+} //namespace level2

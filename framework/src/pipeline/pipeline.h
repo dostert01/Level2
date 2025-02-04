@@ -10,7 +10,7 @@
 #include "payloadnames.h"
 
 using json = nlohmann::json;
-namespace event_forge {
+namespace level2 {
 
 #ifndef UNDEFINED_JSON_DATA
 #define UNDEFINED_JSON_DATA "undefined"

@@ -12,7 +12,7 @@
 
 #define LOGGER Logger::getInstance()
 
-namespace event_forge {
+namespace level2 {
 
 class Logger {
  public:
@@ -45,4 +45,4 @@ class Logger {
   void checkLogLevelInEnvironment();
 };
 
-}  // namespace event_forge
+}  // namespace level2

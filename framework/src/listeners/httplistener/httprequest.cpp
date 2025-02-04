@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "httpdefs.h"
 
-namespace event_forge {
+namespace level2 {
 
 HttpRequest::HttpRequest() : HeaderFieldOwner() {
     urlParams = std::make_shared<UrlParamsMultiMap>();

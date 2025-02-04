@@ -8,7 +8,7 @@
 #include "applicationcontext.h"
 #include "logger.h"
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 using namespace nlohmann::json_abi_v3_11_3;
 

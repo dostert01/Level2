@@ -7,7 +7,7 @@
 #include <optional>
 #include <sqlite3.h>
 
-namespace event_forge {
+namespace level2 {
 
 #define DB_CONNECTION_PARAM_FILE_NAME "fileName"
 

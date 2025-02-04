@@ -7,7 +7,7 @@
 #include "binaryprocessingdata.h"
 #include "matchable.h"
 
-namespace event_forge {
+namespace level2 {
 
 class ProcessingPayload : public Matchable, public SerializableJson {
     private:

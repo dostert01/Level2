@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 
-namespace event_forge {
+namespace level2 {
 
 Logger::Logger() {
   logLevelStringMapper = LogLevelStringMapper();
@@ -103,4 +103,4 @@ void Logger::setMaxLogLevel(LogLevel logLevel) {
   maxLogLevel = logLevel;
 }
 
-}  // namespace event_forge
+}  // namespace level2

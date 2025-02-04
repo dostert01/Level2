@@ -5,7 +5,7 @@
 #include "pipeline.h"
 #include "pipelineprocessor.h"
 
-namespace event_forge {
+namespace level2 {
 
 enum ListenerProcessingMode {not_set, synchronous, asynchronous};
 
@@ -28,5 +28,5 @@ class NetworkListener {
     private:
         bool listening = false;
 };
-} //namespace event_forge
+} //namespace level2
 #endif //#define NETWORK_LISTENER_H

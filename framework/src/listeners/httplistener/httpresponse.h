@@ -5,7 +5,7 @@
 
 #include "headerfieldowner.h"
 
-namespace event_forge {
+namespace level2 {
 
 
 class HttpResponse : public HeaderFieldOwner {
@@ -28,4 +28,4 @@ class HttpResponse : public HeaderFieldOwner {
         void* messagePointer;
 };
 
-} //namespace event_forge
+} //namespace level2

@@ -4,7 +4,7 @@
 
 #include "loggingdestinations.h"
 
-namespace event_forge {
+namespace level2 {
 
 //-------------------------------------------------------------------
 LoggingDestination::~LoggingDestination() {}
@@ -98,4 +98,4 @@ std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestination
     return destination;
 }
 
-}  // namespace event_forge
+}  // namespace level2

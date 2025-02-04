@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace event_forge {
+namespace level2 {
 
 NetworkListener::NetworkListener() {
     processingMode = ListenerProcessingMode::not_set;
@@ -34,4 +34,4 @@ bool NetworkListener::isIniComplete() {
     return initComplete;
 }
 
-} // namespace event_forge
+} // namespace level2

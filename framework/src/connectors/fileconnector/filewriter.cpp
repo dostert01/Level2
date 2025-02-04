@@ -6,7 +6,7 @@
 #include "applicationcontext.h"
 
 #define PARAM_NAME_TARGET_DIRECTORY "targetDirectory"
-namespace event_forge {
+namespace level2 {
 
 FileWriter::FileWriter(PipelineStepInitData& initData) {
   targetDirectory = getNamedArgument(initData, PARAM_NAME_TARGET_DIRECTORY);
@@ -90,4 +90,4 @@ std::string FileWriter::getNamedArgument(PipelineStepInitData& initData,
   return value;
 }
 
-} //namespace event_forge
+} //namespace level2

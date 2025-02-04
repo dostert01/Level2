@@ -1,7 +1,7 @@
 #include "headerfieldowner.h"
 #include "logger.h"
 
-namespace event_forge {
+namespace level2 {
 
 HeaderFieldOwner::HeaderFieldOwner() {
     headerFields = std::make_shared<std::map<std::string, std::string>>();

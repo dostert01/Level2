@@ -10,7 +10,7 @@
 
 #define ONE_SECOND 1000000
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 
 TEST(LoggingDestinations, DefaultIsStdOut) {

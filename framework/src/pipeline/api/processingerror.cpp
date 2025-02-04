@@ -4,7 +4,7 @@
 using json = nlohmann::json;
 #define JSON (*(json*)(jsonData))
 
-namespace event_forge {
+namespace level2 {
 
 ProcessingError::ProcessingError(std::string errorCode, std::string errorMessage) : BinaryProcessingData() {
     this->errorCode = errorCode;

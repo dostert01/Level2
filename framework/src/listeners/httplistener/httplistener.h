@@ -13,7 +13,7 @@
 
 using namespace nlohmann::json_abi_v3_11_3;
 
-namespace event_forge {
+namespace level2 {
 
 class HTTPListener : public GenericServer {
  public:
@@ -28,7 +28,7 @@ class HTTPListener : public GenericServer {
   void processData();
   void sendResponse(Http11 &http);
   bool errorsOccurredDuringProcessing();
-  void handleProcessingErrors(event_forge::HttpResponse &response);
+  void handleProcessingErrors(level2::HttpResponse &response);
   void setProcessingDataPayloadAsResponsePayload(HttpResponse &response);
   void handleNotProcessedError(HttpResponse &response);
   bool processingDataHasNotBeenProcessed();

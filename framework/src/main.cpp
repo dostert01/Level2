@@ -2,7 +2,7 @@
 
 #include "logger.h"
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 
 int main() {

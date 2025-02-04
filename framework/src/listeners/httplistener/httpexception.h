@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace event_forge {
+namespace level2 {
 
 class HttpException : public std::exception {
     public:

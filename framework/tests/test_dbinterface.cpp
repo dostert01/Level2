@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <map>
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 
 #define TEST_DB_FILE_NAME "test.db"

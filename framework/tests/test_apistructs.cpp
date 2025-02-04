@@ -8,7 +8,7 @@
 #include "../logger/logger.h"
 #include "pipeline.h"
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 using json = nlohmann::json;
 

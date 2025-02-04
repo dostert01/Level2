@@ -12,7 +12,7 @@
 
 using namespace nlohmann::json_abi_v3_11_3;
 
-namespace event_forge {
+namespace level2 {
 
 class GenericServer : public NetworkListener {
     public:
@@ -49,4 +49,4 @@ class GenericServer : public NetworkListener {
         void setNonBlocking(int fileDescriptor);
 };
 
-} // namespace event_forge
+} // namespace level2

@@ -5,7 +5,7 @@
 #include "logger.h"
 #include "pipelineapi.h"
 
-namespace event_forge {
+namespace level2 {
 
 class FileWriter {
     public:
@@ -20,5 +20,5 @@ class FileWriter {
         bool ensureDirectoryExists(std::string path);
 };
 
-} // namespace event_forge
+} // namespace level2
 #endif //#ifndef FILE_WRITER_H

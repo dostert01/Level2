@@ -10,7 +10,7 @@
 
 using namespace nlohmann::json_abi_v3_11_3;
 
-namespace event_forge {
+namespace level2 {
 
 class MQTTTopic {
   public:
@@ -40,5 +40,5 @@ class MQTTListener : public NetworkListener {
         std::shared_ptr<MosquittoWrapper> mqtt;
 };
 
-} // namespace event_forge
+} // namespace level2
 #endif //#define MQTT_LISTENER_H

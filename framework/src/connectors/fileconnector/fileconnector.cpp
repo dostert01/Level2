@@ -4,14 +4,14 @@
 
 using namespace std;
 
-event_forge::FileWriter *fileWriter = nullptr;
+level2::FileWriter *fileWriter = nullptr;
 
-int pipeline_step_module_init(event_forge::PipelineStepInitData& initData) {
-  fileWriter = new event_forge::FileWriter(initData);
+int pipeline_step_module_init(level2::PipelineStepInitData& initData) {
+  fileWriter = new level2::FileWriter(initData);
   return 0;
 }
 
-int pipeline_step_module_process(event_forge::PipelineProcessingData& processData) {
+int pipeline_step_module_process(level2::PipelineProcessingData& processData) {
   fileWriter->writeFile(processData);
   return 0;
 }

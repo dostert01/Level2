@@ -8,7 +8,7 @@
 #include "../logger/logger.h"
 #include "binaryDataProcessor.h"
 
-using namespace event_forge;
+using namespace level2;
 using namespace std;
 
 #define PIPELINE_CONFIG_TEST_FILE_01 "/pipelineConfig01.json"

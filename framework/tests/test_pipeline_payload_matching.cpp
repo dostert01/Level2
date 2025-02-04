@@ -2,7 +2,7 @@
 #include "../logger/logger.h"
 #include "matchable.h"
 
-using namespace event_forge;
+using namespace level2;
 
 using namespace std;
 namespace test_pipeline_payload_matching {

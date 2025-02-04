@@ -1,6 +1,6 @@
 #include "httpexception.h"
 
-namespace event_forge {
+namespace level2 {
 
 HttpException::HttpException(const HttpException &other) : exception() {
     this->message = other.message;
@@ -29,4 +29,4 @@ std::string HttpException::getHttpReturnCode() {
 }
 
 
-} //namespace event_forge
+} //namespace level2

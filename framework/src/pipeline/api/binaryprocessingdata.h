@@ -1,6 +1,6 @@
 #pragma once
 
-namespace event_forge {
+namespace level2 {
 
 class BinaryProcessingData {
     public:
