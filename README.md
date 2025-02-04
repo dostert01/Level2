@@ -114,6 +114,14 @@ For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](
 
 Please find one first sample application [here](./sampleApplications/README.md). (Work in Progress ;-) )
 
+First real roundtrip, that makes use of HttpListener to
+
+- trigger synchronous processing
+- selecting the processing pipeline by parameters from the incoming HTTP request
+- returning processed data to the issuer of the request
+
+can be found in an integration test in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp). Please refer to test function `TEST(HTTPListener, sendsDataBackOnGetRequest)` to see for more details on the source code part of the implementation as well as the configuration of the required (simple) processing pipeline.
+
 ## Current bucket list
 
 - Documentation
