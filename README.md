@@ -5,7 +5,7 @@
   - [Preface](#preface)
     - [Why this silly name "Level2"](#why-this-silly-name-level2)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
-      - [Schematic overview](#schematic-overview)
+      - [Schematic overview of dataflow](#schematic-overview-of-dataflow)
       - [Runtime](#runtime)
       - [Business Objects](#business-objects)
       - [Business Logic](#business-logic)
@@ -46,7 +46,7 @@ This will help to leap applications, that are running on this framework to the n
 
 ### The main building blocks in a nutshell
 
-#### Schematic overview
+#### Schematic overview of dataflow
 
 ![schematic overview of the dataflow](./img/level2DataFlow.png)
 
