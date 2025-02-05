@@ -5,12 +5,13 @@
   - [Preface](#preface)
     - [Why this silly name "Level2"](#why-this-silly-name-level2)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
-      - [Schematic overview of dataflow](#schematic-overview-of-dataflow)
       - [Runtime](#runtime)
       - [Business Objects](#business-objects)
       - [Business Logic](#business-logic)
   - [Technical Implementation](#technical-implementation)
     - [Provided Modules](#provided-modules)
+    - [Schematic overview of dataflow](#schematic-overview-of-dataflow)
+    - [Scalability and parallel processing](#scalability-and-parallel-processing)
   - [How to build it](#how-to-build-it)
     - [External Dependencies](#external-dependencies)
       - [GoogleTest](#googletest)
@@ -46,10 +47,6 @@ This will help to leap applications, that are running on this framework to the n
 
 ### The main building blocks in a nutshell
 
-#### Schematic overview of dataflow
-
-![schematic overview of the dataflow](./img/level2DataFlow.png)
-
 #### Runtime
 
 The runtime implements the input-processing-output (IPO) pattern. While doing so,it provides
@@ -75,7 +72,7 @@ Business logic modules can be chained together into pipelines. This is, where th
 
 ### Provided Modules
 
-- **Process Pipelining** allows declarative definition of processing pipelines. Such pipelines consist of a series of business logic specific modules, that can be chained together. As pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements.
+- **Process Pipelining** allows declarative definition of processing pipelines. Such pipelines consist of a series of business logic specific modules called "workers", that can be chained together. As pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements.
   
 - **Connectors** to external systems using local filesystem, MQTT and HTTP (coming soon).Any further protocol is possible and can be implemented as business logic module even outside of the framework.
 
@@ -88,6 +85,32 @@ Business logic modules can be chained together into pipelines. This is, where th
 - Formatted and filtered **Logging** to any destination. Currently implemented are logging destinations for `stdout`, `stderr`, `file` and `syslog`. See [here](./framework/src/logger/README.md) for details.
 
 - **Application Context** covers thread safe access to environmental information about the application and the main configuration of the application as such. Modules of the application (currently the listeners) can be bootstrapped using the `ApplicationContext`.
+
+### Schematic overview of dataflow
+
+![schematic overview of the dataflow](./img/level2DataFlow.png)
+
+As soon as an event, that is triggered by a message being received by one of the listeners, appears, it is being handed over to the `PipelineProcessor` **(1)**. This process of handing over the event/message can either be done for synchronous or asynchronous processing.
+
+The figure above shows an example for synchronous processing of an HTTP request. In this example it is the issuer of the (HTTP) request, that instantly receives back the result of the processing. No connector needs to be involved in this case, because the HttpListener returns the processed data directly back to the http client.
+
+Synchronous processing is possible and makes sense for protocols which allow the sender of a message to wait and instantly receive the processed data back. Hence, synchronous processing is likely to be the default for HTTP where for instance REST request need to be processed or any kind of static or dynamic web content shall be delivered to the client. However, it is still possible to use asynchronous processing for HTTP as well.
+
+In the figure above MQTT is the protocol of choice for triggering asynchronous processing. In asynchronous mode, the Listener (in this case the MqttListener) simply hands over its message to the `PipelineProcessor` by placing it into a FIFO queue for. The listener itself than does not need to take further care about the message and can confirm successful retrieval of the message if the corresponding protocol allows and/or requires that.
+
+In both cases, be it synchronous or asynchronous processing, it is the `PipelineProcessor` who finds a suitable (business)process **(2)** for processing the incoming payload. Each of these processes can contain an arbitrary number of pipelines. Each of the contained pipelines are having  a specific set of parameters called 'matching patterns' attached, which allow the `PipelineProcessor` to match the incoming message and its meta information against. Once a message matches one particular pipeline, the `PipelineProcessor` hands over the message to that pipeline and triggers the processing. This processing continues until no further matching pipeline can be found.
+
+Throughout the entire pipeline, any worker can access further internal or external data sources. Two of the pipelines in the above figure are making use of the SQL database interface **(3)** to read and or write data to an SQL database.
+
+### Scalability and parallel processing
+
+Listeners are using instances of class `PipelineFifo` for handing messages over to a `PipelineProcessor` for _asynchronous_ processing. For _synchronous_ processing in turn, it is an instance of `PipelineProcessor` itself, that messages are being handed over directly. Because listeners can make use of any number of `PipelineProcessor`s and `PipelineFifo`s, it is completely up to the application how many instances of these classes it will use.
+
+Each `PipelineProcessor` can run one pipeline at a time. Hence one way to scale the application is to multiply the amount of `PipelineProcessor` instances.
+
+Each `PipelineProcessor` on the other hand can deal with any number of `PipelineFifo`s while `PipelineFifo`s can also be shared across multiple instances of `PipelineProcessor`s.
+
+On the receiving side, the Listeners can deal with any number of `PipelineProcessor`s and `PipelineFifo`s as well. Especially during _asynchronous_ processing with multiple `PipelineProcessor`s, the workload will automatically be distributed across multiple CPUs because the `PipelineProcessor`s are using a separate thread for execution of the pipelines. In _synchronous_ processing mode, it is up to the listener to use a dedicated thread for each synchronous call to `PipelineProcessor::execute`. [`HttpListener`](./framework/src/listeners/httplistener/) is the first (and currently the only synchronous) listener to implement this pattern. For `HttpListener` it appears to be reasonable to provide one instance of `PipelineProcessor` per allowed client connection.
 
 ## How to build it
 
@@ -144,9 +167,12 @@ Please find one first sample application [here](./sampleApplications/README.md).
 - Authentication API and module for the HTTP server (HttpListener)
 - Request filtering API and module for the HTTP server (HttpListener)
 - **HTTP client** / HttpConnector.
+- Finish implementation of asynchronous processing in HttpListener
 - Blueprinting a setup to run HttpListener behind a reverse proxy
 - Sample implementation of a weberver for static content using HttpListener
 - Proof of concept for passing [db connections represented by instances of class `Database`](./framework/src/dbinterface/dbinterface.h) from one processing module to another through the processing pipeline.
+- Implement pipeline processing loop in the `PipelineProcessor` to allow chained execution of multiple matching pipelines
 - Thread safe database connection pooling
+- Enable listeners to handle multiple instances of `PipelineProcessor` and `PipelineFifo` to allow more flexibility in designing multi threated processing for synchronous and asynchronous processing
 - **Monitoring** capabilities should be extended beyond whats already possible by dumping the `PipelineProcessingData` and friends to Json. At least at the end of each pipeline, it could make sense to automatically persist the corresponding payload object. How the json serialization works can be seen for instance in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp) in `TEST(HTTPListener, sendsDataBackOnGetRequest)`.
 - Make dependency to SQLite optional
