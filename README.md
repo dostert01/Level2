@@ -5,6 +5,7 @@
   - [Preface](#preface)
     - [Why this silly name "Level2"](#why-this-silly-name-level2)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
+      - [Schematic overview](#schematic-overview)
       - [Runtime](#runtime)
       - [Business Objects](#business-objects)
       - [Business Logic](#business-logic)
@@ -44,6 +45,10 @@ Because Level2 is my second implementation of an event driven modular business a
 This will help to leap applications, that are running on this framework to the next level (level2) in terms of scalability, performance and minimization of TCO. Or as Sledge Hammer would say: "Trust me, I know what I'm doing" ;-)
 
 ### The main building blocks in a nutshell
+
+#### Schematic overview
+
+![schematic overview of the dataflow](./img/level2DataFlow.png)
 
 #### Runtime
 
