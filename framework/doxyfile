@@ -1,0 +1,62 @@
+#---------------------------------------------------------------------------
+# General configuration
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "Level2"
+PROJECT_NUMBER         = "0.1"
+PROJECT_BRIEF          = "An event driven business application framework"
+OUTPUT_DIRECTORY       = "docs"
+INPUT                 = "src"
+RECURSIVE             = YES
+EXCLUDE_PATTERNS      = "*/test/*" "*/third_party/*"
+
+#---------------------------------------------------------------------------
+# Build configuration
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL           = YES
+EXTRACT_PRIVATE       = NO
+EXTRACT_STATIC        = YES
+EXTRACT_LOCAL_CLASSES = YES
+SHOW_HEADERFILE       = YES
+SORT_MEMBER_DOCS      = NO
+SORT_BRIEF_DOCS       = NO
+
+#---------------------------------------------------------------------------
+# Output Formats
+#---------------------------------------------------------------------------
+
+GENERATE_HTML         = YES
+GENERATE_LATEX        = NO
+GENERATE_XML          = NO
+GENERATE_MAN          = NO
+GENERATE_RTF          = NO
+
+#---------------------------------------------------------------------------
+# Documentation Formatting
+#---------------------------------------------------------------------------
+
+ENABLE_PREPROCESSING  = YES
+MACRO_EXPANSION       = YES
+EXPAND_ONLY_PREDEF    = NO
+SEARCH_INCLUDES       = YES
+
+#---------------------------------------------------------------------------
+# Source Code Listings
+#---------------------------------------------------------------------------
+
+SOURCE_BROWSER        = YES
+INLINE_SOURCES        = YES
+REFERENCES_RELATION   = YES
+
+#---------------------------------------------------------------------------
+# Diagram Support
+#---------------------------------------------------------------------------
+
+HAVE_DOT             = YES
+DOT_GRAPH_MAX_NODES  = 50
+GENERATE_LEGEND      = YES
+DOT_IMAGE_FORMAT     = png
+CALL_GRAPH           = YES
+CALLER_GRAPH         = YES
+CLASS_DIAGRAMS       = YES
