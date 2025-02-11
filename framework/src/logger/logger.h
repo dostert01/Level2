@@ -128,7 +128,7 @@ class Logger {
    */
   void addLoggingDestination(std::unique_ptr<LoggingDestination> destination);
   /**
-   * @brief Replace all logging destination by the new one.
+   * @brief Replace all logging destinations by the new one.
    * 
    * **Example:**
    * @code

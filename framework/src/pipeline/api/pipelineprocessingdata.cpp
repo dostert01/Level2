@@ -7,7 +7,7 @@ using json = nlohmann::json;
 
 namespace level2 {
 
-std::atomic_int PipelineProcessingData::counter{0};
+std::atomic_int PipelineProcessingData::instanceCounter{0};
 
 PipelineProcessingData::PipelineProcessingData() {
     setDefaultProperties();
@@ -30,9 +30,9 @@ void PipelineProcessingData::setDefaultProperties() {
 
 std::string PipelineProcessingData::getFormattedCounter() {
     char buffer[1024];
-    int localCounter = counter.fetch_add(1);
+    int localCounter = instanceCounter.fetch_add(1);
     if(localCounter > PIPELINE_PROCESSING_DATA_COUNTER_MAX) {
-        counter.store(0);
+        instanceCounter.store(0);
     }
     sprintf(buffer, "%09d", localCounter);
     return std::string(buffer);

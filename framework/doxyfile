@@ -6,9 +6,9 @@ PROJECT_NAME           = "Level2"
 PROJECT_NUMBER         = "0.1"
 PROJECT_BRIEF          = "An event driven business application framework"
 OUTPUT_DIRECTORY       = "docs"
-INPUT                 = "src"
-RECURSIVE             = YES
-EXCLUDE_PATTERNS      = "*/test/*" "*/third_party/*"
+INPUT                  = "src"
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = "*/test/*" "*/third_party/*"
 
 #---------------------------------------------------------------------------
 # Build configuration
