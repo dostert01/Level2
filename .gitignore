@@ -24,7 +24,7 @@ _deps/
 framework/Testing/
 framework/src/logger/Testing/
 framework/src/pipeline/.CMakeLists.txt.swp
-framework/tests/test_secondTake
+framework/tests/test_level2
 framework/tests/test_applicationcontext
 framework/tests/test_dbinterface
 framework/tests/test_eventForge
