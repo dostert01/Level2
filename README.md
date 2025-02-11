@@ -96,7 +96,7 @@ The figure above shows an example for synchronous processing of an HTTP request.
 
 Synchronous processing is possible and makes sense for protocols which allow the sender of a message to wait and instantly receive the processed data back. Hence, synchronous processing is likely to be the default for HTTP where for instance REST request need to be processed or any kind of static or dynamic web content shall be delivered to the client. However, it is still possible to use asynchronous processing for HTTP as well.
 
-In the figure above MQTT is the protocol of choice for triggering asynchronous processing. In asynchronous mode, the Listener (in this case the MqttListener) simply hands over its message to the `PipelineProcessor` by placing it into a FIFO queue for. The listener itself than does not need to take further care about the message and can confirm successful retrieval of the message if the corresponding protocol allows and/or requires that.
+In the figure above MQTT is the protocol of choice for triggering asynchronous processing. In asynchronous mode, the Listener (in this case the MqttListener) simply hands over its message to the `PipelineProcessor` by placing it into a FIFO queue. The listener itself than does not need to take further care about the message and can confirm successful retrieval of the message if the corresponding protocol allows and/or requires that.
 
 In both cases, be it synchronous or asynchronous processing, it is the `PipelineProcessor` who finds a suitable (business)process **(2)** for processing the incoming payload. Each of these processes can contain an arbitrary number of pipelines. Each of the contained pipelines are having  a specific set of parameters called 'matching patterns' attached, which allow the `PipelineProcessor` to match the incoming message and its meta information against. Once a message matches one particular pipeline, the `PipelineProcessor` hands over the message to that pipeline and triggers the processing. This processing continues until no further matching pipeline can be found.
 
@@ -176,3 +176,5 @@ Please find one first sample application [here](./sampleApplications/README.md).
 - Enable listeners to handle multiple instances of `PipelineProcessor` and `PipelineFifo` to allow more flexibility in designing multi threated processing for synchronous and asynchronous processing
 - **Monitoring** capabilities should be extended beyond whats already possible by dumping the `PipelineProcessingData` and friends to Json. At least at the end of each pipeline, it could make sense to automatically persist the corresponding payload object. How the json serialization works can be seen for instance in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp) in `TEST(HTTPListener, sendsDataBackOnGetRequest)`.
 - Make dependency to SQLite optional
+- Listener and connector for apache kafka
+- Listener and connector for RabbitMQ
