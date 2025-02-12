@@ -9,27 +9,31 @@
       - [Business Objects](#business-objects)
       - [Business Logic](#business-logic)
   - [Technical Implementation](#technical-implementation)
-    - [Provided Modules](#provided-modules)
+    - [Application Building Blocks](#application-building-blocks)
     - [Schematic overview of dataflow](#schematic-overview-of-dataflow)
     - [Scalability and parallel processing](#scalability-and-parallel-processing)
+  - [How to use](#how-to-use)
+    - [](#)
+    - [Simple example of an HTTP roundtrip](#simple-example-of-an-http-roundtrip)
   - [How to build it](#how-to-build-it)
     - [External Dependencies](#external-dependencies)
       - [GoogleTest](#googletest)
       - [nlohmann/json](#nlohmannjson)
       - [SQLite](#sqlite)
       - [MQTT / Mosquitto](#mqtt--mosquitto)
-  - [How to use](#how-to-use)
   - [Current bucket list](#current-bucket-list)
 
 ## What it is
 
-Level2 is an event driven business application framework written in C++. Its main idea is to keep **Business Objects**, **Business Logic** and **Runtime** separated from each other to allow
+Level2 is an event driven business application framework written in C++. Its main idea is to allow building of scalable and flexible event driven applications by **declarative defining the business logic**. To achieve this, it keeps **Business Objects**, **Business Logic** and **Runtime** separated from each other to allow
 
 - the runtime to be scalable
 - business objects to be defined independent of the runtime and the business logic
 - the business logic to be defined as part of the configuration allowing declarative description of the logic
 - deployment of business logic to be independent of the software deployment process
 - to build any kind of message oriented middleware and dialog based business (web) applications on top of it.
+
+Chapter [How to use](#how-to-use) of this document shows some examples of how to declarative describe business processes for bootstrapping and running them with Level2.
 
 ## Preface
 
@@ -64,27 +68,27 @@ When reaching the system, incoming data is being enriched with meta information,
 
 #### Business Logic
 
-The smallest building blocks of business logic inside the framework are business logic modules. These modules themselves implement the IPO pattern. They are based on a simple API, which allows modular extensibility of the system's capabilities in a way, that is independent of development and release cycle of the framework itself.
+The smallest building blocks of business logic inside the framework are business worker modules (or workers). These modules themselves implement the IPO pattern. They are based on a simple API, which allows modular extensibility of the system's capabilities in a way, that is independent of development and release cycle of the framework itself.
 
-Business logic modules can be chained together into pipelines. This is, where the state (respectively the meta information) of a payload and its business object comes into play. Each pipeline can have a set to matching patterns attached. These patterns are matched against the state of any incoming payload. Once a pipeline's matching patters match a payload, this particular payload will be processed by the corresponding pipeline. During the processing of a payload, a pipeline or more precise the contained business logic modules can apply any kind of changes to the payload and its state information. This can either cause the payload to be processed by subsequent matching pipelines or being handed over to external systems.
+Worker modules can be chained together into pipelines. This is, where the state (respectively the meta information) of a payload and its business object comes into play. Each pipeline can have a set to matching patterns attached. These patterns are matched against the state of any incoming payload. Once a pipeline's matching patters match a payload, this particular payload will be processed by the corresponding pipeline. During the processing of a payload, a pipeline or more precise the contained worker modules can apply any kind of changes to the payload and its state information. This can either cause the payload to be processed by subsequent matching pipelines or being handed over to external systems.
 
 ## Technical Implementation
 
-### Provided Modules
+### Application Building Blocks
 
-- **Process Pipelining** allows declarative definition of processing pipelines. Such pipelines consist of a series of business logic specific modules called "workers", that can be chained together. As pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements.
+- The class **ApplicationContext** allows to bootstrap an entire application from a JSON file, that declares the components of the application. Further on, `ApplicationContext` covers thread safe access to environmental information about the application and its main configuration
+
+- **Process Pipelining** allows declarative definition of processing pipelines. Such pipelines consist of a series of business logic specific worker modules, that can be chained together. As pipelines are defined declarative, they can be changed and extended at runtime, making it quick and easy to react to changing business requirements.
   
 - **Connectors** to external systems using local filesystem, MQTT and HTTP (coming soon).Any further protocol is possible and can be implemented as business logic module even outside of the framework.
 
-- Event **listeners** for local filesystem, MQTT and HTTP (coming soon). Any further protocol is possible but currently must be implemented as part of the framework.
+- Event **listeners**  to listen for events/data coming in via local filesystem, MQTT and HTTP. Any further protocol is possible but currently must be implemented as part of the framework.
 
-- **API** for developing business logic modules and connectors. Processing pipelines can be extended by making use of a **lean API**, that allows quick implementation of new business logic modules. For further details refer to the [Pipeline Implementation Part of the Framework](./framework/src/pipeline/README.md)
-
-- Generic **SQL Database Interface** to enable processing pipelines to communicate with any RDBMS. Currently SQLite is implemented as the first one. See [here](./framework/src/dbinterface/README.md) how to use the existing implementation and to extend for the support of further RDBMSs.
+- **API** for developing worker modules and connectors. Processing pipelines can be extended by making use of a **lean API**, that allows quick implementation of new  modules. For further details refer to the [Pipeline Implementation Part of the Framework](./framework/src/pipeline/README.md) or directly to [`pipelineapi.h`](./framework/src/pipeline/api/pipelineapi.h)
 
 - Formatted and filtered **Logging** to any destination. Currently implemented are logging destinations for `stdout`, `stderr`, `file` and `syslog`. See [here](./framework/src/logger/README.md) for details.
 
-- **Application Context** covers thread safe access to environmental information about the application and the main configuration of the application as such. Modules of the application (currently the listeners) can be bootstrapped using the `ApplicationContext`.
+- Generic **SQL Database Interface** to enable processing pipelines to communicate with any RDBMS. Currently SQLite is implemented as the first one. See [here](./framework/src/dbinterface/README.md) how to use the existing implementation and to extend for the support of further RDBMSs.
 
 ### Schematic overview of dataflow
 
@@ -111,6 +115,33 @@ Each `PipelineProcessor` can run one pipeline at a time. Hence one way to scale 
 Each `PipelineProcessor` on the other hand can deal with any number of `PipelineFifo`s while `PipelineFifo`s can also be shared across multiple instances of `PipelineProcessor`s.
 
 On the receiving side, the Listeners can deal with any number of `PipelineProcessor`s and `PipelineFifo`s as well. Especially during _asynchronous_ processing with multiple `PipelineProcessor`s, the workload will automatically be distributed across multiple CPUs because the `PipelineProcessor`s are using a separate thread for execution of the pipelines. In _synchronous_ processing mode, it is up to the listener to use a dedicated thread for each synchronous call to `PipelineProcessor::execute`. [`HttpListener`](./framework/src/listeners/httplistener/) is the first (and currently the only synchronous) listener to implement this pattern. For `HttpListener` it appears to be reasonable to provide one instance of `PipelineProcessor` per allowed client connection.
+
+## How to use
+
+Declarative application design with Level2 requires the following:
+
+1. Declaration of the pipelines, that embrace the required worker modules and execute them in order, once a corresponding message/event hits the application
+2. Declaration of (business) processes, that embrace the required pipelines, that are needed to implement and execute the business logic
+3. Declaration of the application building blocks such as required listeners, used (business) processes and the general configuration of the application
+4. The worker modules, that are supposed to be used by the pipelines
+
+While the first three points can be done declarative, the 4th one requires implementation of worker modules using the API, that is defined in [`pipelineapi.h`](./framework/src/pipeline/api/pipelineapi.h). The assumption is, that by the time, the pool of already implemented worker modules will grow towards an extend, that covers most of the requirements of a certain business case. Once a set of (so to say) most important worker modules exists, setting up a new application mainly will boil down to declaring the first three building blocks without the need to implement (a lot) more worker modules. Depending on the business case and the amount of already existing worker modules, it is then possible to _implement_ new business logic and maybe even more important to _change_ existing business logic just by deploying new declarations of pipelines (**1**) and business processes (**2**) to an existing application.
+
+In the following, I will give two examples of how to do the declarative part of the application design. Both examples assume, that all requires worker modules are already available and in place. Examples for the implementation of worker modues can already be found under [framework/src/pipeline/api/workerModules/](./framework/src/pipeline/api/workerModules/) and will be subject of a chapter of the document, that is later to come.
+
+### 
+
+### Simple example of an HTTP roundtrip
+
+First real roundtrip, that makes use of HttpListener to
+
+- trigger synchronous processing
+- selecting the processing pipeline by parameters from the incoming HTTP request
+- returning processed data to the issuer of the request
+
+can be found in an integration test in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp). Please refer to test function `TEST(HTTPListener, sendsDataBackOnGetRequest)` to see for more details on the source code part of the implementation as well as the configuration of the required (simple) processing pipeline.
+
+Please find one first sample application [here](./sampleApplications/README.md). (Work in Progress ;-) )
 
 ## How to build it
 
@@ -147,18 +178,6 @@ CMake makes use of `find_package(SQLite3 REQUIRED)` to make SQLite available for
 To build with support for MQTT, it is required to have [Eclipse Mosquitto](https://mosquitto.org/) and its development packages installed. [CMakeLists.txt](./framework/CMakeLists.txt) uses `find_package(Mosquito REQUIRED)` to make it available for the build process. However, Level2 can still be built without this dependency. MQTT support will be excluded from the build if Mosquitto can not be found.
 
 For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](./framework/tests/test_mqttconnector.cpp) and [test_mqttlistener.cpp](./framework/tests/test_mqttlistener.cpp) it is required to have an MQTT broker listening on port 1883 on the loopback interface.
-
-## How to use
-
-First real roundtrip, that makes use of HttpListener to
-
-- trigger synchronous processing
-- selecting the processing pipeline by parameters from the incoming HTTP request
-- returning processed data to the issuer of the request
-
-can be found in an integration test in [test_httplistener.cpp](./framework/tests/test_httplistener.cpp). Please refer to test function `TEST(HTTPListener, sendsDataBackOnGetRequest)` to see for more details on the source code part of the implementation as well as the configuration of the required (simple) processing pipeline.
-
-Please find one first sample application [here](./sampleApplications/README.md). (Work in Progress ;-) )
 
 ## Current bucket list
 
