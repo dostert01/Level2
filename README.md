@@ -13,7 +13,8 @@
     - [Schematic overview of dataflow](#schematic-overview-of-dataflow)
     - [Scalability and parallel processing](#scalability-and-parallel-processing)
   - [How to use](#how-to-use)
-    - [](#)
+    - [HTTP server for static web content](#http-server-for-static-web-content)
+    - [Middleware for messages distribution in EDI](#middleware-for-messages-distribution-in-edi)
     - [Simple example of an HTTP roundtrip](#simple-example-of-an-http-roundtrip)
   - [How to build it](#how-to-build-it)
     - [External Dependencies](#external-dependencies)
@@ -125,11 +126,76 @@ Declarative application design with Level2 requires the following:
 3. Declaration of the application building blocks such as required listeners, used (business) processes and the general configuration of the application
 4. The worker modules, that are supposed to be used by the pipelines
 
-While the first three points can be done declarative, the 4th one requires implementation of worker modules using the API, that is defined in [`pipelineapi.h`](./framework/src/pipeline/api/pipelineapi.h). The assumption is, that by the time, the pool of already implemented worker modules will grow towards an extend, that covers most of the requirements of a certain business case. Once a set of (so to say) most important worker modules exists, setting up a new application mainly will boil down to declaring the first three building blocks without the need to implement (a lot) more worker modules. Depending on the business case and the amount of already existing worker modules, it is then possible to _implement_ new business logic and maybe even more important to _change_ existing business logic just by deploying new declarations of pipelines (**1**) and business processes (**2**) to an existing application.
+While the first three points can be done declarative, the 4th one requires implementation of worker modules using the API, that is defined in [`pipelineapi.h`](./framework/src/pipeline/api/pipelineapi.h). The assumption is, that by the time, the pool of already implemented worker modules will grow towards an extend, that covers most of the requirements of a certain business case. Once a set of (so to say) most important worker modules exists, setting up a new application mainly will boil down to declaring the first three building blocks without the need to implement (a lot) more worker modules. Depending on the business case and the amount of already existing worker modules, it is then possible to _implement new_ business logic and maybe even more important to _change existing_ business logic just by deploying new declarations of pipelines (**1**) and business processes (**2**) to an existing application.
 
-In the following, I will give two examples of how to do the declarative part of the application design. Both examples assume, that all requires worker modules are already available and in place. Examples for the implementation of worker modues can already be found under [framework/src/pipeline/api/workerModules/](./framework/src/pipeline/api/workerModules/) and will be subject of a chapter of the document, that is later to come.
+In the following, I will give two examples of how to do the declarative part of the application design. Both examples assume, that all requires worker modules are already available and in place. Examples for the implementation of worker modules can already be found under [framework/src/pipeline/api/workerModules/](./framework/src/pipeline/api/workerModules/) and will be subject of a chapter of the document, that is later to come.
 
-### 
+### HTTP server for static web content
+
+The purpose if this server shall be to listen for incoming HTTP GET request on static resources, that are stored on that server. Such resources - if found - shall be returned in a synchronous HTTP roundtrip with the response.
+
+The following is required to wire up this functionality:
+
+1. appropriate worker modules
+   1. **GetRequestInspector** - to extract the name of the requested resource from the request and add it as parameter to the [`PipelineProcessingData`](./framework/src/pipeline/api/pipelineprocessingdata.h).
+   2. **FileCollector** - to collect the requested resource from the server's local filesystem and add it as payload ([`ProcessingPayload`](./framework/src/pipeline/api/processingpayload.h)) to the `PipelineProcessingData`.
+2. pipeline
+   1. This simple example only requires one pipeline, that chains together and parameterizes **GetRequestInspector** and **FileCollector**
+3. One process is required, that contains just the above pipeline and sets a matching pattern for that pipeline, that configures it to be triggers for incoming HTTP GET request for resources of a particular path.
+4. Configure the `ApplicationContext` to set up one HttpListener on a specific port and bind it to the process of **3** for synchronous processing.
+
+Once the worker modules `GetRequestInspector` and `FileCollector` are in place, the pipeline can be declared like
+
+```json
+{
+    "pipelineName" : "processHttpGetRequests",
+    "pipelineSteps" : [
+        {
+            "stepName":"gather requested resource path",
+            "libraryName":"GetRequestInspector",
+            "namedArguments" : {
+                "readResourceFrom":"http.rcv.headerField.path",
+                "writeResourcePathTo":"GetRequestInspector.requestedResource.path",
+                "writeResourceNameTo":"GetRequestInspector.requestedResource.fileName",
+            }
+        },
+        {
+            "stepName":"find and return requested resource",
+            "libraryName":"FileCollector",
+            "namedArguments" : {
+                "resourceStore":"ApplicationContext.staticContent/webRoot",
+                "readResourcePathFrom":"GetRequestInspector.requestedResource.path",
+                "readResourceNameFrom":"GetRequestInspector.requestedResource.fileName"
+            }
+        }
+    ]
+}
+```
+
+With this pipeline saved as `processHttpGetRequests.json`, it is now possible to declare the process
+
+```json
+{
+    "processName" : "simpleStaticWebserver",
+    "pipelines" : [
+        {
+            "pipelineConfigFile":"processHttpGetRequests.json",
+            "matchingPatterns" : [
+                {
+                  "http.rcv.headerField.method": "GET",
+                  "http.rcv.headerField.path": "^/static/[a-Z]*\\.(html|js|css)",
+                  "receivedByListener": "HttpListener",
+                  "receivedViaProtocol": "http"
+                }
+            ]
+        }
+    ]
+}
+```
+
+...
+
+### Middleware for messages distribution in EDI
 
 ### Simple example of an HTTP roundtrip
 
