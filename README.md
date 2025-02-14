@@ -23,6 +23,7 @@
       - [SQLite](#sqlite)
       - [MQTT / Mosquitto](#mqtt--mosquitto)
   - [Current bucket list](#current-bucket-list)
+  - [External references](#external-references)
 
 ## What it is
 
@@ -132,7 +133,7 @@ In the following, I will give two examples of how to do the declarative part of 
 
 ### HTTP server for static web content
 
-The purpose if this server shall be to listen for incoming HTTP GET request on static resources, that are stored on that server. Such resources - if found - shall be returned in a synchronous HTTP roundtrip with the response.
+The purpose of this server shall be to listen for incoming HTTP GET request on static resources, that are stored on that server. Such resources - if found - shall be returned in a synchronous HTTP roundtrip with the response.
 
 The following is required to wire up this functionality:
 
@@ -172,6 +173,14 @@ Once the worker modules `GetRequestInspector` and `FileCollector` are in place, 
 }
 ```
 
+**Explanation:**
+
+- `pipelineName` is the application wide unique name of the pipeline
+- `pipelineSteps` list of steps to be executed by this pipeline. The steps are executed in the order in wich they appear in this array.
+- `stepName` a pipeline wide unique name of a step
+- `libraryName` the name of the shared object, that implements the required functionality and exposes it by using [pipelineapi.h](./framework/src/pipeline/api/pipelineapi.h). Under Linux, this name will be expanded by adding the prefix `lib` and the suffix `.so`.
+- `namedArguments` list of library specific arguments to be passed to the shared object during execution of the pipeline. See [argumentsProcessor.cpp](./framework/src/pipeline/api/workerModules/argumentsProcessor/argumentsProcessor.cpp) for a usage example.
+
 With this pipeline saved as `processHttpGetRequests.json`, it is now possible to declare the process
 
 ```json
@@ -193,9 +202,107 @@ With this pipeline saved as `processHttpGetRequests.json`, it is now possible to
 }
 ```
 
-...
+**Explanation:**
+
+- `procaessName` is the application wide unique name for this process
+- `pipelines` array of pipelines contained in this process. A unique pipelines can be contained in any number of processes ss long as the `matchingPatterns` of each usage differ. in the example above, the pipeline `processHttpGetRequests.json` could be used by a different process for instance to process GET request for a different `http.rcv.headerField.path` matching pattern.
+- `pipelineConfigFile` the file name under with the corresponding pipeline was saved
+- `matchingPatterns` defines a list of key value pairs with are matched against the matching patterns of the payload (instances of `PipelineProcessingData`) at runtime. These patterns are represented by `PipelineProcessingData::matchingPatterns` respectively its ancestor class `Matchable::matchingPatterns`. A particular instance of `PipelineProcessingData` will be processes by a pipeline only if all the pipeline's matching patters can be matches against a corresponding matching pattern in the `Matchable::matchingPatterns` of the `PipelineProcessingData` in question. During processing of `PipelineProcessingData`, it is ensured by [`PipeLineProcessor`](./framework/src/pipeline/pipelineprocessor.h), that one instance of `PipelineProcessingData` can be processed by one particular pipeline only once (However, this feature is not implemented yet. See [chapter current bucket list](#current-bucket-list)). values of `matchingPatterns` _can_ be regular expressions. For more information on regular expressions and the supported grammar please refer to [cppreference.com - Regular expressions library](https://en.cppreference.com/w/cpp/regex).
+
+Now, as the process is declared, the application bootstrapping for `ApplicationContext` can be set up. This will include
+
+- The (business) process, that was declared above
+- An instance of `HttpListener`
+- The binding of the process from above to the `HttpListener` instance
+- All required path definitions
+- Setup of the application logging
+
+```json
+{
+    "applicationDirectories": {
+        "root": "$HOME/opt/testApplication",
+        "pipelines": "etc/pipelines.d",
+        "processes": "etc/processes.d",
+        "workerModules": "lib",
+    },
+    "Listeners": {
+        "HTTPListeners": [
+            {
+                "name": "httpGetListener01",
+                "port": 8888,
+                "maxClients" : 10
+            },
+            {
+                "name": "httpGetListener02",
+                "port": 8889,
+                "maxClients" : 10
+            }
+        ]
+
+    },
+    "listenerToProcessBindings": [
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener01",
+        "type": "synchronous"
+      },
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener02",
+        "type": "synchronous"
+      }
+    ],
+    "logging": {
+      "logLevel": "debug",
+      "loggers" : [
+        {
+          "type": "file",
+          "destination": "var/log/application.log"
+        },
+        {
+          "type": "stdOut"
+        }
+      ]
+    }
+}
+```
+
+**Explanation:**
+
+- `applicationDirectories` declares a set of standard directories for the application. During start of the application it will be ensured by `ApplicationContext`, that all these directories exist and are accessible. All directories are relative to `applicationDirectories/root`. It is possible to include variables like `$HOME` into the `root` path. Such variables will be replaces by the values of corresponding environment variables if possible.
+- `Listeners` declares the listeners, that shall be started during application start. Besides the listener specific parameters, all listeners must have an application wide unique `name`.
+- `listenerToProcessBindings` contains information about which processes loaded from `applicationDirectories/processes` are supposed to be attached to which listeners. It is possible to bind one process to multiple listeners for instance to trigger pipelines of the same process using different protocols or origins. Th example above simply make use of multiple bindings to showcase, that it works. The resulting parallel processing capability could also have been achieved by doubling `maxClients` of one single listener. While it is possible to bind one process to multiple listeners, it is also possible to bind multiple processes to one listeners.
+- `logging` configures the application logging capabilities.
+
+Now, with the application's context declared and saved to a file, the application can be brought to life with just a few lines of code.
+
+```cpp
+#include "level2.h"
+
+using namespace level2;
+
+int main() {
+  APP_CONTEXT.loadApplicationConfig("/path/to/application/context.json");
+  LOGGER.info("starting test application");
+  return APP_CONTEXT.runApplication();
+}
+```
+
+**Explanation:**
+
+- `#include "level2.h"` includes all required headers, that are needed to fail access to the macros `APP_CONTEXT` for starting up the application and `LOGGER` for logging to the configured logging destinations.
+- `APP_CONTEXT.loadApplicationConfig("/path/to/application/context.json");` subsequently loads the application declaration, that was created above
+- `APP_CONTEXT.runApplication();` starts up all required listeners, loads processes and pipelines and starts into the application loop. The application loop ends by tearing down all loaded resources once the application received `SIGTERM`. In the case `0` is returned. A non zero value will be returned if something fails during initialization of the application.
+
+
+> At this point it is important to mention, that in particular the functionality, that is described here for automatic stating the application using the `APP_CONTEXT`, is not implemented yet. The missing functionality in class `ApplicationContext` is what will be implemented next. See section [current bucket list](#current-bucket-list).
+
 
 ### Middleware for messages distribution in EDI
+
+_(coming soon)_
 
 ### Simple example of an HTTP roundtrip
 
@@ -247,14 +354,15 @@ For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](
 
 ## Current bucket list
 
+- Implement `level2.h` and all missing functionality in class `ApplicationContext` for automatically bootstrapping the application and running the application loop.
 - Documentation, documentation, documentation
-- A first **sample application** as a proof of concept and showcase
+- Implement the two use cases, that are described in chapter [How to use](#how-to-use)
+- Implement execution only once feature for `PipelineProcessingData` in `PipelineProcessor`
 - Authentication API and module for the HTTP server (HttpListener)
 - Request filtering API and module for the HTTP server (HttpListener)
 - **HTTP client** / HttpConnector.
 - Finish implementation of asynchronous processing in HttpListener
 - Blueprinting a setup to run HttpListener behind a reverse proxy
-- Sample implementation of a weberver for static content using HttpListener
 - Proof of concept for passing [db connections represented by instances of class `Database`](./framework/src/dbinterface/dbinterface.h) from one processing module to another through the processing pipeline.
 - Implement pipeline processing loop in the `PipelineProcessor` to allow chained execution of multiple matching pipelines
 - Thread safe database connection pooling
@@ -263,3 +371,7 @@ For successful execution of MQTT related unit tests in [test_mqttconnector.cpp](
 - Make dependency to SQLite optional
 - Listener and connector for apache kafka
 - Listener and connector for RabbitMQ
+
+## External references
+
+- [cppreference.com - Regular expressions library](https://en.cppreference.com/w/cpp/regex)
