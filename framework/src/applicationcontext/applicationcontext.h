@@ -1,6 +1,7 @@
 #pragma once
 
 #include <logger.h>
+#include <applicationDirectories.h>
 
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -31,7 +32,7 @@ class ApplicationContext {
   std::vector<std::shared_ptr<T>> createObjectsFromJson(json objectAsJson, std::string path, Args &&...args) {
     std::vector<std::shared_ptr<T>> returnValue;
     std::optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
-    if (toBeCreatedFrom.has_value()) {
+    if (toBeCreatedFrom.has_value() && toBeCreatedFrom.value().is_array()) {
       for (auto &jsonObject : toBeCreatedFrom.value()) {
         LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
         try {
@@ -42,6 +43,14 @@ class ApplicationContext {
                      "corresponding object will be missing! Errormessage: ") + e.what());
         }
       }
+    } else if (toBeCreatedFrom.has_value() && toBeCreatedFrom.value().is_object()) {
+        try {
+          returnValue.emplace_back(std::make_shared<T>(toBeCreatedFrom.value(), std::forward<Args>(args)...));
+        } catch (const std::exception &e) {
+          LOGGER.error(
+              std::string("Exception occurred during parsing json to an object. The "
+                     "corresponding object will be missing! Errormessage: ") + e.what());
+        }      
     }
     return std::move(returnValue);
   };
