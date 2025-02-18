@@ -9,9 +9,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Specify the library
 add_library(applicationcontext SHARED
-    applicationcontext.cpp)
+    applicationcontext.cpp
+    applicationDirectories.cpp
+)
 
-target_link_libraries(applicationcontext PRIVATE nlohmann_json::nlohmann_json dl)
+target_link_libraries(applicationcontext PUBLIC 
+    nlohmann_json::nlohmann_json
+    dl
+    common
+)
 
 # Specify the include directories for the library
 target_include_directories(applicationcontext PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../logger)

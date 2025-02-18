@@ -22,13 +22,14 @@ add_library(mosquittowrapper SHARED
 add_library(common SHARED
     base64.cpp
     matchable.cpp
+    systemUtils.cpp
 )
 
 target_link_libraries(mosquittowrapper
     ${MOSQUITTO_LIBRARY}
 )
 
-target_link_libraries(common
+target_link_libraries(common PUBLIC
     logger
 )
 

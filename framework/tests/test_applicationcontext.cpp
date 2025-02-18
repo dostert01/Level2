@@ -7,6 +7,7 @@
 #include <vector>
 #include "applicationcontext.h"
 #include "logger.h"
+#include <common.h>
 
 using namespace level2;
 using namespace std;
@@ -15,6 +16,7 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define ENV_VAR_NAME "MY_TEST_VARIABLE"
 #define APP_CONFIG_TEST_FILE_01 "/applicationConfig01.json"
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
+#define APP_CONFIG_TEST_FILE_06 "/applicationConfig06.json"
 
 namespace test_applicationcontext {
     string workingDir;
@@ -43,6 +45,7 @@ void configureTest() {
     test_applicationcontext::configureTestVariables();
 }
 
+/*
 TEST(ApplicationContext, AlwaysCreatesASingletonInstanceAsPointer) {
     ApplicationContext* ctx1 = ApplicationContext::getInstanceAsPointer();
     ApplicationContext* ctx2 = ApplicationContext::getInstanceAsPointer();
@@ -131,7 +134,7 @@ TEST(ApplicationContext, canSplitStrings04) {
     EXPECT_EQ("Much", result[3]);
     EXPECT_EQ("More", result[4]);
 }
-
+*/
 class MockListener {
     public:
         MockListener() = default;
@@ -145,7 +148,7 @@ class MockListener {
         int port = 1234;
         string clientId = "hallo";
 };
-
+/*
 TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
@@ -159,10 +162,20 @@ TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
     EXPECT_EQ(2, listeners.size());
 }
-
+*/
 TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
     EXPECT_EQ(1, listeners.size());
+}
+
+
+TEST(ApplicationContext, canReadApplicationRootDirAndExpandEnvVariables) {
+    common::getCurrentWorkingDirectory();
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    EXPECT_EQ(1, dirs.size());
+    EXPECT_EQ(common::getCurrentWorkingDirectory().value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
 }

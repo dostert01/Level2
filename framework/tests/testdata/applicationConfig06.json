@@ -1,0 +1,49 @@
+{
+    "applicationDirectories": {
+        "root": "$PWD/opt/testApplication",
+        "pipelines": "etc/pipelines.d",
+        "processes": "etc/processes.d",
+        "workerModules": "lib"
+    },
+    "Listeners": {
+        "HTTPListeners": [
+            {
+                "name": "httpGetListener01",
+                "port": 8888,
+                "maxClients" : 10
+            },
+            {
+                "name": "httpGetListener02",
+                "port": 8889,
+                "maxClients" : 10
+            }
+        ]
+
+    },
+    "listenerToProcessBindings": [
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener01",
+        "type": "synchronous"
+      },
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener02",
+        "type": "synchronous"
+      }
+    ],
+    "logging": {
+      "logLevel": "debug",
+      "loggers" : [
+        {
+          "type": "file",
+          "destination": "var/log/application.log"
+        },
+        {
+          "type": "stdOut"
+        }
+      ]
+    }
+}

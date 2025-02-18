@@ -5,8 +5,7 @@
 #include <regex>
 #include <fstream>
 #include "pipeline.h"
-#include "../logger/logger.h"
-#include "binaryDataProcessor.h"
+#include "logger.h"
 
 using namespace level2;
 using namespace std;

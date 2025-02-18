@@ -223,7 +223,7 @@ Now, as the process is declared, the application bootstrapping for `ApplicationC
         "root": "$HOME/opt/testApplication",
         "pipelines": "etc/pipelines.d",
         "processes": "etc/processes.d",
-        "workerModules": "lib",
+        "workerModules": "lib"
     },
     "Listeners": {
         "HTTPListeners": [

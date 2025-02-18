@@ -19,38 +19,36 @@ class ApplicationContext {
  public:
   static ApplicationContext &getInstance();
   static ApplicationContext *getInstanceAsPointer();
-  friend bool operator==(const ApplicationContext &lhs,
-                         const ApplicationContext &rhs);
-  std::optional<std::string> readEnv(std::string variableName);
-  std::optional<std::string> getCurrentWorkingDirectory();
+  friend bool operator==(const ApplicationContext &lhs, const ApplicationContext &rhs);
   void loadApplicationConfig(const std::string &configFilePath);
-  std::vector<std::string> splitString(std::string toSplit, std::string separator);
   std::optional<json> findRecursiveInJsonTree(std::string path);
   std::optional<json> findRecursiveInJsonTree(json objectAsJson, std::string path);
+
+  template <typename T, typename... Args>
+  void createSingleObject(std::vector<std::shared_ptr<T>> &returnValue, json &jsonObject, Args &&...args) {
+    LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
+    try {
+      returnValue.emplace_back(std::make_shared<T>(jsonObject, std::forward<Args>(args)...));
+    } catch (const std::exception &e) {
+      LOGGER.error(
+          std::string("Exception occurred during parsing json to an object. The "
+                  "corresponding object will be missing! Errormessage: ") + e.what());
+    }      
+  }
 
   template <typename T, typename... Args>
   std::vector<std::shared_ptr<T>> createObjectsFromJson(json objectAsJson, std::string path, Args &&...args) {
     std::vector<std::shared_ptr<T>> returnValue;
     std::optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
-    if (toBeCreatedFrom.has_value() && toBeCreatedFrom.value().is_array()) {
-      for (auto &jsonObject : toBeCreatedFrom.value()) {
-        LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
-        try {
-          returnValue.emplace_back(std::make_shared<T>(jsonObject, std::forward<Args>(args)...));
-        } catch (const std::exception &e) {
-          LOGGER.error(
-              std::string("Exception occurred during parsing json to an object. The "
-                     "corresponding object will be missing! Errormessage: ") + e.what());
+    if (toBeCreatedFrom.has_value()) {
+      json currentJson = toBeCreatedFrom.value();
+      if (currentJson.is_array()) {
+        for (auto &jsonObject : currentJson) {
+          createSingleObject(returnValue, jsonObject, std::forward<Args>(args)...);
         }
+      } else if (currentJson.is_object()) {
+          createSingleObject(returnValue, currentJson, std::forward<Args>(args)...);
       }
-    } else if (toBeCreatedFrom.has_value() && toBeCreatedFrom.value().is_object()) {
-        try {
-          returnValue.emplace_back(std::make_shared<T>(toBeCreatedFrom.value(), std::forward<Args>(args)...));
-        } catch (const std::exception &e) {
-          LOGGER.error(
-              std::string("Exception occurred during parsing json to an object. The "
-                     "corresponding object will be missing! Errormessage: ") + e.what());
-        }      
     }
     return std::move(returnValue);
   };
