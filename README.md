@@ -292,7 +292,7 @@ int main() {
 
 **Explanation:**
 
-- `#include "level2.h"` includes all required headers, that are needed to fail access to the macros `APP_CONTEXT` for starting up the application and `LOGGER` for logging to the configured logging destinations.
+- `#include "level2.h"` includes all required headers, that are needed to gain access to the macros `APP_CONTEXT` for starting up the application and `LOGGER` for logging to the configured logging destinations.
 - `APP_CONTEXT.loadApplicationConfig("/path/to/application/context.json");` subsequently loads the application declaration, that was created above
 - `APP_CONTEXT.runApplication();` starts up all required listeners, loads processes and pipelines and starts into the application loop. The application loop ends by tearing down all loaded resources once the application received `SIGTERM`. In the case `0` is returned. A non zero value will be returned if something fails during initialization of the application.
 
