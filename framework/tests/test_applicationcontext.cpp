@@ -17,6 +17,7 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define APP_CONFIG_TEST_FILE_01 "/applicationConfig01.json"
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_06 "/applicationConfig06.json"
+#define APP_CONFIG_TEST_FILE_07 "/applicationConfig07.json"
 
 namespace test_applicationcontext {
     string workingDir;
@@ -104,11 +105,13 @@ TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
     EXPECT_EQ(2, listeners.size());
 }
 
-TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
+TEST(ApplicationContext, FailureInParsingLeadsToUsingTheDefaultConstructor) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
-    EXPECT_EQ(1, listeners.size());
+    EXPECT_EQ(2, listeners.size());
+    EXPECT_EQ(1234, listeners[0]->port);
+    EXPECT_EQ(1883, listeners[1]->port);
 }
 
 TEST(ApplicationDirectories, canReadApplicationRootDirAndExpandEnvVariables) {
@@ -127,4 +130,15 @@ TEST(ApplicationDirectories, pathsGetPrefixedWithApplicationRootPath) {
     EXPECT_EQ(appRoot + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
     EXPECT_EQ(appRoot + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
     EXPECT_EQ(appRoot + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());
+}
+
+TEST(ApplicationDirectories, canHandleInvalidInputByFallingBackToDefaults) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_07);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string appRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or("");
+    EXPECT_EQ(1, dirs.size());
+    EXPECT_EQ(appRoot + "/pipelines.d", dirs[0]->getPipelinesDir());
+    EXPECT_EQ(appRoot + "/processes.d", dirs[0]->getProcessesDir());
+    EXPECT_EQ(appRoot + "/lib", dirs[0]->getWorkerModulesDir());
 }

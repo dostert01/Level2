@@ -14,6 +14,7 @@ namespace level2 {
 
 class MQTTTopic {
   public:
+    MQTTTopic() = default;
     MQTTTopic(json jsonObject);
     std::string getName();
   private:

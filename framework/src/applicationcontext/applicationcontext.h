@@ -33,6 +33,10 @@ class ApplicationContext {
       LOGGER.error(
           std::string("Exception occurred during parsing json to an object. The "
                   "corresponding object will be missing! Errormessage: ") + e.what());
+      LOGGER.warn("default constructor will be used instead of failed initialization from json. "
+        "Maybe the provided default values might be incorrect or unexpected in the context of "
+        "the application. Try fixing your json input!");
+      returnValue.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
     }      
   }
 

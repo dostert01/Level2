@@ -8,7 +8,7 @@ namespace level2 {
 
 class ApplicationDirectories {
     public:
-        ApplicationDirectories() = default;
+        ApplicationDirectories();
         ApplicationDirectories(json jsonObject);
         std::string getApplicationRootDir();
         std::string getPipelinesDir();

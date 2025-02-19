@@ -3,6 +3,13 @@
 
 namespace level2 {
 
+ApplicationDirectories::ApplicationDirectories() {
+    applicationRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or(".");
+    pipelines = "pipelines.d";
+    processes = "processes.d";
+    workerModules = "lib";
+};
+
 ApplicationDirectories::ApplicationDirectories(json jsonObject) {
     applicationRoot = StaticStringFunctions::replaceEnvVariablesInPath(jsonObject["root"]);
     pipelines = jsonObject["pipelines"];
