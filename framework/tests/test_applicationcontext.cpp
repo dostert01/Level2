@@ -45,7 +45,6 @@ void configureTest() {
     test_applicationcontext::configureTestVariables();
 }
 
-/*
 TEST(ApplicationContext, AlwaysCreatesASingletonInstanceAsPointer) {
     ApplicationContext* ctx1 = ApplicationContext::getInstanceAsPointer();
     ApplicationContext* ctx2 = ApplicationContext::getInstanceAsPointer();
@@ -56,24 +55,6 @@ TEST(ApplicationContext, AlwaysCreatesASingletonInstanceAsReference) {
     ApplicationContext& ctx1 = ApplicationContext::getInstance();
     ApplicationContext& ctx2 = ApplicationContext::getInstance();
     EXPECT_EQ(ctx1, ctx2);
-}
-
-TEST(ApplicationContext, CanReadFromEnvironment) {
-    setenv(ENV_VAR_NAME, "Hello World", 1);
-    optional<string> value = APP_CONTEXT.readEnv(ENV_VAR_NAME);
-    unsetenv(ENV_VAR_NAME);
-    EXPECT_TRUE(value.has_value());
-    EXPECT_EQ("Hello World", value);
-}
-
-TEST(ApplicationContext, ReturnsEmptyOptionalIfVariableIsNotDefined) {
-    optional<string> value = APP_CONTEXT.readEnv(ENV_VAR_NAME);
-    EXPECT_FALSE(value.has_value());
-}
-
-TEST(ApplicationContext, CanReadTheCurrentWorkingDirectory) {
-    optional<string> value = APP_CONTEXT.getCurrentWorkingDirectory();
-    EXPECT_TRUE(value.has_value());
 }
 
 TEST(ApplicationContext, LogsFailureIfParsingJsonFails) {
@@ -95,46 +76,6 @@ TEST(ApplicationContext, CanLoadAppConfigFromJsonFile) {
     EXPECT_FALSE(regex_search(output, regex));
 }
 
-TEST(ApplicationContext, canSplitStrings01) {
-    vector<string> result = APP_CONTEXT.splitString("Listeners", "/");
-    EXPECT_EQ(1, result.size());
-    EXPECT_EQ("Listeners", result[0]);
-}
-
-TEST(ApplicationContext, canSplitStrings02) {
-    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners", "/");
-    for(auto &s : result) {
-        LOGGER.info("split result: " + s);
-    }
-    EXPECT_EQ(2, result.size());
-    EXPECT_EQ("Listeners", result[0]);
-    EXPECT_EQ("MQTTListeners", result[1]);
-}
-
-TEST(ApplicationContext, canSplitStrings03) {
-    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners/AndMuchMore", "/");
-    for(auto &s : result) {
-        LOGGER.info("split result: " + s);
-    }
-    EXPECT_EQ(3, result.size());
-    EXPECT_EQ("Listeners", result[0]);
-    EXPECT_EQ("MQTTListeners", result[1]);
-    EXPECT_EQ("AndMuchMore", result[2]);
-}
-
-TEST(ApplicationContext, canSplitStrings04) {
-    vector<string> result = APP_CONTEXT.splitString("Listeners/MQTTListeners/And/Much/More", "/");
-    for(auto &s : result) {
-        LOGGER.info("split result: " + s);
-    }
-    EXPECT_EQ(5, result.size());
-    EXPECT_EQ("Listeners", result[0]);
-    EXPECT_EQ("MQTTListeners", result[1]);
-    EXPECT_EQ("And", result[2]);
-    EXPECT_EQ("Much", result[3]);
-    EXPECT_EQ("More", result[4]);
-}
-*/
 class MockListener {
     public:
         MockListener() = default;
@@ -148,7 +89,7 @@ class MockListener {
         int port = 1234;
         string clientId = "hallo";
 };
-/*
+
 TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
@@ -162,7 +103,7 @@ TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
     EXPECT_EQ(2, listeners.size());
 }
-*/
+
 TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
@@ -170,20 +111,19 @@ TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
     EXPECT_EQ(1, listeners.size());
 }
 
-
 TEST(ApplicationDirectories, canReadApplicationRootDirAndExpandEnvVariables) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
     EXPECT_EQ(1, dirs.size());
-    EXPECT_EQ(common::getCurrentWorkingDirectory().value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
+    EXPECT_EQ(StaticStringFunctions::getCurrentWorkingDirectory().value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
 }
 
 TEST(ApplicationDirectories, pathsGetPrefixedWithApplicationRootPath) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
-    std::string appRoot = common::getCurrentWorkingDirectory().value_or("");
+    std::string appRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or("");
     EXPECT_EQ(appRoot + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
     EXPECT_EQ(appRoot + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
     EXPECT_EQ(appRoot + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());

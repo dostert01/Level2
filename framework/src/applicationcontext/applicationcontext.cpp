@@ -44,7 +44,7 @@ void ApplicationContext::loadApplicationConfig(const std::string& configFilePath
 
   std::optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, std::string path) {
     LOGGER.debug("searching for json objects with path: '" + path + "'");
-    std::vector<std::string> pathElements = common::splitString(path, PATH_SEPARATOR);
+    std::vector<std::string> pathElements = StaticStringFunctions::splitString(path, PATH_SEPARATOR);
     json currentJson = objectAsJson;
     for (auto pathElement : pathElements) {
       if (currentJson.contains(pathElement)) {

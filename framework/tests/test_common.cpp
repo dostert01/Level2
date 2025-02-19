@@ -9,7 +9,7 @@ using namespace std;
 
 #define LOREM_IPSUM "Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\nsed diam nonumy eirmod tempor invidunt \n"
 
-namespace test_common {
+namespace test_StaticStringFunctions {
     string workingDir;
     string testFilesDir;
 
@@ -32,8 +32,8 @@ namespace test_common {
 }
 
 void configureTest() {
-    test_common::configureLogger();
-    test_common::configureTestVariables();
+    test_StaticStringFunctions::configureLogger();
+    test_StaticStringFunctions::configureTestVariables();
 }
 
 TEST(Base64, canEncodeShortString) {
@@ -54,55 +54,55 @@ TEST(Base64, canEncodeLongStringWithNewLine) {
 }
 
 TEST(systemUtils, canReadExistingEnvVariable) {
-    auto result = level2::common::readEnv("PWD");
-    EXPECT_EQ(common::getCurrentWorkingDirectory(), result.value_or(""));
+    auto result = level2::StaticStringFunctions::readEnv("PWD");
+    EXPECT_EQ(StaticStringFunctions::getCurrentWorkingDirectory(), result.value_or(""));
 }
 
 TEST(systemUtils, readEnvReturnsEmptyOptionalIfVariableDoesNotExists) {
-    auto result = level2::common::readEnv("nonExistingEnvVar_readEnvReturnsEmptyOptionalIfVariableDoesNotExists");
+    auto result = level2::StaticStringFunctions::readEnv("nonExistingEnvVar_readEnvReturnsEmptyOptionalIfVariableDoesNotExists");
     EXPECT_FALSE(result.has_value());
 }
 
 TEST(systemUtils, splitStringCanSplitAPath01) {
-    auto result = level2::common::splitString("this/is/a/path", "/");
+    auto result = level2::StaticStringFunctions::splitString("this/is/a/path", "/");
     EXPECT_EQ(4, result.size());
 }
 
 TEST(systemUtils, splitStringCanSplitAPath02) {
-    auto result = level2::common::splitString("/this/is/a/path", "/");
+    auto result = level2::StaticStringFunctions::splitString("/this/is/a/path", "/");
     EXPECT_EQ(4, result.size());
     EXPECT_EQ("this", result[0]);
 }
 
 TEST(systemUtils, splitStringCanSplitAPath03) {
-    auto result = level2::common::splitString("this/is/a/path/", "/");
+    auto result = level2::StaticStringFunctions::splitString("this/is/a/path/", "/");
     EXPECT_EQ(4, result.size());
     EXPECT_EQ("path", result[3]);
 }
 
 TEST(systemUtils, splitStringCanSplitAPath04) {
-    auto result = level2::common::splitString("hello", "/");
+    auto result = level2::StaticStringFunctions::splitString("hello", "/");
     EXPECT_EQ(1, result.size());
     EXPECT_EQ("hello", result[0]);
 }
 
 TEST(systemUtils, splitStringCanUseLongSeparators) {
-    auto result = level2::common::splitString("###this###is###a###path###", "###");
+    auto result = level2::StaticStringFunctions::splitString("###this###is###a###path###", "###");
     EXPECT_EQ(4, result.size());
     EXPECT_EQ("path", result[3]);
 }
 
 TEST(systemUtils, replaceEnvVarsInPathWorksWithJustAnEnvVar) {
-    auto result = level2::common::replaceEnvVariablesInPath("$PWD");
-    EXPECT_EQ(level2::common::getCurrentWorkingDirectory(), result);
+    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("$PWD");
+    EXPECT_EQ(level2::StaticStringFunctions::getCurrentWorkingDirectory(), result);
 }
 
 TEST(systemUtils, doesNotTouchNotExistingEnvVars) {
-    auto result = level2::common::replaceEnvVariablesInPath("$nonExistingEnvVar_systemUtils");
+    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("$nonExistingEnvVar_systemUtils");
     EXPECT_EQ("$nonExistingEnvVar_systemUtils", result);
 }
 
 TEST(systemUtils, replaceEnvVarsInPathWorks) {
-    auto result = level2::common::replaceEnvVariablesInPath("/start/$PWD/end");
-    EXPECT_EQ("start/" + level2::common::getCurrentWorkingDirectory().value() + "/end", result);
+    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("/start/$PWD/end");
+    EXPECT_EQ("start/" + level2::StaticStringFunctions::getCurrentWorkingDirectory().value() + "/end", result);
 }

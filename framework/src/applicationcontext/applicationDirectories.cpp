@@ -4,7 +4,7 @@
 namespace level2 {
 
 ApplicationDirectories::ApplicationDirectories(json jsonObject) {
-    applicationRoot = common::replaceEnvVariablesInPath(jsonObject["root"]);
+    applicationRoot = StaticStringFunctions::replaceEnvVariablesInPath(jsonObject["root"]);
     pipelines = jsonObject["pipelines"];
     processes = jsonObject["processes"];
     workerModules = jsonObject["workerModules"];
