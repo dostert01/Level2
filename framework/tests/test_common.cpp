@@ -52,3 +52,57 @@ TEST(Base64, canEncodeLongStringWithNewLine) {
         result);
     EXPECT_EQ("\n", result.substr(76,1));
 }
+
+TEST(systemUtils, canReadExistingEnvVariable) {
+    auto result = level2::common::readEnv("PWD");
+    EXPECT_EQ(common::getCurrentWorkingDirectory(), result.value_or(""));
+}
+
+TEST(systemUtils, readEnvReturnsEmptyOptionalIfVariableDoesNotExists) {
+    auto result = level2::common::readEnv("nonExistingEnvVar_readEnvReturnsEmptyOptionalIfVariableDoesNotExists");
+    EXPECT_FALSE(result.has_value());
+}
+
+TEST(systemUtils, splitStringCanSplitAPath01) {
+    auto result = level2::common::splitString("this/is/a/path", "/");
+    EXPECT_EQ(4, result.size());
+}
+
+TEST(systemUtils, splitStringCanSplitAPath02) {
+    auto result = level2::common::splitString("/this/is/a/path", "/");
+    EXPECT_EQ(4, result.size());
+    EXPECT_EQ("this", result[0]);
+}
+
+TEST(systemUtils, splitStringCanSplitAPath03) {
+    auto result = level2::common::splitString("this/is/a/path/", "/");
+    EXPECT_EQ(4, result.size());
+    EXPECT_EQ("path", result[3]);
+}
+
+TEST(systemUtils, splitStringCanSplitAPath04) {
+    auto result = level2::common::splitString("hello", "/");
+    EXPECT_EQ(1, result.size());
+    EXPECT_EQ("hello", result[0]);
+}
+
+TEST(systemUtils, splitStringCanUseLongSeparators) {
+    auto result = level2::common::splitString("###this###is###a###path###", "###");
+    EXPECT_EQ(4, result.size());
+    EXPECT_EQ("path", result[3]);
+}
+
+TEST(systemUtils, replaceEnvVarsInPathWorksWithJustAnEnvVar) {
+    auto result = level2::common::replaceEnvVariablesInPath("$PWD");
+    EXPECT_EQ(level2::common::getCurrentWorkingDirectory(), result);
+}
+
+TEST(systemUtils, doesNotTouchNotExistingEnvVars) {
+    auto result = level2::common::replaceEnvVariablesInPath("$nonExistingEnvVar_systemUtils");
+    EXPECT_EQ("$nonExistingEnvVar_systemUtils", result);
+}
+
+TEST(systemUtils, replaceEnvVarsInPathWorks) {
+    auto result = level2::common::replaceEnvVariablesInPath("/start/$PWD/end");
+    EXPECT_EQ("start/" + level2::common::getCurrentWorkingDirectory().value() + "/end", result);
+}

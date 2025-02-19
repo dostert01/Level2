@@ -4,6 +4,10 @@
 #include <optional>
 #include <string>
 
+#ifndef PATH_SEPARATOR
+#define PATH_SEPARATOR "/"
+#endif
+
 namespace level2 {
     namespace common {
 

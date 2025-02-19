@@ -30,9 +30,13 @@ namespace level2 {
     std::vector<std::string> splitString(std::string toSplit, std::string separator) {
         std::vector<std::string> result;
         int start = 0;
+        if(toSplit.ends_with(separator))
+          toSplit = toSplit.substr(0, toSplit.length() - separator.length());
         int found = toSplit.find(separator, start);
         while(found != std::string::npos) {
-            result.push_back(toSplit.substr(start, found - start));
+            if(found != 0) {
+              result.push_back(toSplit.substr(start, found - start));
+            }
             start += (found - start) + separator.length();
             found = toSplit.find(separator, start);
         }
@@ -41,7 +45,7 @@ namespace level2 {
     }
     
     std::string replaceEnvVariablesInPath(std::string path) {
-      auto pathSections = common::splitString(path, "/");
+      auto pathSections = common::splitString(path, PATH_SEPARATOR);
       path = "";
       for(size_t i = 0; i < pathSections.size(); i++) {
           if(pathSections[i].starts_with("$")) {
@@ -55,7 +59,7 @@ namespace level2 {
               free(variableName);
               variableName = NULL;
           }
-          path.append(pathSections[i].append("/"));
+          path.append(pathSections[i].append(PATH_SEPARATOR));
       }
       path.pop_back();
       return path;

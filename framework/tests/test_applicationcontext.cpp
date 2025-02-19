@@ -171,11 +171,20 @@ TEST(ApplicationContext, FailureInParsingLeadsToMissingObject) {
 }
 
 
-TEST(ApplicationContext, canReadApplicationRootDirAndExpandEnvVariables) {
-    common::getCurrentWorkingDirectory();
+TEST(ApplicationDirectories, canReadApplicationRootDirAndExpandEnvVariables) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
     EXPECT_EQ(1, dirs.size());
     EXPECT_EQ(common::getCurrentWorkingDirectory().value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
+}
+
+TEST(ApplicationDirectories, pathsGetPrefixedWithApplicationRootPath) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string appRoot = common::getCurrentWorkingDirectory().value_or("");
+    EXPECT_EQ(appRoot + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
+    EXPECT_EQ(appRoot + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
+    EXPECT_EQ(appRoot + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());
 }

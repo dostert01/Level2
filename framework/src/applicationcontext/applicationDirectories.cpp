@@ -15,15 +15,15 @@ std::string ApplicationDirectories::getApplicationRootDir() {
 }
 
 std::string ApplicationDirectories::getPipelinesDir() {
-    return pipelines;
+    return applicationRoot + PATH_SEPARATOR + pipelines;
 }
 
 std::string ApplicationDirectories::getProcessesDir() {
-    return processes;
+    return applicationRoot + PATH_SEPARATOR + processes;
 }
 
 std::string ApplicationDirectories::getWorkerModulesDir() {
-    return workerModules;
+    return applicationRoot + PATH_SEPARATOR + workerModules;
 }
 
 } // namespace level2
