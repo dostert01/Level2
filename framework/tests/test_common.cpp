@@ -54,8 +54,11 @@ TEST(Base64, canEncodeLongStringWithNewLine) {
 }
 
 TEST(systemUtils, canReadExistingEnvVariable) {
-    auto result = level2::StaticStringFunctions::readEnv("PWD");
-    EXPECT_EQ(StaticStringFunctions::getCurrentWorkingDirectory(), result.value_or(""));
+    std::string envVarName = "systemUtils_canReadExistingEnvVariable";
+    setenv(envVarName.c_str(), "hallo", 1);
+    auto result = level2::StaticStringFunctions::readEnv(envVarName);
+    EXPECT_EQ("hallo", result.value_or(""));
+    unsetenv(envVarName.c_str());
 }
 
 TEST(systemUtils, readEnvReturnsEmptyOptionalIfVariableDoesNotExists) {
@@ -93,8 +96,11 @@ TEST(systemUtils, splitStringCanUseLongSeparators) {
 }
 
 TEST(systemUtils, replaceEnvVarsInPathWorksWithJustAnEnvVar) {
-    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("$PWD");
-    EXPECT_EQ(level2::StaticStringFunctions::getCurrentWorkingDirectory(), result);
+    std::string envVarName = "systemUtils_replaceEnvVarsInPathWorksWithJustAnEnvVar";
+    setenv(envVarName.c_str(), "hallo", 1);
+    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("$" + envVarName);
+    EXPECT_EQ("hallo", result);
+    unsetenv(envVarName.c_str());
 }
 
 TEST(systemUtils, doesNotTouchNotExistingEnvVars) {
@@ -103,6 +109,43 @@ TEST(systemUtils, doesNotTouchNotExistingEnvVars) {
 }
 
 TEST(systemUtils, replaceEnvVarsInPathWorks) {
-    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("/start/$PWD/end");
-    EXPECT_EQ("start/" + level2::StaticStringFunctions::getCurrentWorkingDirectory().value() + "/end", result);
+    std::string envVarName = "systemUtils_replaceEnvVarsInPathWorks";
+    setenv(envVarName.c_str(), "hallo", 1);
+    auto result = level2::StaticStringFunctions::replaceEnvVariablesInPath("/start/$" + envVarName + "/end");
+    EXPECT_EQ("start/hallo/end", result);
+    unsetenv(envVarName.c_str());
+}
+
+TEST(staticFileFunctions, canCreateDirectory) {
+    std::string basedirectoryName = "./staticFileFunctions_test";
+    std::string directoryName = basedirectoryName + "/this/is/a/test/directory";
+    filesystem::remove_all(basedirectoryName);
+    EXPECT_FALSE(filesystem::exists(directoryName));
+    auto[success, message] = StaticFileFunctions::createDirectory(directoryName);
+    EXPECT_TRUE(success);
+    EXPECT_EQ("", message);
+    EXPECT_TRUE(filesystem::exists(directoryName));
+    filesystem::remove_all(basedirectoryName);
+}
+
+TEST(staticFileFunctions, createDirectoryRetrunsTrueIfDirectoryAlreadyExists) {
+    std::string basedirectoryName = "./staticFileFunctions_test";
+    std::string directoryName = basedirectoryName + "/this/is/a/test/directory";
+    filesystem::remove_all(basedirectoryName);
+    StaticFileFunctions::createDirectory(directoryName);
+    auto[success, message] = StaticFileFunctions::createDirectory(directoryName);
+    EXPECT_TRUE(success);
+    EXPECT_EQ("", message);
+    EXPECT_TRUE(filesystem::exists(directoryName));
+    filesystem::remove_all(basedirectoryName);
+}
+
+TEST(staticFileFunctions, createDirectoryRetrunsFalseIfDirectoryCanNotBeCreated) {
+    std::string basedirectoryName = "/thisDirectoryShouldNotBeCreatable";
+    std::string directoryName = basedirectoryName + "/this/is/a/test/directory";
+    auto[success, message] = StaticFileFunctions::createDirectory(directoryName);
+    EXPECT_FALSE(success);
+    EXPECT_TRUE(message.find("success: false - exception has been thrown") != std::string::npos);
+    EXPECT_FALSE(filesystem::exists(directoryName));
+    filesystem::remove_all(basedirectoryName);
 }

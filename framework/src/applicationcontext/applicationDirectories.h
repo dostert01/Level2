@@ -14,11 +14,15 @@ class ApplicationDirectories {
         std::string getPipelinesDir();
         std::string getProcessesDir();
         std::string getWorkerModulesDir();
-    private:
+        bool createApplicationDirectories();
+
+       private:
         std::string applicationRoot;
         std::string pipelines;
         std::string processes;
         std::string workerModules;
+        bool allDirectoriesExist;
+        int createSingleDirectory(std::string path);
 };
 
 } // namespace level2

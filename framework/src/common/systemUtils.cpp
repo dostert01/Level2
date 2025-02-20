@@ -2,6 +2,8 @@
 #include <string.h>
 #include <systemUtils.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <filesystem>
 
 namespace level2 {
 
@@ -63,6 +65,23 @@ std::string StaticStringFunctions::replaceEnvVariablesInPath(std::string path) {
   }
   path.pop_back();
   return path;
+}
+
+std::pair<bool, std::string> StaticFileFunctions::createDirectory(std::string directoryName) {
+  struct stat fileStatus;
+  std::string errorMessage = "";
+  bool dirExists =
+      (stat(directoryName.c_str(), &fileStatus) == 0 && (fileStatus.st_mode & S_IFDIR));
+  if (!dirExists) {
+    try {
+      dirExists = std::filesystem::create_directories(directoryName);
+    } catch (const std::exception& e) {
+      errorMessage = "trying to create target diretory: " + directoryName +
+                 " success: " + (dirExists ? "true" : "false");
+      errorMessage.append(" - exception has been thrown: " + std::string(e.what()));
+    }
+  }
+  return {dirExists, errorMessage};
 }
 
 }  // namespace level2

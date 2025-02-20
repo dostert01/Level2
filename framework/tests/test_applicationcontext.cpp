@@ -119,17 +119,17 @@ TEST(ApplicationDirectories, canReadApplicationRootDirAndExpandEnvVariables) {
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
     EXPECT_EQ(1, dirs.size());
-    EXPECT_EQ(StaticStringFunctions::getCurrentWorkingDirectory().value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
+    EXPECT_EQ(StaticStringFunctions::readEnv("PWD").value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
 }
 
 TEST(ApplicationDirectories, pathsGetPrefixedWithApplicationRootPath) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
-    std::string appRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or("");
-    EXPECT_EQ(appRoot + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
-    EXPECT_EQ(appRoot + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
-    EXPECT_EQ(appRoot + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());
+    std::string cwd = StaticStringFunctions::readEnv("PWD").value_or("");
+    EXPECT_EQ(cwd + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
+    EXPECT_EQ(cwd + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
+    EXPECT_EQ(cwd + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());
 }
 
 TEST(ApplicationDirectories, canHandleInvalidInputByFallingBackToDefaults) {
@@ -141,4 +141,15 @@ TEST(ApplicationDirectories, canHandleInvalidInputByFallingBackToDefaults) {
     EXPECT_EQ(appRoot + "/pipelines.d", dirs[0]->getPipelinesDir());
     EXPECT_EQ(appRoot + "/processes.d", dirs[0]->getProcessesDir());
     EXPECT_EQ(appRoot + "/lib", dirs[0]->getWorkerModulesDir());
+}
+
+TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
+    configureTest();
+    filesystem::remove_all("./opt");
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string cwd = StaticStringFunctions::readEnv("PWD").value_or("");
+    EXPECT_TRUE(dirs[0]->createApplicationDirectories());
+    EXPECT_TRUE(filesystem::exists(cwd + "/opt/testApplication/etc/processes.d"));
+    //filesystem::remove_all("./opt");
 }
