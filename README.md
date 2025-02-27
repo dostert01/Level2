@@ -3,7 +3,6 @@
 - [Level2](#level2)
   - [What it is](#what-it-is)
   - [Preface](#preface)
-    - [Why this silly name "Level2"](#why-this-silly-name-level2)
     - [The main building blocks in a nutshell](#the-main-building-blocks-in-a-nutshell)
       - [Runtime](#runtime)
       - [Business Objects](#business-objects)
@@ -44,12 +43,6 @@ This software is still in a very early state. This means, that it is not product
 Even though, there might still be numerous gaps to be filled, Level2 already is capable of processing any kind of structured (text based) data using configurable and modularized workflows. Hence, the development has reached a point, where it makes sense to start spending further development effort with real business requirements in mind. This is mainly the case, because the core concept and core functionalities are already in place and working.
 
 So, if you are looking for a small, performant, scalable open source framework to base your business applications on, Level2 might be worth a look for you. In case you are interested in participating and/or contributing, both would be very welcome and appreciated. But of course I am also happy if you simply use the project for your own purposes.
-
-### Why this silly name "Level2"
-
-Because Level2 is my second implementation of an event driven modular business application framework. This time completely from scratch as free software and with the knowledge of certain important dos and don'ts in mind.
-
-This will help to leap applications, that are running on this framework to the next level (level2) in terms of scalability, performance and minimization of TCO. Or as Sledge Hammer would say: "Trust me, I know what I'm doing" ;-)
 
 ### The main building blocks in a nutshell
 
