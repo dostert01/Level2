@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <memory>
+#include <format>
 
 #include "applicationcontext.h"
 #include "generic_server.h"
@@ -47,7 +48,7 @@ void GenericServer::startListening() {
 }
 
 void GenericServer::stopListening() {
-  LOGGER.info("stopping to listen for incoming HTTP calls on port: " + std::to_string(port));
+  LOGGER.info(std::format("stopping to listen for incoming HTTP calls on port: {}", port));
   if(serverSocket != -1)
   {
     close(serverSocket);
@@ -58,7 +59,7 @@ void GenericServer::stopListening() {
   }
   if(listeningThread.joinable()) {
     listeningThread.join();
-    LOGGER.info("stopped to listen for incoming HTTP calls on port: " + std::to_string(port));
+    LOGGER.info(std::format("stopped to listen for incoming HTTP calls on port: {}", port));
   }
   if(workingThreadsCleaner.joinable()) {
     workingThreadsCleaner.join();
@@ -66,7 +67,7 @@ void GenericServer::stopListening() {
   }
 }
 
-void GenericServer::workingThreadFunction(int clientSocket, std::string clientHost) {
+void GenericServer::workingThreadFunction(int clientSocket, const std::string& clientHost) {
   LOGGER.trace("start processing incoming connection");
   setNonBlocking(clientSocket);
   handleClientConnection(clientSocket, clientHost);
@@ -87,7 +88,7 @@ void GenericServer::listeningThreadFunction() {
   bindServerSocket();
   listenOnServerSocket();
   if(initComplete) {
-    LOGGER.info("server is listening on port " + std::to_string(port) + ". Error: " + std::string(strerror(errno)));
+    LOGGER.error(std::format("server is listening on port {}. Error: {}" , port, strerror(errno)));
   }
   
   struct epoll_event ev, events[MAX_EVENTS];
@@ -105,8 +106,13 @@ void GenericServer::listeningThreadFunction() {
         struct sockaddr_in clientAddress;
         socklen_t addressStructLen = sizeof(clientAddress);
         int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &addressStructLen);
-        LOGGER.info("New connection from " + std::string(inet_ntoa(clientAddress.sin_addr)) + ":" + std::to_string(ntohs(clientAddress.sin_port)));
-        std::future<void> workingThread = std::async(std::launch::async, &GenericServer::workingThreadFunction, this, clientSocket, std::string(inet_ntoa(clientAddress.sin_addr)));
+        LOGGER.info(std::format("New connection from {}:{}", inet_ntoa(clientAddress.sin_addr), ntohs(clientAddress.sin_port)));
+        std::future<void> workingThread = std::async(
+          std::launch::async,
+          &GenericServer::workingThreadFunction,
+          this,
+          clientSocket,
+          std::string(inet_ntoa(clientAddress.sin_addr)));
         auto workingThreadPointer = std::make_shared<std::future<void>>(std::move(workingThread));
         addToListOfWorkingThreads(workingThreadPointer);
       }
@@ -118,7 +124,7 @@ void GenericServer::createServerSocket() {
   if(initComplete) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if(serverSocket == -1) {
-      handleListeningError("failed creating listening socket: " + std::string(strerror(errno)));
+      handleListeningError(std::format("failed creating listening socket: {}", std::string(strerror(errno))));
     }
   }
 }
@@ -165,7 +171,7 @@ void GenericServer::setSocketOptions() {
 void GenericServer::setNonBlocking(int fileDescriptor) {
     int flags = fcntl(fileDescriptor, F_GETFL, 0);
     if(flags == -1) {
-      handleListeningError("failed reading flags from file descriptor: " + std::string(strerror(errno)));
+      handleListeningError(std::format("failed reading flags from file descriptor: {}", std::string(strerror(errno))));
     }
     flags = flags | O_NONBLOCK;
     if(fcntl(fileDescriptor, F_SETFL, flags) == -1) {
@@ -194,7 +200,7 @@ void GenericServer::addToListOfWorkingThreads(std::shared_ptr<std::future<void>>
   workingThreads.push_back(workingThreadPointer);
 }
 
-void GenericServer::handleListeningError(std::string message) {
+void GenericServer::handleListeningError(const std::string& message) {
     LOGGER.error(message);
     initComplete = false;
     setIsListening(false);

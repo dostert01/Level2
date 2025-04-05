@@ -7,11 +7,6 @@
 
 namespace level2 {
 
-#ifdef DEFAULT_BUFFER_SIZE
-#undef DEFAULT_BUFFER_SIZE
-#endif
-#define DEFAULT_BUFFER_SIZE 2048
-
 ApplicationContext& ApplicationContext::getInstance() {
   static ApplicationContext instance;
   return instance;
@@ -25,8 +20,7 @@ bool operator==(const ApplicationContext& lhs, const ApplicationContext& rhs) {
   return (&lhs.getInstance() == &rhs.getInstance());
 }
 
-void ApplicationContext::loadApplicationConfig(
-    const std::string& configFilePath) {
+void ApplicationContext::loadApplicationConfig(const std::string& configFilePath) {
   try {
     LOGGER.info("Loading app config from file: " + configFilePath);
     std::ifstream jsonFile(configFilePath);
@@ -38,16 +32,20 @@ void ApplicationContext::loadApplicationConfig(
   }
 }
 
-std::optional<json> ApplicationContext::findRecursiveInJsonTree(
-    std::string path) {
+void ApplicationContext::configureLogger() {
+  LOGGER.removeAllDestinations();
+  
+}
+
+std::optional<json> ApplicationContext::findRecursiveInJsonTree(std::string& path) {
   return findRecursiveInJsonTree(jsonAppConfigData, path);
 }
 
-std::optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, std::string path) {
+std::optional<json> ApplicationContext::findRecursiveInJsonTree(json objectAsJson, std::string& path) {
   LOGGER.debug("searching for json objects with path: '" + path + "'");
   std::vector<std::string> pathElements = StaticStringFunctions::splitString(path, PATH_SEPARATOR);
   json currentJson = objectAsJson;
-  for (auto pathElement : pathElements) {
+  for (auto const& pathElement : pathElements) {
     if (currentJson.contains(pathElement)) {
       currentJson = currentJson[pathElement];
     } else {

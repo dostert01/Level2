@@ -25,7 +25,7 @@ class HttpResponse : public HeaderFieldOwner {
         std::string statusCode;
         std::string protocol;
         char* payload;
-        void* messagePointer;
+        char* messagePointer;
 };
 
 } //namespace level2

@@ -34,7 +34,7 @@ class GenericServer : public NetworkListener {
         std::shared_mutex workingThreadsMutex;
         void listeningThreadFunction();
         void addToListOfWorkingThreads(std::shared_ptr<std::future<void>> &workingThreadPointer);
-        void workingThreadFunction(int clientSocket, std::string clientHost);
+        void workingThreadFunction(int clientSocket, const std::string& clientHost);
         virtual void handleClientConnection(int clientSocket, std::string clientHost) = 0;
         void workingThreadsCleanerFunction();
         bool haveWorkingThreads();
@@ -45,7 +45,7 @@ class GenericServer : public NetworkListener {
         void stopListening();
         void bindServerSocket();
         void listenOnServerSocket();
-        void handleListeningError(std::string message);
+        void handleListeningError(const std::string& message);
         void setNonBlocking(int fileDescriptor);
 };
 
