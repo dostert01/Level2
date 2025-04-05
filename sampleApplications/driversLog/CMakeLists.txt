@@ -20,7 +20,7 @@ cmake_print_variables(CMAKE_CURRENT_SOURCE_DIR)
 cmake_print_variables(PROJECT_ROOT_DIR)
 
 # Festlegen des Standards für C++
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # add subdirs

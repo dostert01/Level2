@@ -83,7 +83,7 @@ size_t HttpResponse::getMessagePointer(void* &message) {
     size_t headerLen = strlen(header.c_str());
     size_t contentLength = getContentLength();
     size_t messageLen = contentLength + headerLen;
-    this->messagePointer = realloc(this->messagePointer, messageLen);
+    this->messagePointer = (char*)realloc(this->messagePointer, messageLen);
     memcpy(this->messagePointer, header.c_str(), headerLen);
     auto messageBody = getPayloadPointer();
     if((contentLength > 0) && (messageBody.has_value())) {

@@ -80,5 +80,6 @@
         "future": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc-10",
-    "cmake.options.statusBarVisibility": "icon"
+    "cmake.options.statusBarVisibility": "icon",
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
 }

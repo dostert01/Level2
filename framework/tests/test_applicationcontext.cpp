@@ -151,5 +151,12 @@ TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
     std::string cwd = StaticStringFunctions::readEnv("PWD").value_or("");
     EXPECT_TRUE(dirs[0]->createApplicationDirectories());
     EXPECT_TRUE(filesystem::exists(cwd + "/opt/testApplication/etc/processes.d"));
-    //filesystem::remove_all("./opt");
+    filesystem::remove_all("./opt");
+}
+
+TEST(ApplicationContext, canConfigureLogger) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    LOGGER.removeAllDestinations();
+    APP_CONTEXT.configureLogger();
 }

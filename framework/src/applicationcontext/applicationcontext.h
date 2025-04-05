@@ -21,11 +21,12 @@ class ApplicationContext {
   static ApplicationContext *getInstanceAsPointer();
   friend bool operator==(const ApplicationContext &lhs, const ApplicationContext &rhs);
   void loadApplicationConfig(const std::string &configFilePath);
-  std::optional<json> findRecursiveInJsonTree(std::string path);
-  std::optional<json> findRecursiveInJsonTree(json objectAsJson, std::string path);
+  void configureLogger();
+  std::optional<json> findRecursiveInJsonTree(std::string& path);
+  std::optional<json> findRecursiveInJsonTree(json objectAsJson, std::string& path);
 
   template <typename T, typename... Args>
-  void createSingleObject(std::vector<std::shared_ptr<T>> &returnValue, json &jsonObject, Args &&...args) {
+  void createSingleObject(std::vector<std::shared_ptr<T>> &returnValue, json &jsonObject, Args &&...args) const {
     LOGGER.debug("jsonObject to create an object from: " + jsonObject.dump());
     try {
       returnValue.emplace_back(std::make_shared<T>(jsonObject, std::forward<Args>(args)...));
@@ -43,8 +44,7 @@ class ApplicationContext {
   template <typename T, typename... Args>
   std::vector<std::shared_ptr<T>> createObjectsFromJson(json objectAsJson, std::string path, Args &&...args) {
     std::vector<std::shared_ptr<T>> returnValue;
-    std::optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path);
-    if (toBeCreatedFrom.has_value()) {
+    if (std::optional<json> toBeCreatedFrom = findRecursiveInJsonTree(objectAsJson, path); toBeCreatedFrom.has_value()) {
       json currentJson = toBeCreatedFrom.value();
       if (currentJson.is_array()) {
         for (auto &jsonObject : currentJson) {
