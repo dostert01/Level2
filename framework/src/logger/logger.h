@@ -128,6 +128,19 @@ class Logger {
    */
   void addLoggingDestination(std::unique_ptr<LoggingDestination> destination);
   /**
+   * @brief Add one more logging destinations.
+   * 
+   * @code
+   * LoggingDestinationFactory factory = LoggingDestinationFactory();
+   * std::map<std::string, std::string> params;
+   * params["type"] = "syslog";
+   * params["applicationName"] = "testApp";
+   * LOGGER.addLoggingDestination(factory.createDestinationFromParamsMap(params));
+   * @endcode
+   * 
+   */
+  void addLoggingDestination(std::optional<std::unique_ptr<LoggingDestination>> destination);
+  /**
    * @brief Replace all logging destinations by the new one.
    * 
    * **Example:**

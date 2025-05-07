@@ -122,3 +122,58 @@ TEST(LoggingDestinations, CanLogToSyslog) {
     logger.error(logString);
     EXPECT_TRUE(stringPresentInSyslog(logString));
 }
+
+TEST(LoggingDestinationByType, returnsEmptyOptionalForEmptyParamsMap) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_FALSE(destination.has_value());
+}
+
+TEST(LoggingDestinationByType, returnsEmptyOptionalForUnknownType) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    params["type"] = "unknown type";
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_FALSE(destination.has_value());
+}
+
+TEST(LoggingDestinationByType, canCreateLoggingDestinationByType01) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    params["type"] = "stdout";
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_TRUE(destination.has_value());
+    EXPECT_FALSE(dynamic_cast<LoggingDestinationStdOut*>(destination.value().get()) == NULL);
+}
+
+TEST(LoggingDestinationByType, canCreateLoggingDestinationByType02) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    params["type"] = "stderr";
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_TRUE(destination.has_value());
+    EXPECT_FALSE(dynamic_cast<LoggingDestinationStdErr*>(destination.value().get()) == NULL);
+}
+
+TEST(LoggingDestinationByType, canCreateLoggingDestinationByType03) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    params["type"] = "file";
+    params["fileName"] = "someLogFile";
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_TRUE(destination.has_value());
+    EXPECT_FALSE(dynamic_cast<LoggingDestinationFile*>(destination.value().get()) == NULL);
+    EXPECT_EQ("someLogFile", dynamic_cast<LoggingDestinationFile*>(destination.value().get())->getLogFileName());
+}
+
+TEST(LoggingDestinationByType, canCreateLoggingDestinationByType04) {
+    LoggingDestinationFactory factory = LoggingDestinationFactory();
+    std::map<std::string, std::string> params;
+    params["type"] = "syslog";
+    params["applicationName"] = "testApp";
+    auto destination = factory.createDestinationFromParamsMap(params);
+    EXPECT_TRUE(destination.has_value());
+    EXPECT_FALSE(dynamic_cast<LoggingDestinationSyslog*>(destination.value().get()) == NULL);
+    EXPECT_EQ("testApp", dynamic_cast<LoggingDestinationSyslog*>(destination.value().get())->getSyslogIdent());
+}

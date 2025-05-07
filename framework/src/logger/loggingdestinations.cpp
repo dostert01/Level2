@@ -41,6 +41,10 @@ LoggingDestinationSyslog::~LoggingDestinationSyslog() {
     closelog();
 }
 
+std::string LoggingDestinationSyslog::getSyslogIdent() {
+    return syslogIdent;
+}
+
 void LoggingDestinationSyslog::doLogging(const LogLevel &logLevel,
                                          const std::string &message,
                                          const std::string &timestamp) {
@@ -61,6 +65,10 @@ void LoggingDestinationSyslog::doLogging(const LogLevel &logLevel,
 //-------------------------------------------------------------------
 LoggingDestinationFile::LoggingDestinationFile(const std::string fileName){
     logFileName = fileName;
+}
+
+std::string LoggingDestinationFile::getLogFileName() {
+    return logFileName;
 }
 
 void LoggingDestinationFile::doLogging(const LogLevel& logLevel, const std::string& message,
@@ -96,6 +104,30 @@ std::unique_ptr<LoggingDestination> LoggingDestinationFactory::createDestination
     std::unique_ptr<LoggingDestination> destination(
       new LoggingDestinationFile(fileName));
     return destination;
+}
+
+std::optional<std::unique_ptr<LoggingDestination>> LoggingDestinationFactory::createDestinationFromParamsMap(std::map<std::string, std::string>& params) {
+    std::optional<std::unique_ptr<LoggingDestination>> returnValue;
+
+    auto destinationType = params.find("type");
+    if(destinationType != params.end()) {
+        if(destinationType->second == LOGGING_DESTINATION_TYPE_STDOUT) {
+            returnValue = createDestinationStdOut();
+        } else if(destinationType->second == LOGGING_DESTINATION_TYPE_FILE) {
+            auto fileName = params.find("fileName");
+            if(fileName != params.end()) {
+                returnValue = createDestinationFile(fileName->second);
+            }
+        } else if(destinationType->second == LOGGING_DESTINATION_TYPE_STDERR) {
+            returnValue = createDestinationStdErr();
+        } else if(destinationType->second == LOGGING_DESTINATION_TYPE_SYSLOG) {
+            auto applicationName = params.find("applicationName");
+            if(applicationName != params.end()) {
+                returnValue = createDestinationSyslog(applicationName->second);
+            }
+        }
+    }
+    return returnValue;
 }
 
 }  // namespace level2

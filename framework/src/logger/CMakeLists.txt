@@ -12,7 +12,8 @@ add_library(logger SHARED
     logger.cpp 
     timeproviders.cpp 
     loggingdestinations.cpp
-    loglevels.cpp)
+    loglevels.cpp
+)
 
 # Specify the include directories for the library
 target_include_directories(logger PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -22,8 +22,8 @@ class ApplicationContext {
   friend bool operator==(const ApplicationContext &lhs, const ApplicationContext &rhs);
   void loadApplicationConfig(const std::string &configFilePath);
   void configureLogger();
-  std::optional<json> findRecursiveInJsonTree(std::string& path);
-  std::optional<json> findRecursiveInJsonTree(json objectAsJson, std::string& path);
+  std::optional<json> findRecursiveInJsonTree(const std::string& path);
+  std::optional<json> findRecursiveInJsonTree(json objectAsJson, const std::string& path);
 
   template <typename T, typename... Args>
   void createSingleObject(std::vector<std::shared_ptr<T>> &returnValue, json &jsonObject, Args &&...args) const {
@@ -65,6 +65,7 @@ class ApplicationContext {
  private:
   ApplicationContext() = default;
   json jsonAppConfigData;
+  void addLoggingDestinationsFromJson2TheLogger(std::optional<json> &loggerJson, LoggingDestinationFactory &factory);
 };
 
 }  // namespace level2

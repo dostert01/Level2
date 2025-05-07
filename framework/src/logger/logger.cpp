@@ -94,6 +94,13 @@ void Logger::addLoggingDestination(std::unique_ptr<LoggingDestination> destinati
   loggingDestinations.push_back(move(destination));
 }
 
+void Logger::addLoggingDestination(std::optional<std::unique_ptr<LoggingDestination>> destination) {
+  if(destination.has_value()) {
+    addLoggingDestination(move(destination.value()));
+  }
+}
+
+
 void Logger::setLoggingDestination(std::unique_ptr<LoggingDestination> destination) {
   removeAllDestinations();
   addLoggingDestination(std::move(destination));

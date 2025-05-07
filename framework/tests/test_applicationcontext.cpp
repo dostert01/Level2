@@ -156,7 +156,10 @@ TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
 
 TEST(ApplicationContext, canConfigureLogger) {
     configureTest();
-    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     LOGGER.removeAllDestinations();
+    EXPECT_EQ(0, LOGGER.getCountOfLoggingDestinations());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     APP_CONTEXT.configureLogger();
+    EXPECT_EQ(4, LOGGER.getCountOfLoggingDestinations());
 }
+

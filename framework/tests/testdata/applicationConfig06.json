@@ -39,10 +39,17 @@
       "loggers" : [
         {
           "type": "file",
-          "destination": "var/log/application.log"
+          "fileName": "var/log/application.log"
         },
         {
-          "type": "stdOut"
+          "type": "stdout"
+        },
+        {
+          "type": "stderr"
+        },
+        {
+          "type": "syslog",
+          "applicationName": "testApp"
         }
       ]
     }
