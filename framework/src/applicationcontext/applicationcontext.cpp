@@ -6,7 +6,9 @@
 #include <iostream>
 #include <format>
 
-#define LOGGER_CONFIG_PATH "logging/loggers"
+#define LOGGING_DESTINATION_CONFIG_PATH "logging/loggers"
+#define LOGLEVEL_CONFIG_PATH "logging"
+#define ENTITY_NAME_LOG_LEVEL "logLevel"
 
 namespace level2 {
 
@@ -36,16 +38,31 @@ void ApplicationContext::loadApplicationConfig(const std::string& configFilePath
 }
 
 void ApplicationContext::configureLogger() {
-  auto loggerJson = findRecursiveInJsonTree(LOGGER_CONFIG_PATH);
-  if(loggerJson.has_value()) {
+  configureLoggingDestinations();
+  configureLogLevel();
+}
+
+void ApplicationContext::configureLogLevel() {
+  auto loglevelJson = findRecursiveInJsonTree(LOGLEVEL_CONFIG_PATH);
+  if (loglevelEntryInJsonIsValid(loglevelJson)) {
+    LOGGER.setMaxLogLevel(std::string(loglevelJson.value().at(ENTITY_NAME_LOG_LEVEL)));
+  }
+}
+
+bool ApplicationContext::loglevelEntryInJsonIsValid(std::optional<nlohmann::json_abi_v3_11_3::json> &loglevelJson) {
+  return loglevelJson.has_value() && (loglevelJson.value().contains(ENTITY_NAME_LOG_LEVEL)) && loglevelJson.value()[ENTITY_NAME_LOG_LEVEL].is_string();
+}
+
+void ApplicationContext::configureLoggingDestinations() {
+  auto loggerJson = findRecursiveInJsonTree(LOGGING_DESTINATION_CONFIG_PATH);
+  if (loggerJson.has_value()) {
     LoggingDestinationFactory factory = LoggingDestinationFactory();
     addLoggingDestinationsFromJson2TheLogger(loggerJson, factory);
     LOGGER.debug(std::format("Logger has been configured from json: '{}'", loggerJson.value().dump()));
   }
 }
 
-void ApplicationContext::addLoggingDestinationsFromJson2TheLogger(std::optional<json> &loggerJson, LoggingDestinationFactory &factory)
-{
+void ApplicationContext::addLoggingDestinationsFromJson2TheLogger(std::optional<json> &loggerJson, LoggingDestinationFactory &factory) {
   for (const auto &destinationConfig : loggerJson.value())
   {
     if(destinationConfig.contains("type")) {

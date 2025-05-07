@@ -18,6 +18,7 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_06 "/applicationConfig06.json"
 #define APP_CONFIG_TEST_FILE_07 "/applicationConfig07.json"
+#define APP_CONFIG_TEST_FILE_08 "/applicationConfig08.json"
 
 namespace test_applicationcontext {
     string workingDir;
@@ -154,7 +155,7 @@ TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
     filesystem::remove_all("./opt");
 }
 
-TEST(ApplicationContext, canConfigureLogger) {
+TEST(ApplicationContext, canConfigureLoggingDestinations) {
     configureTest();
     LOGGER.removeAllDestinations();
     EXPECT_EQ(0, LOGGER.getCountOfLoggingDestinations());
@@ -163,3 +164,20 @@ TEST(ApplicationContext, canConfigureLogger) {
     EXPECT_EQ(4, LOGGER.getCountOfLoggingDestinations());
 }
 
+TEST(ApplicationContext, canSetLogLevel) {
+    configureTest();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    APP_CONTEXT.configureLogger();
+    EXPECT_EQ(LogLevel::LOG_LEVEL_DEBUG, LOGGER.getLogLevel());
+}
+
+TEST(ApplicationContext, doesNotChangeLogLevelOnUnknownParameterValue) {
+    configureTest();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_08);
+    APP_CONTEXT.configureLogger();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+}

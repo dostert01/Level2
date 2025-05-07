@@ -65,6 +65,9 @@ class ApplicationContext {
  private:
   ApplicationContext() = default;
   json jsonAppConfigData;
+  void configureLoggingDestinations();
+  void configureLogLevel();
+  bool loglevelEntryInJsonIsValid(std::optional<json> &loglevelJson);
   void addLoggingDestinationsFromJson2TheLogger(std::optional<json> &loggerJson, LoggingDestinationFactory &factory);
 };
 

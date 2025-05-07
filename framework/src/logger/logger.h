@@ -154,6 +154,16 @@ class Logger {
    * Set the maximum log level to be reported
    */
   void setMaxLogLevel(LogLevel logLevel);
+  /**
+   * Set the maximum log level to be reported
+   * @param logLevel must match any of the log level string literals as
+   * defined in loglevels.h.
+   */
+  void setMaxLogLevel(std::string logLevel);
+  /**
+   * Get the current configured log level
+   */
+  LogLevel getLogLevel();
 
  private:
   Logger();

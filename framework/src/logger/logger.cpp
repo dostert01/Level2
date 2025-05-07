@@ -111,4 +111,15 @@ void Logger::setMaxLogLevel(LogLevel logLevel) {
   maxLogLevel = logLevel;
 }
 
+void Logger::setMaxLogLevel(std::string logLevel) {
+  std::unique_lock<std::shared_mutex> lock(mutex);
+  std::optional<LogLevel> level = logLevelStringMapper.string2LogLevel(logLevel);
+  if(level.has_value())
+    maxLogLevel = level.value();
+}
+
+LogLevel Logger::getLogLevel() {
+  return maxLogLevel;
+}
+
 }  // namespace level2

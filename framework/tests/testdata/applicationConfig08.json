@@ -35,7 +35,7 @@
       }
     ],
     "logging": {
-      "logLevel": "DEBUG",
+      "logLevel": "OnUnknownParameterValue",
       "loggers" : [
         {
           "type": "file",
