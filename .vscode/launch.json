@@ -59,6 +59,34 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "(gdb) Launch test_application",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/framework/tests/test_application",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                { "name": "TEST_FILES_DIR", "value": "${workspaceFolder}/framework/tests/testdata"}
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: g++-10 build active file",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",

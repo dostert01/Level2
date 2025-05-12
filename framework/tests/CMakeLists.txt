@@ -62,6 +62,12 @@ add_executable(test_applicationcontext
     test_applicationcontext.cpp
     $<TARGET_OBJECTS:applicationcontext>)
 
+add_executable(test_application
+    test_application.cpp
+    $<TARGET_OBJECTS:application>)
+target_link_libraries(test_application PRIVATE
+    application)
+
 add_executable(test_apistructs
     test_apistructs.cpp
     $<TARGET_OBJECTS:pipeline>
@@ -144,6 +150,9 @@ set_tests_properties(test_level2 PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_F
 
 add_test(NAME test_applicationcontext COMMAND test_applicationcontext)
 set_tests_properties(test_applicationcontext PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
+
+add_test(NAME test_application COMMAND test_application)
+set_tests_properties(test_application PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")
 
 add_test(NAME test_common COMMAND test_common)
 set_tests_properties(test_common PROPERTIES ENVIRONMENT "TEST_FILES_DIR=${TEST_FILES_DIR}")

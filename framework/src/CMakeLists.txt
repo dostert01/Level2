@@ -24,6 +24,7 @@ add_subdirectory(applicationcontext)
 add_subdirectory(connectors)
 add_subdirectory(listeners)
 add_subdirectory(common)
+add_subdirectory(application)
 
 # Hinzufügen der ausführbaren Datei
 add_executable(level2 main.cpp)
