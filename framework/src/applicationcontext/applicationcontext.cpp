@@ -9,6 +9,7 @@
 #define LOGGING_DESTINATION_CONFIG_PATH "logging/loggers"
 #define LOGLEVEL_CONFIG_PATH "logging"
 #define ENTITY_NAME_LOG_LEVEL "logLevel"
+#define APPLICATION_DIRECTORIES "applicationDirectories"
 
 namespace level2 {
 
@@ -25,9 +26,33 @@ bool operator==(const ApplicationContext& lhs, const ApplicationContext& rhs) {
   return (&lhs.getInstance() == &rhs.getInstance());
 }
 
+void ApplicationContext::resetAllMemberVariables() {
+  applicationDirectories = nullptr;
+  jsonAppConfigData = nullptr;
+}
+
 void ApplicationContext::loadApplicationConfig(const std::string& configFilePath) {
+  resetAllMemberVariables();
   loadJsonConfig(configFilePath);
   configureLogger();
+  configureApplicationDirectories();
+}
+
+std::shared_ptr<ApplicationDirectories> ApplicationContext::getApplicationDirectories() {
+  return applicationDirectories;
+}
+
+void ApplicationContext::configureApplicationDirectories()
+{
+  auto dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>(APPLICATION_DIRECTORIES);
+  if (dirs.size() > 0) {
+    applicationDirectories = dirs[0];
+  } else {
+    LOGGER.warn(std::format("application configuration does not contain an unambiguous definition for {}. Falling back to defaults.",
+      std::string(APPLICATION_DIRECTORIES)));
+    applicationDirectories = std::make_shared<ApplicationDirectories>();
+  }
+  applicationDirectories->createApplicationDirectories();
 }
 
 void ApplicationContext::loadJsonConfig(const std::string &configFilePath)
