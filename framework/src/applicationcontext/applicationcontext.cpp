@@ -26,13 +26,20 @@ bool operator==(const ApplicationContext& lhs, const ApplicationContext& rhs) {
 }
 
 void ApplicationContext::loadApplicationConfig(const std::string& configFilePath) {
+  loadJsonConfig(configFilePath);
+  configureLogger();
+}
+
+void ApplicationContext::loadJsonConfig(const std::string &configFilePath)
+{
   try {
     LOGGER.info(std::format("Loading app config from file: {}", configFilePath));
     std::ifstream jsonFile(configFilePath);
     jsonAppConfigData = json::parse(jsonFile);
     jsonFile.close();
     LOGGER.debug(std::format("Success loading app config from file: ", configFilePath));
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception &e) {
     LOGGER.error(e.what());
   }
 }
@@ -54,8 +61,15 @@ bool ApplicationContext::loglevelEntryInJsonIsValid(std::optional<nlohmann::json
 }
 
 void ApplicationContext::configureLoggingDestinations() {
+  LOGGER.removeAllDestinations();
+  addNewLoggingDestinations();
+}
+
+void ApplicationContext::addNewLoggingDestinations()
+{
   auto loggerJson = findRecursiveInJsonTree(LOGGING_DESTINATION_CONFIG_PATH);
-  if (loggerJson.has_value()) {
+  if (loggerJson.has_value())
+  {
     LoggingDestinationFactory factory = LoggingDestinationFactory();
     addLoggingDestinationsFromJson2TheLogger(loggerJson, factory);
     LOGGER.debug(std::format("Logger has been configured from json: '{}'", loggerJson.value().dump()));

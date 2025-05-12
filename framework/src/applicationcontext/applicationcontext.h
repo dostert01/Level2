@@ -21,7 +21,6 @@ class ApplicationContext {
   static ApplicationContext *getInstanceAsPointer();
   friend bool operator==(const ApplicationContext &lhs, const ApplicationContext &rhs);
   void loadApplicationConfig(const std::string &configFilePath);
-  void configureLogger();
   std::optional<json> findRecursiveInJsonTree(const std::string& path);
   std::optional<json> findRecursiveInJsonTree(json objectAsJson, const std::string& path);
 
@@ -65,7 +64,10 @@ class ApplicationContext {
  private:
   ApplicationContext() = default;
   json jsonAppConfigData;
+  void loadJsonConfig(const std::string &configFilePath);
   void configureLoggingDestinations();
+  void addNewLoggingDestinations();
+  void configureLogger();
   void configureLogLevel();
   bool loglevelEntryInJsonIsValid(std::optional<json> &loglevelJson);
   void addLoggingDestinationsFromJson2TheLogger(std::optional<json> &loggerJson, LoggingDestinationFactory &factory);

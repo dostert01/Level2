@@ -99,7 +99,7 @@ TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
     EXPECT_EQ(0, listeners.size());
 }
 
-TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
+TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListenerFromAppConfig) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
@@ -157,10 +157,8 @@ TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
 
 TEST(ApplicationContext, canConfigureLoggingDestinations) {
     configureTest();
-    LOGGER.removeAllDestinations();
-    EXPECT_EQ(0, LOGGER.getCountOfLoggingDestinations());
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
-    APP_CONTEXT.configureLogger();
     EXPECT_EQ(4, LOGGER.getCountOfLoggingDestinations());
 }
 
@@ -169,7 +167,6 @@ TEST(ApplicationContext, canSetLogLevel) {
     LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
     EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
-    APP_CONTEXT.configureLogger();
     EXPECT_EQ(LogLevel::LOG_LEVEL_DEBUG, LOGGER.getLogLevel());
 }
 
@@ -178,6 +175,13 @@ TEST(ApplicationContext, doesNotChangeLogLevelOnUnknownParameterValue) {
     LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
     EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_08);
-    APP_CONTEXT.configureLogger();
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+}
+
+TEST(ApplicationContextAutoInit, loadApplicationConfigConfiguresTheLogger) {
+    configureTest();
     LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_DEBUG, LOGGER.getLogLevel());
 }
