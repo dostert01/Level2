@@ -5,8 +5,9 @@
 #include <filesystem>
 #include <regex>
 #include <vector>
-#include <application.h>
-#include <common.h>
+
+#include "application.h"
+#include "common.h"
 
 using namespace level2;
 using namespace std;
@@ -54,8 +55,7 @@ TEST(ApplicationContext, AlwaysCreatesASingletonInstanceAsPointer) {
     deleteTestAppDirectory();
 }
 
-TEST(ApplicationContext, InitializesTheAppContext)
-{
+TEST(ApplicationContext, InitializesTheAppContext) {
     configureTest();
     std::shared_ptr<Application> app = Application::getInstance(test_application::testFilesDir + APP_CONFIG_TEST_FILE_06);
     EXPECT_NE(nullptr, APP_CONTEXT.getApplicationDirectories());

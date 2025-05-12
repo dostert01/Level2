@@ -1,13 +1,13 @@
 #pragma once
 
-#include <logger.h>
-#include <applicationDirectories.h>
-
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <shared_mutex>
 #include <string>
 #include <vector>
+
+#include "logger.h"
+#include "applicationDirectories.h"
 
 #define APP_CONTEXT ApplicationContext::getInstance()
 

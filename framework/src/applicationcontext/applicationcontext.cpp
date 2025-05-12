@@ -1,10 +1,10 @@
-#include <applicationcontext.h>
-#include <logger.h>
-#include <systemUtils.h>
-
 #include <fstream>
 #include <iostream>
 #include <format>
+
+#include "logger.h"
+#include "systemUtils.h"
+#include "applicationcontext.h"
 
 #define JSON_NAME_LOGGING_DESTINATION_CONFIG_PATH "logging/loggers"
 #define JSON_NAME_LOGLEVEL_CONFIG_PATH "logging"
