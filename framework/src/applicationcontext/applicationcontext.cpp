@@ -6,10 +6,10 @@
 #include <iostream>
 #include <format>
 
-#define LOGGING_DESTINATION_CONFIG_PATH "logging/loggers"
-#define LOGLEVEL_CONFIG_PATH "logging"
-#define ENTITY_NAME_LOG_LEVEL "logLevel"
-#define APPLICATION_DIRECTORIES "applicationDirectories"
+#define JSON_NAME_LOGGING_DESTINATION_CONFIG_PATH "logging/loggers"
+#define JSON_NAME_LOGLEVEL_CONFIG_PATH "logging"
+#define JSON_NAME_LOG_LEVEL "logLevel"
+#define JSON_NAME_APPLICATION_DIRECTORIES "applicationDirectories"
 
 namespace level2 {
 
@@ -44,12 +44,12 @@ std::shared_ptr<ApplicationDirectories> ApplicationContext::getApplicationDirect
 
 void ApplicationContext::configureApplicationDirectories()
 {
-  auto dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>(APPLICATION_DIRECTORIES);
+  auto dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>(JSON_NAME_APPLICATION_DIRECTORIES);
   if (dirs.size() > 0) {
     applicationDirectories = dirs[0];
   } else {
     LOGGER.warn(std::format("application configuration does not contain an unambiguous definition for {}. Falling back to defaults.",
-      std::string(APPLICATION_DIRECTORIES)));
+      std::string(JSON_NAME_APPLICATION_DIRECTORIES)));
     applicationDirectories = std::make_shared<ApplicationDirectories>();
   }
   applicationDirectories->createApplicationDirectories();
@@ -75,14 +75,14 @@ void ApplicationContext::configureLogger() {
 }
 
 void ApplicationContext::configureLogLevel() {
-  auto loglevelJson = findRecursiveInJsonTree(LOGLEVEL_CONFIG_PATH);
+  auto loglevelJson = findRecursiveInJsonTree(JSON_NAME_LOGLEVEL_CONFIG_PATH);
   if (loglevelEntryInJsonIsValid(loglevelJson)) {
-    LOGGER.setMaxLogLevel(std::string(loglevelJson.value().at(ENTITY_NAME_LOG_LEVEL)));
+    LOGGER.setMaxLogLevel(std::string(loglevelJson.value().at(JSON_NAME_LOG_LEVEL)));
   }
 }
 
 bool ApplicationContext::loglevelEntryInJsonIsValid(std::optional<nlohmann::json_abi_v3_11_3::json> &loglevelJson) {
-  return loglevelJson.has_value() && (loglevelJson.value().contains(ENTITY_NAME_LOG_LEVEL)) && loglevelJson.value()[ENTITY_NAME_LOG_LEVEL].is_string();
+  return loglevelJson.has_value() && (loglevelJson.value().contains(JSON_NAME_LOG_LEVEL)) && loglevelJson.value()[JSON_NAME_LOG_LEVEL].is_string();
 }
 
 void ApplicationContext::configureLoggingDestinations() {
@@ -92,7 +92,7 @@ void ApplicationContext::configureLoggingDestinations() {
 
 void ApplicationContext::addNewLoggingDestinations()
 {
-  auto loggerJson = findRecursiveInJsonTree(LOGGING_DESTINATION_CONFIG_PATH);
+  auto loggerJson = findRecursiveInJsonTree(JSON_NAME_LOGGING_DESTINATION_CONFIG_PATH);
   if (loggerJson.has_value())
   {
     LoggingDestinationFactory factory = LoggingDestinationFactory();
