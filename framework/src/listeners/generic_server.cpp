@@ -18,7 +18,7 @@
 using namespace std::chrono_literals;
 namespace level2 {
 
-GenericServer::GenericServer(json jsonObject) {
+GenericServer::GenericServer(json jsonObject) : NetworkListener(jsonObject) {
   port = jsonObject["port"];
   maxClients = jsonObject["maxClients"];
   serverSocket = -1;

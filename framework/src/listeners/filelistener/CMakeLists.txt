@@ -22,7 +22,7 @@ target_link_libraries(filelistener
     pipeline
     pipelineapi 
     applicationcontext
-    listeners
+    listenersbase
     nlohmann_json::nlohmann_json dl
 )
 

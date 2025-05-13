@@ -16,6 +16,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api
     ${CMAKE_SOURCE_DIR}/framework/src/dbinterface
     ${CMAKE_SOURCE_DIR}/framework/src/applicationcontext
+    ${CMAKE_SOURCE_DIR}/framework/src/application
     ${CMAKE_SOURCE_DIR}/framework/src/connectors
     ${CMAKE_SOURCE_DIR}/_deps/json-src/single_include/
     ${CMAKE_SOURCE_DIR}/framework/src/pipeline/api/samplelibs/binaryDataProcessor/
@@ -63,10 +64,11 @@ add_executable(test_applicationcontext
     $<TARGET_OBJECTS:applicationcontext>)
 
 add_executable(test_application
-    test_application.cpp
-    $<TARGET_OBJECTS:application>)
+    test_application.cpp)
 target_link_libraries(test_application PRIVATE
-    application)
+    application
+    logger
+    listeners)
 
 add_executable(test_apistructs
     test_apistructs.cpp

@@ -16,7 +16,7 @@
 using namespace std;
 namespace level2 {
 
-FileListener::FileListener(json jsonObject) {
+FileListener::FileListener(json jsonObject) : NetworkListener(jsonObject) {
   directory2Monitor = jsonObject["directory2Monitor"];
   inotifyFd = -1;
   inotifyWatch = -1;

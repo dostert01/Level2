@@ -27,7 +27,7 @@ target_link_libraries(httplistener PUBLIC
     pipelineapi
     pipeline
     applicationcontext
-    listeners
+    listenersbase
     nlohmann_json::nlohmann_json dl
 )
 

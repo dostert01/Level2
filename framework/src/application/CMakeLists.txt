@@ -21,6 +21,7 @@ add_library(application SHARED
 target_link_libraries(application PUBLIC
     applicationcontext
     logger
+    listenersbase
 )
 
 # Specify the include directories for the library

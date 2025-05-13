@@ -12,9 +12,11 @@ enum ListenerProcessingMode {not_set, synchronous, asynchronous};
 class NetworkListener {
     public:
         NetworkListener();
+        NetworkListener(json jsonObject);
         virtual ~NetworkListener() = default;
         bool isListening();
         bool isIniComplete();
+        std::string getName();
         virtual void init(std::shared_ptr<PipelineFiFo> fillerPipe);
         virtual void init(std::shared_ptr<PipeLineProcessor> processor);
         virtual void startListening() = 0;
@@ -27,6 +29,7 @@ class NetworkListener {
         ListenerProcessingMode processingMode;
     private:
         bool listening = false;
+        std::string name;
 };
 } //namespace level2
 #endif //#define NETWORK_LISTENER_H

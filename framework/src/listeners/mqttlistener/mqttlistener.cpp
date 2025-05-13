@@ -3,7 +3,7 @@
 
 namespace level2 {
 
-MQTTListener::MQTTListener(json jsonObject) {
+MQTTListener::MQTTListener(json jsonObject) : NetworkListener(jsonObject) {
   hostName = jsonObject["hostName"];
   port = jsonObject["port"];
   clientId = jsonObject["clientId"];

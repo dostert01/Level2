@@ -20,7 +20,7 @@ add_library(mqttlistener SHARED
 
 target_link_libraries(mqttlistener
     pipelineapi
-    listeners
+    listenersbase
     mosquittowrapper
     applicationcontext
     ${MOSQUITTO_LIBRARY}

@@ -1,12 +1,29 @@
 #pragma once
 
 #include "applicationcontext.h"
+#include "listeners.h"
 
 namespace level2 {
     class Application {
         public:
-            Application() = default;
+            Application(const std::string& configFilePath);
             static std::shared_ptr<Application> getInstance(const std::string& configFilePath);
+            std::vector<std::shared_ptr<Listener>> getListeners();
+        private:
+            Application() = default;
+            std::vector<std::shared_ptr<Listener>> listeners;
+            void loadListeners();
 
+            template <typename ListenerType>
+            void addListeners(const std::string& jsonPath) {
+                auto foundListeners = APP_CONTEXT.createObjectsFromAppConfigJson<ListenerType>(jsonPath);
+                for(auto& listener : foundListeners) {
+                    if(!std::static_pointer_cast<Listener>(listener)->getName().empty())
+                        listeners.push_back(std::move(listener));
+                    else
+                        LOGGER.error("Your app config json contains at least one listener without a 'name' attribute. "
+                            "This listener will be skipped. Please fix you json by adding a 'name' to all listeners.");
+                }
+            }
     };
 }

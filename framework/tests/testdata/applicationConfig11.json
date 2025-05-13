@@ -1,0 +1,84 @@
+{
+    "applicationDirectories": {
+        "root": "$PWD/opt/testApplication",
+        "pipelines": "etc/pipelines.d",
+        "processes": "etc/processes.d",
+        "workerModules": "lib"
+    },
+    "Listeners": {
+        "HTTPListeners": [
+            {
+                "name": "httpGetListener01",
+                "port": 8888,
+                "maxClients" : 10
+            },
+            {
+                "name": "httpGetListener02",
+                "port": 8889,
+                "maxClients" : 10
+            }
+        ],
+        "FileListeners": [
+          {
+              "name": "fileListener01",
+              "directory2Monitor": "filelistenerTest.tmp/newFiles01"
+          },
+          {
+              "name": "fileListener02",
+              "directory2Monitor": "filelistenerTest.tmp/newFiles02"
+          }
+      ],
+      "MQTTListeners": [
+        {
+            "name": "mqttListener01",
+            "hostName": "127.0.0.1",
+            "port": 1883,
+            "clientId": "mqttconnectorClient01",
+            "topics": [
+                {
+                    "name": "test/topic01"
+                },
+                {
+                    "name": "test/topic02"
+                }
+            ]
+        },
+        {
+            "name": "mqttListener02",
+            "hostName": "127.0.0.1",
+            "port": 1883,
+            "clientId": "mqttconnectorClient02",
+            "topics": [
+                {
+                    "name": "test/topic03"
+                },
+                {
+                    "name": "test/topic04"
+                }
+            ]
+        }
+      ]
+    },
+    "listenerToProcessBindings": [
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener01",
+        "type": "synchronous"
+      },
+      {
+        "name": "HTTP get to be processed by process simpleStaticWebserver",
+        "processName": "simpleStaticWebserver",
+        "listenerName": "httpGetListener02",
+        "type": "synchronous"
+      }
+    ],
+    "logging": {
+      "logLevel": "TRACE",
+      "loggers" : [
+        {
+          "type": "stdout"
+        }
+      ]
+    }
+}
