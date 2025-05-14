@@ -54,6 +54,9 @@ add_executable(test_level2
     test_loggingdestinations.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_level2 PUBLIC
+    applicationcontext
+)
 
 add_executable(test_common
     test_common.cpp
@@ -74,26 +77,41 @@ add_executable(test_apistructs
     test_apistructs.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_apistructs PUBLIC
+    applicationcontext
+)
 
 add_executable(test_pipelineprocessor
     test_pipelineprocessor.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_pipelineprocessor PUBLIC
+    applicationcontext
+)
 
 add_executable(test_pipeline
     test_pipeline.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_pipeline PUBLIC
+    applicationcontext
+)
 
 add_executable(test_pipeline_payload_matching
     test_pipeline_payload_matching.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_pipeline_payload_matching PUBLIC
+    applicationcontext
+)
 
 add_executable(test_pipelinefifo
     test_pipelinefifo.cpp
     $<TARGET_OBJECTS:pipelinefifo>
     $<TARGET_OBJECTS:pipeline>)
+target_link_libraries(test_pipelinefifo PUBLIC
+    applicationcontext
+)
 
 add_executable(test_dbinterface
     test_dbinterface.cpp
@@ -105,7 +123,6 @@ add_executable(test_httplistener
     test_httplistener.cpp
     $<TARGET_OBJECTS:pipelinefifo>
 )
-
 target_link_libraries(test_httplistener PRIVATE
     httplistener
 )
@@ -114,11 +131,13 @@ add_executable(test_fileconnector
     test_fileconnector.cpp
     $<TARGET_OBJECTS:pipeline>
     $<TARGET_OBJECTS:pipelinefifo>)
+target_link_libraries(test_fileconnector PUBLIC
+    applicationcontext
+)
 
 add_executable(test_filelistener
     test_filelistener.cpp
 )
-
 target_link_libraries(test_filelistener PRIVATE
     filelistener
 )

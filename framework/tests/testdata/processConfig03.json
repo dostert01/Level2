@@ -1,5 +1,5 @@
 {
-    "processName" : "answer hello world to a http GET request",
+    "processName" : "answer hello world to an http GET request",
     "pipelines" : [
         {
             "pipelineConfigFile":"pipelineConfig08.json",

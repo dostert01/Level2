@@ -23,7 +23,9 @@ class ApplicationContext {
   void loadApplicationConfig(const std::string &configFilePath);
   std::optional<json> findRecursiveInJsonTree(const std::string& path);
   std::optional<json> findRecursiveInJsonTree(json objectAsJson, const std::string& path);
-  std::shared_ptr<ApplicationDirectories> getApplicationDirectories();
+  std::shared_ptr<ApplicationDirectories>& getApplicationDirectories();
+  void setApplicationDirectories(std::shared_ptr<ApplicationDirectories>& appDirectories);
+  void resetAllMemberVariables();
 
   template <typename T, typename... Args>
   void createSingleObject(std::vector<std::shared_ptr<T>> &returnValue, json &jsonObject, Args &&...args) const {
@@ -66,8 +68,6 @@ class ApplicationContext {
   ApplicationContext() = default;
   json jsonAppConfigData;
   std::shared_ptr<ApplicationDirectories> applicationDirectories;
-  void configureApplicationDirectories();
-  void resetAllMemberVariables();
   void loadJsonConfig(const std::string &configFilePath);
   void configureLoggingDestinations();
   void addNewLoggingDestinations();

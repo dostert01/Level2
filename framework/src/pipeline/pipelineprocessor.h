@@ -34,8 +34,8 @@ namespace level2 {
             std::shared_mutex pipelineExecutionMutex;
             std::vector<std::shared_ptr<Pipeline>> pipelines;
             void loadProcessorConfig(const std::string& configFilePath);
-            void setConfigFileDirFromConfigFileName(
-                const std::string& configFilePath);
+            void setConfigFileDirFromConfigFileName(const std::string &configFilePath);
+            bool appContextHasBeenInitializedByTheApplication();
             void loadHeaderData(const json& jsonData);
             void loadPipelines(const json& jsonData);
             std::string getDirNameFromPath(const std::string path);

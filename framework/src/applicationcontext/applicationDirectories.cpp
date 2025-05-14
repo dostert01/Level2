@@ -6,34 +6,35 @@ namespace level2 {
 
 ApplicationDirectories::ApplicationDirectories() {
     applicationRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or(".");
-    pipelines = "pipelines.d";
-    processes = "processes.d";
-    workerModules = "lib";
-    allDirectoriesExist = false;
+    setInternalVariables("pipelines.d", "processes.d", "lib");
 };
 
 ApplicationDirectories::ApplicationDirectories(json jsonObject) {
-    applicationRoot = StaticStringFunctions::replaceEnvVariablesInPath(jsonObject["root"]);
-    pipelines = jsonObject["pipelines"];
-    processes = jsonObject["processes"];
-    workerModules = jsonObject["workerModules"];
-    allDirectoriesExist = false;
+    applicationRoot = std::filesystem::path(StaticStringFunctions::replaceEnvVariablesInPath(jsonObject["root"]));
+    setInternalVariables(std::string(jsonObject["pipelines"]), std::string(jsonObject["processes"]), std::string(jsonObject["workerModules"]));
 };
 
-std::string ApplicationDirectories::getApplicationRootDir() {
+void ApplicationDirectories::setInternalVariables(const std::string& pipelinesDir, const std::string& processesDir, const std::string& workerModulesDir) {
+    pipelines = std::filesystem::path(applicationRoot.string() + PATH_SEPARATOR + pipelinesDir);
+    processes = std::filesystem::path(applicationRoot.string() + PATH_SEPARATOR + processesDir);
+    workerModules = std::filesystem::path(applicationRoot.string() + PATH_SEPARATOR + workerModulesDir);
+    allDirectoriesExist = false;
+}
+
+std::filesystem::path& ApplicationDirectories::getApplicationRootDir() {
     return applicationRoot;
 }
 
-std::string ApplicationDirectories::getPipelinesDir() {
-    return applicationRoot + PATH_SEPARATOR + pipelines;
+std::filesystem::path& ApplicationDirectories::getPipelinesDir() {
+    return pipelines;
 }
 
-std::string ApplicationDirectories::getProcessesDir() {
-    return applicationRoot + PATH_SEPARATOR + processes;
+std::filesystem::path& ApplicationDirectories::getProcessesDir() {
+    return processes;
 }
 
-std::string ApplicationDirectories::getWorkerModulesDir() {
-    return applicationRoot + PATH_SEPARATOR + workerModules;
+std::filesystem::path& ApplicationDirectories::getWorkerModulesDir() {
+    return workerModules;
 }
 
 bool ApplicationDirectories::createApplicationDirectories() {

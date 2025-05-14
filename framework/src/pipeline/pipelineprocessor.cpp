@@ -4,7 +4,7 @@
 
 #include "pipelineprocessor.h"
 #include "logger.h"
-
+#include "applicationcontext.h"
 
 using namespace std;
 namespace level2 {
@@ -52,10 +52,20 @@ void PipeLineProcessor::loadProcessorConfig(const string& configFilePath) {
     }
 }
 
-void PipeLineProcessor::setConfigFileDirFromConfigFileName(
-    const string& configFilePath) {
-  configFileDir = getDirNameFromPath(configFilePath);
-  LOGGER.info("Reading config files from directory: '" + configFileDir + "'");
+void PipeLineProcessor::setConfigFileDirFromConfigFileName(const string& configFilePath) {
+    if (appContextHasBeenInitializedByTheApplication()) {
+        LOGGER.info("pipeline config directory is supplied by the APP_CONTEXT");
+        configFileDir = APP_CONTEXT.getApplicationDirectories()->getPipelinesDir();
+    }
+    else {
+        LOGGER.info("pipeline config directory is the same as the processes config directory");
+        configFileDir = getDirNameFromPath(configFilePath);
+    }
+  LOGGER.info("Reading pipeline config files from directory: '" + configFileDir + "'");
+}
+
+bool PipeLineProcessor::appContextHasBeenInitializedByTheApplication() {
+    return APP_CONTEXT.getApplicationDirectories() != nullptr;
 }
 
 string PipeLineProcessor::getDirNameFromPath(const string path) {
