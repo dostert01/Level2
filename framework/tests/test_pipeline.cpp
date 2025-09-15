@@ -36,6 +36,12 @@ namespace test_pipeline {
             LOGGER.error("Environment variable TEST_FILES_DIR must be set to where the tests expect the testfiles to live!");
         }  
     }
+
+    void printProcessingDataAsJson(std::shared_ptr<level2::PipelineProcessingData> &processData) {
+        json j = {};
+        processData->toJson(&j);
+        std::cout << j << std::endl;
+    }
 }
 
 void configureTest() {
@@ -233,4 +239,6 @@ TEST(Pipeline, CanGetAllErrors) {
     EXPECT_EQ("this is a test error", allErrors.at(0)->getErrorMessage());
     EXPECT_EQ("second error", allErrors.at(1)->getErrorCode());
     EXPECT_EQ("this is yet another test error", allErrors.at(1)->getErrorMessage());
+
+    test_pipeline::printProcessingDataAsJson(processData);
 }
