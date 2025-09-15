@@ -4,6 +4,9 @@
 #include "pipelinefifo.h"
 #include "pipeline.h"
 #include "pipelineprocessor.h"
+#include "logger.h"
+
+#include <format>
 
 namespace level2 {
 
@@ -22,11 +25,22 @@ class NetworkListener {
         virtual void startListening() = 0;
         virtual std::optional<std::shared_ptr<PipelineProcessingData>> getLastMessage();
     protected:
-        void setIsListening(bool value) { listening = value; }
         bool initComplete = false;
         std::shared_ptr<PipelineFiFo> pipelineFifo;
         std::shared_ptr<PipeLineProcessor> pipeLineProcessor;
         ListenerProcessingMode processingMode;
+        void setIsListening(bool value) { listening = value; }
+        template <typename T> T getFromJson(std::string fieldName, json jsonObject, T defaultValue) {
+            T returnValue;
+            try {
+                returnValue = jsonObject[fieldName];
+            } catch (const std::exception& e) {
+                LOGGER.error(std::format("Construction of NetworkListener failed {} "
+                    "Make sure field '{}' is contained in the json structure! "
+                    "Using default value: '{}'", e.what(), fieldName, defaultValue));
+            }
+            return returnValue;
+        }
     private:
         bool listening = false;
         std::string name;

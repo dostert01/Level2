@@ -10,7 +10,7 @@ NetworkListener::NetworkListener() {
 
 NetworkListener::NetworkListener(json jsonObject) {
     processingMode = ListenerProcessingMode::not_set;
-    name = jsonObject["name"];
+    name = getFromJson<std::string>("name", jsonObject, "");
 }
 
 void NetworkListener::init(shared_ptr<PipelineFiFo> fifo) {

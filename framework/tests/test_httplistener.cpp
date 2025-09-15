@@ -113,6 +113,7 @@ namespace test_httplistener {
 
 #define configureTest() test_httplistener::configureTest()
 
+
 TEST(HTTPListener, CanCreateAnInstaneOfTheHTTPListener) {
     shared_ptr<HTTPListener> listener = HTTPListener::getInstance();
     EXPECT_TRUE(listener.get() != nullptr);
@@ -154,6 +155,7 @@ TEST(HTTPListener, isListeningStatusWorks02) {
     EXPECT_TRUE(listeners[0]->isListening());
 }
 
+
 TEST(HTTPListener, CanReceiveSomeData) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_httplistener::testFilesDir + APP_CONFIG_TEST_FILE_05);
@@ -175,7 +177,6 @@ TEST(Http11, canParseFirstLine) {
     EXPECT_EQ("GET", request.value()->getMethod());
     EXPECT_EQ("/api/1.0/index.html", request.value()->getPath());
 }
-
 TEST(Http11, canParseNormalHeaderLines) {
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
     Http11 http(fd);
@@ -191,6 +192,7 @@ TEST(Http11, parsingInvalidHeaderFailsWithEmptyRequestObject) {
     auto request = http.readRequest("");
     EXPECT_EQ(std::nullopt, request);
 }
+
 
 TEST(Http11, getHeaderFieldValueReturnsEmptyOptionalOnFailure) {
     int fd = open(std::string(test_httplistener::testFilesDir + HTTP_REQUEST_TEST_FILE_01).c_str(), O_RDONLY, O_NONBLOCK);
@@ -319,10 +321,15 @@ TEST(HTTPListener, sendsDataBackOnGetRequest) {
     auto listener = test_httplistener::issueRequestTowardsSynchronousProcessingListener(PROCESS_CONFIG_TEST_FILE_03, HTTP_REQUEST_TEST_FILE_05, httpResponseBuffer);   
     auto processedData = listener->getLastProcessingData();
     json j = {};
-    processedData.value()->toJson(&j);
-    EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 11\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\nhello world", httpResponseBuffer);
-    std::cout << std::setw(4) << j << '\n';
+    EXPECT_TRUE(processedData.has_value());
+    if(processedData.has_value()) {
+        processedData.value()->toJson(&j);
+        EXPECT_EQ("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 11\r\nContent-Type: text/plain; charset=utf-8\r\nServer: level2 httpListener\r\n\r\n\r\nhello world", httpResponseBuffer);
+        std::cout << std::setw(4) << j << '\n';
+    }
 }
+
+
 
 TEST(HTTPListener, returnsHttpErrorIfNoProcessingPipelineWasFound) {
     std::string httpResponseBuffer;

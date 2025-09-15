@@ -19,8 +19,8 @@ using namespace std::chrono_literals;
 namespace level2 {
 
 GenericServer::GenericServer(json jsonObject) : NetworkListener(jsonObject) {
-  port = jsonObject["port"];
-  maxClients = jsonObject["maxClients"];
+  port = getFromJson<int>("port", jsonObject, -1);
+  maxClients = getFromJson<int>("maxClients", jsonObject, 10);
   serverSocket = -1;
   keepListeningThreadRunning.store(false);
 };
@@ -104,6 +104,7 @@ void GenericServer::listeningThreadFunction() {
     } else if (countEvents > 0) {
       for(int i = 0; i < countEvents; i++) {
         struct sockaddr_in clientAddress;
+        memset(&clientAddress, 0, sizeof(clientAddress));
         socklen_t addressStructLen = sizeof(clientAddress);
         int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &addressStructLen);
         LOGGER.info(std::format("New connection from {}:{}", inet_ntoa(clientAddress.sin_addr), ntohs(clientAddress.sin_port)));
