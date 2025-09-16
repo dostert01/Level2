@@ -81,12 +81,15 @@ void ApplicationContext::configureLoggingDestinations() {
 
 void ApplicationContext::addNewLoggingDestinations()
 {
+  LoggingDestinationFactory factory = LoggingDestinationFactory();
   auto loggerJson = findRecursiveInJsonTree(JSON_NAME_LOGGING_DESTINATION_CONFIG_PATH);
   if (loggerJson.has_value())
   {
-    LoggingDestinationFactory factory = LoggingDestinationFactory();
     addLoggingDestinationsFromJson2TheLogger(loggerJson, factory);
     LOGGER.debug(std::format("Logger has been configured from json: '{}'", loggerJson.value().dump()));
+  } else {
+    LOGGER.addLoggingDestination(factory.createDestinationStdOut());
+    LOGGER.warn("No logging destination was defines by application config. Hence, the default logging destination will be used.");
   }
 }
 

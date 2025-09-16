@@ -121,6 +121,13 @@ TEST(ApplicationContext, canConfigureLoggingDestinations) {
     EXPECT_EQ(4, LOGGER.getCountOfLoggingDestinations());
 }
 
+TEST(ApplicationContext, createsAtLeastOneLoggingDestination) {
+    configureTest();
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
+}
+
 TEST(ApplicationContext, canSetLogLevel) {
     configureTest();
     LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
