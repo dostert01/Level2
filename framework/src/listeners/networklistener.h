@@ -31,7 +31,7 @@ class NetworkListener {
         ListenerProcessingMode processingMode;
         void setIsListening(bool value) { listening = value; }
         template <typename T> T getFromJson(std::string fieldName, json jsonObject, T defaultValue) {
-            T returnValue;
+            T returnValue = defaultValue;
             try {
                 returnValue = jsonObject[fieldName];
             } catch (const std::exception& e) {
