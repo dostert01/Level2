@@ -89,7 +89,7 @@ void ApplicationContext::addNewLoggingDestinations()
     LOGGER.debug(std::format("Logger has been configured from json: '{}'", loggerJson.value().dump()));
   } else {
     LOGGER.addLoggingDestination(factory.createDestinationStdOut());
-    LOGGER.warn("No logging destination was defines by application config. Hence, the default logging destination will be used.");
+    LOGGER.warn("No logging destination is defined by application config. Hence, the default logging destination will be used.");
   }
 }
 
