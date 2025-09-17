@@ -70,8 +70,9 @@ add_executable(test_application
     test_application.cpp)
 target_link_libraries(test_application PRIVATE
     application
-    logger
-    listeners)
+    filelistener
+    mqttlistener
+    httplistener)
 
 add_executable(test_apistructs
     test_apistructs.cpp
