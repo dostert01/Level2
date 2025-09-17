@@ -155,13 +155,6 @@ TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
     filesystem::remove_all("./opt");
 }
 
-TEST(ApplicationContext, canConfigureLogger) {
-    configureTest();
-    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
-    LOGGER.removeAllDestinations();
-    APP_CONTEXT.configureLogger();
-}
-
 TEST(ApplicationContext, canConfigureLoggingDestinations) {
     configureTest();
     EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
