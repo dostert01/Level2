@@ -6,3 +6,4 @@ test_common
 test_filelistener
 test_httplistener
 test_httplistener
+test_application
