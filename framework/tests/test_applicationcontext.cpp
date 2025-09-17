@@ -17,6 +17,7 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define APP_CONFIG_TEST_FILE_01 "/applicationConfig01.json"
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_06 "/applicationConfig06.json"
+#define APP_CONFIG_TEST_FILE_07 "/applicationConfig07.json"
 #define APP_CONFIG_TEST_FILE_08 "/applicationConfig08.json"
 
 namespace test_applicationcontext {
@@ -112,6 +113,53 @@ TEST(ApplicationContext, FailureInParsingLeadsToUsingTheDefaultConstructor) {
     EXPECT_EQ(2, listeners.size());
     EXPECT_EQ(1234, listeners[0]->port);
     EXPECT_EQ(1883, listeners[1]->port);
+}
+
+TEST(ApplicationDirectories, canReadApplicationRootDirAndExpandEnvVariables) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    EXPECT_EQ(1, dirs.size());
+    EXPECT_EQ(StaticStringFunctions::readEnv("PWD").value_or("") + "/opt/testApplication", dirs[0]->getApplicationRootDir());
+}
+
+TEST(ApplicationDirectories, pathsGetPrefixedWithApplicationRootPath) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string cwd = StaticStringFunctions::readEnv("PWD").value_or("");
+    EXPECT_EQ(cwd + "/opt/testApplication/etc/pipelines.d", dirs[0]->getPipelinesDir());
+    EXPECT_EQ(cwd + "/opt/testApplication/etc/processes.d", dirs[0]->getProcessesDir());
+    EXPECT_EQ(cwd + "/opt/testApplication/lib", dirs[0]->getWorkerModulesDir());
+}
+
+TEST(ApplicationDirectories, canHandleInvalidInputByFallingBackToDefaults) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_07);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string appRoot = StaticStringFunctions::getCurrentWorkingDirectory().value_or("");
+    EXPECT_EQ(1, dirs.size());
+    EXPECT_EQ(appRoot + "/pipelines.d", dirs[0]->getPipelinesDir());
+    EXPECT_EQ(appRoot + "/processes.d", dirs[0]->getProcessesDir());
+    EXPECT_EQ(appRoot + "/lib", dirs[0]->getWorkerModulesDir());
+}
+
+TEST(ApplicationDirectories, canEnsureThatDirectoriesExist) {
+    configureTest();
+    filesystem::remove_all("./opt");
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    vector<shared_ptr<ApplicationDirectories>> dirs = APP_CONTEXT.createObjectsFromAppConfigJson<ApplicationDirectories>("applicationDirectories");
+    std::string cwd = StaticStringFunctions::readEnv("PWD").value_or("");
+    EXPECT_TRUE(dirs[0]->createApplicationDirectories());
+    EXPECT_TRUE(filesystem::exists(cwd + "/opt/testApplication/etc/processes.d"));
+    filesystem::remove_all("./opt");
+}
+
+TEST(ApplicationContext, canConfigureLogger) {
+    configureTest();
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    LOGGER.removeAllDestinations();
+    APP_CONTEXT.configureLogger();
 }
 
 TEST(ApplicationContext, canConfigureLoggingDestinations) {
