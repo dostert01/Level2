@@ -7,7 +7,7 @@
 #include <vector>
 #include "applicationcontext.h"
 #include "logger.h"
-#include <common.h>
+#include "common.h"
 
 using namespace level2;
 using namespace std;
@@ -18,6 +18,7 @@ using namespace nlohmann::json_abi_v3_11_3;
 #define APP_CONFIG_TEST_FILE_02 "/applicationConfig02.json"
 #define APP_CONFIG_TEST_FILE_06 "/applicationConfig06.json"
 #define APP_CONFIG_TEST_FILE_07 "/applicationConfig07.json"
+#define APP_CONFIG_TEST_FILE_08 "/applicationConfig08.json"
 
 namespace test_applicationcontext {
     string workingDir;
@@ -98,7 +99,7 @@ TEST(ApplicationContext, CreatesAnEmptyVectorIfConfigIsNotFound) {
     EXPECT_EQ(0, listeners.size());
 }
 
-TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListnerFromAppConfig) {
+TEST(ApplicationContext, CanCreateAnObjectOfTypeMockListenerFromAppConfig) {
     configureTest();
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_01);
     vector<shared_ptr<MockListener>> listeners = APP_CONTEXT.createObjectsFromAppConfigJson<MockListener>("Listeners/MQTTListeners");
@@ -159,4 +160,42 @@ TEST(ApplicationContext, canConfigureLogger) {
     APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
     LOGGER.removeAllDestinations();
     APP_CONTEXT.configureLogger();
+}
+
+TEST(ApplicationContext, canConfigureLoggingDestinations) {
+    configureTest();
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    EXPECT_EQ(4, LOGGER.getCountOfLoggingDestinations());
+}
+
+TEST(ApplicationContext, createsAtLeastOneLoggingDestination) {
+    configureTest();
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_02);
+    EXPECT_EQ(1, LOGGER.getCountOfLoggingDestinations());
+}
+
+TEST(ApplicationContext, canSetLogLevel) {
+    configureTest();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_DEBUG, LOGGER.getLogLevel());
+}
+
+TEST(ApplicationContext, doesNotChangeLogLevelOnUnknownParameterValue) {
+    configureTest();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_08);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+}
+
+TEST(ApplicationContextAutoInit, loadApplicationConfigConfiguresTheLogger) {
+    configureTest();
+    LOGGER.setMaxLogLevel(LogLevel::LOG_LEVEL_NO_LOGGING);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_NO_LOGGING, LOGGER.getLogLevel());
+    APP_CONTEXT.loadApplicationConfig(test_applicationcontext::testFilesDir + APP_CONFIG_TEST_FILE_06);
+    EXPECT_EQ(LogLevel::LOG_LEVEL_DEBUG, LOGGER.getLogLevel());
 }
