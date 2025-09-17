@@ -25,7 +25,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add sub projects
 add_subdirectory(_deps/googletest)
 add_subdirectory(framework)
-add_subdirectory(sampleApplications)
 
 # Tests hinzufügen
 enable_testing()
